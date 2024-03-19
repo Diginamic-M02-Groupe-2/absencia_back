@@ -1,8 +1,11 @@
 package com.absencia.diginamic.config;
 
+import jakarta.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -13,11 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-
-import jakarta.annotation.Resource;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -41,22 +40,22 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
         return http
             .cors(cors -> cors.disable())
             .csrf(csrf -> csrf.disable())
-            .exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
-            .authorizeHttpRequests(customizer -> customizer
-                .requestMatchers("/api/**").permitAll()
-                .anyRequest().authenticated()
+            // .exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
+            .authorizeHttpRequests(authorize -> authorize
+                // .requestMatchers(HttpMethod.POST, "/").permitAll()
+                // .requestMatchers("/api/**").authenticated()
+                .anyRequest().permitAll()
             )
-            .formLogin(customizer -> customizer
+            /* .formLogin(customizer -> customizer
                 .loginPage("/api/login")
-                .permitAll()
-            )
-            .logout(customizer ->
+            ) */
+            /* .logout(customizer ->
                 customizer.permitAll()
-            )
+            ) */
             .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
             .build();
     }
@@ -71,7 +70,7 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+    /* @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
@@ -88,7 +87,7 @@ public class WebSecurityConfig {
         config.setMaxAge(3600L);
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
-    }
+    } */
 
     @Bean
     public SessionCreationPolicy sessionCreationPolicy() {
