@@ -40,8 +40,7 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.applyPermitDefaultValues();
+        final CorsConfiguration corsConfig = new CorsConfiguration().applyPermitDefaultValues();
 
         return http
             // TODO: Re-enable it?
@@ -67,28 +66,8 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /* @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("Authorization");
-        config.addAllowedHeader("Content-Type");
-        config.addAllowedHeader("Accept");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("DELETE");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("OPTIONS");
-        config.setMaxAge(3600L);
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    } */
-
     @Bean
     public SessionCreationPolicy sessionCreationPolicy() {
         return SessionCreationPolicy.STATELESS;
     }
-
 }
