@@ -40,23 +40,16 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
-        return http
-            .cors(cors -> cors.disable())
-            .csrf(csrf -> csrf.disable())
-            // .exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/login").permitAll()
-                .anyRequest().authenticated()
-            )
-            .formLogin(customizer -> customizer
-                .loginProcessingUrl("/api/login")
-            )
-            /* .logout(customizer ->
-                customizer.permitAll()
-            ) */
-            .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
-            .build();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/login").permitAll()
+                        .anyRequest().authenticated())
+                .logout(customizer -> customizer.permitAll())
+                .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 
     @Bean

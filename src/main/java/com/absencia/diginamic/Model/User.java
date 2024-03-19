@@ -2,13 +2,18 @@ package com.absencia.diginamic.Model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 
 @Entity
-// @Inheritance(strategy = InheritanceType.JOINED)
-public /* abstract */ class User {
+@Inheritance(strategy = InheritanceType.JOINED)
+
+public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -25,8 +30,8 @@ public /* abstract */ class User {
 	@Column(length = 255)
 	private String password;
 
-	// @Enumerated(EnumType.ORDINAL)
-	// private Service service;
+	@Enumerated(EnumType.ORDINAL)
+	private Service service;
 
 	public Long getId() {
 		return id;
@@ -68,11 +73,11 @@ public /* abstract */ class User {
 		this.password = password;
 	}
 
-	// public Service getService() {
-	// return service;
-	// }
+	public Service getService() {
+		return service;
+	}
 
-	// public void setService(final Service service) {
-	// this.service = service;
-	// }
+	public void setService(final Service service) {
+		this.service = service;
+	}
 }

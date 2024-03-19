@@ -25,14 +25,13 @@ import java.util.Arrays;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
     private UserDetailsService userDetailsService;
 
-    @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain chain)
+    protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res,
+            @NonNull FilterChain chain)
             throws IOException, ServletException {
         String header = req.getHeader(JWTConstants.HEADER_STRING);
         String username = null;
