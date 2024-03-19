@@ -4,10 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DiginamicApplicationTests {
-
+class ApplicationTests {
 	@Test
-	void contextLoads() {
-	}
-
+	void contextLoads() {}
 }

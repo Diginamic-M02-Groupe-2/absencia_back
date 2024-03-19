@@ -1,6 +1,6 @@
 package com.absencia.diginamic.service;
 
-import com.absencia.diginamic.Model.User.User;
+import com.absencia.diginamic.model.User;
 
 public interface UserService {
 

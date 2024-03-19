@@ -1,4 +1,4 @@
-package com.absencia.diginamic.Model.Absence;
+package com.absencia.diginamic.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

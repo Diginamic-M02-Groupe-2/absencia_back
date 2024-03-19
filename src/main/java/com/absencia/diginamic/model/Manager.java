@@ -1,4 +1,4 @@
-package com.absencia.diginamic.Model.User;
+package com.absencia.diginamic.model;
 
 import java.util.Set;
 

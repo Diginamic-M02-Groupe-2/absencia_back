@@ -1,4 +1,4 @@
-package com.absencia.diginamic.Model.Absence;
+package com.absencia.diginamic.model;
 
 public enum AbsenceType {
 	PUBLIC_HOLIDAY, // Férié
