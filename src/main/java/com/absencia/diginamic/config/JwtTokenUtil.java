@@ -7,7 +7,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import com.absencia.diginamic.Model.User.User;
 import com.absencia.diginamic.constants.JWTConstants;
 
 import java.io.Serializable;
@@ -32,20 +31,6 @@ public class JwtTokenUtil implements Serializable {
         return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(final String token) {
-        return Jwts
-                .parser()
-                .verifyWith(new SecretKeySpec(JWTConstants.SIGNING_KEY.getBytes(), "HmacSHA256"))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
-
-    private Boolean isTokenExpired(String token) {
-        final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(new Date());
-    }
-
     public String generateToken(final String email) {
         return Jwts.builder()
             .claim("email", email)
@@ -62,4 +47,17 @@ public class JwtTokenUtil implements Serializable {
                 && !isTokenExpired(token));
     }
 
+    private Claims getAllClaimsFromToken(final String token) {
+        return Jwts
+                .parser()
+                .verifyWith(new SecretKeySpec(JWTConstants.SIGNING_KEY.getBytes(), "HmacSHA256"))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    private Boolean isTokenExpired(String token) {
+        final Date expiration = getExpirationDateFromToken(token);
+        return expiration.before(new Date());
+    }
 }
