@@ -4,8 +4,7 @@ import com.absencia.diginamic.config.JwtTokenUtil;
 import com.absencia.diginamic.config.WebSecurityConfig;
 import com.absencia.diginamic.dto.LoginResponse;
 import com.absencia.diginamic.dto.LoginUser;
-
-import javax.naming.AuthenticationException;
+import com.absencia.diginamic.dto.LogoutResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -16,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +33,7 @@ public class AuthController {
     }
 
     @PostMapping(value="/login")
-    public ResponseEntity<LoginResponse> register(@RequestBody final LoginUser loginUser) throws AuthenticationException {
+    public ResponseEntity<LoginResponse> login(@RequestBody final LoginUser loginUser) {
         final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser.getEmail(), loginUser.getPassword());
         final Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
@@ -42,5 +42,12 @@ public class AuthController {
         final String token = jwtTokenUtil.generateToken(loginUser.getEmail());
 
         return ResponseEntity.ok(new LoginResponse(token));
+    }
+
+    @PostMapping(value="/logout")
+    public ResponseEntity<LogoutResponse> logout(@RequestHeader(name="Authorization") final String token) {
+        SecurityContextHolder.getContext().setAuthentication(null);
+
+        return ResponseEntity.ok(new LogoutResponse());
     }
 }
