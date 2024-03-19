@@ -12,21 +12,22 @@ import jakarta.persistence.InheritanceType;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class User {
+
+public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(length=255)
+	@Column(length = 255)
 	private String firstName;
 
-	@Column(length=255)
+	@Column(length = 255)
 	private String lastName;
 
-	@Column(length=128, unique=true)
+	@Column(length = 128, unique = true)
 	private String email;
 
-	@Column(length=255)
+	@Column(length = 255)
 	private String password;
 
 	@Enumerated(EnumType.ORDINAL)
