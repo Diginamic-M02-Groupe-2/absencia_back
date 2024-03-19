@@ -3,7 +3,7 @@ package com.absencia.diginamic.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -12,9 +12,12 @@ import com.absencia.diginamic.Model.User;
 import com.absencia.diginamic.constants.JWTConstants;
 
 import java.io.Serializable;
+import java.security.Key;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.function.Function;
+
+import javax.crypto.spec.SecretKeySpec;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -32,11 +35,13 @@ public class JwtTokenUtil implements Serializable {
         return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(JWTConstants.SIGNING_KEY)
-                .parseClaimsJws(token)
-                .getBody();
+    private Claims getAllClaimsFromToken(final String token) {
+        return Jwts
+            .parser()
+            .verifyWith(new SecretKeySpec(JWTConstants.SIGNING_KEY.getBytes(), "HmacSHA256"))
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -50,15 +55,19 @@ public class JwtTokenUtil implements Serializable {
 
     private String doGenerateToken(String subject) {
 
-        Claims claims = Jwts.claims().setSubject(subject);
-        claims.put("scopes", Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));
+        Claims claims = Jwts.claims().subject(subject).build();
+        claims.put("scoapes", Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));
+
+        String secret = JWTConstants.SIGNING_KEY;
+        byte[] secretBytes = secret.getBytes();
+        Key key = new SecretKeySpec(secretBytes, "HmacSHA256");
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setIssuer("admin")
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWTConstants.ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
-                .signWith(SignatureAlgorithm.HS256, JWTConstants.SIGNING_KEY)
+                .claims(claims)
+                .issuer("admin")
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + JWTConstants.ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
+                .signWith(key)
                 .compact();
     }
 

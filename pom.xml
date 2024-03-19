@@ -13,7 +13,7 @@
 	<artifactId>diginamic</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>diginamic</name>
-	<description>Projet Final</description>
+	<description>Logiciel fictif de gestion des absences et jours fériés.</description>
 	<properties>
 		<java.version>21</java.version>
 	</properties>
@@ -30,7 +30,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -49,20 +48,19 @@
 			<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
-			<version>0.6.0</version>
+			<version>0.12.5</version>
 		</dependency>
 		<dependency>
     		<groupId>javax.xml.bind</groupId>
     		<artifactId>jaxb-api</artifactId>
     		<version>2.3.0</version>
-</dependency>
-<dependency>
-    <groupId>javax.servlet</groupId>
-    <artifactId>javax.servlet-api</artifactId>
-    <version>4.0.1</version>
-    <scope>provided</scope>
-</dependency>
-
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>4.0.1</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
