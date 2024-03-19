@@ -1,4 +1,4 @@
-package com.absencia.diginamic.Model;
+package com.absencia.diginamic.Model.User;
 
 public enum Service {
 	MANAGEMENT,
