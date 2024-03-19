@@ -40,12 +40,10 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        final CorsConfiguration corsConfig = new CorsConfiguration().applyPermitDefaultValues();
-
         return http
             // TODO: Re-enable it?
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(request -> corsConfig))
+            .cors(cors -> cors.configurationSource(corsConfigurer -> new CorsConfiguration().applyPermitDefaultValues()))
             .exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/login").permitAll()
