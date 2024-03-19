@@ -12,7 +12,6 @@ import jakarta.persistence.InheritanceType;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

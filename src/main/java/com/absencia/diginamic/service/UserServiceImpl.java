@@ -9,9 +9,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.absencia.diginamic.Model.User;
 import com.absencia.diginamic.exception.DuplicateUserNameException;
 import com.absencia.diginamic.exception.ResourceNotFoundException;
+import com.absencia.diginamic.Model.User.User;
 import com.absencia.diginamic.repository.UserRepository;
 
 import java.util.Arrays;
