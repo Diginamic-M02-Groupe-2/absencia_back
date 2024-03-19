@@ -46,13 +46,12 @@ public class WebSecurityConfig {
             .csrf(csrf -> csrf.disable())
             // .exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
             .authorizeHttpRequests(authorize -> authorize
-                // .requestMatchers(HttpMethod.POST, "/").permitAll()
-                // .requestMatchers("/api/**").authenticated()
-                .anyRequest().permitAll()
+                .requestMatchers("/api/login").permitAll()
+                .anyRequest().authenticated()
             )
-            /* .formLogin(customizer -> customizer
-                .loginPage("/api/login")
-            ) */
+            .formLogin(customizer -> customizer
+                .loginProcessingUrl("/api/login")
+            )
             /* .logout(customizer ->
                 customizer.permitAll()
             ) */
