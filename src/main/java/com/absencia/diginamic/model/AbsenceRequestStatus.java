@@ -1,4 +1,4 @@
-package com.absencia.diginamic.Model.AbsenceRequest;
+package com.absencia.diginamic.model;
 
 public enum AbsenceRequestStatus {
 	INITIAL,

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.absencia.diginamic.exception.DuplicateUserNameException;
 import com.absencia.diginamic.exception.ResourceNotFoundException;
-import com.absencia.diginamic.Model.User.User;
+import com.absencia.diginamic.model.User;
 import com.absencia.diginamic.repository.UserRepository;
 
 import java.util.Arrays;

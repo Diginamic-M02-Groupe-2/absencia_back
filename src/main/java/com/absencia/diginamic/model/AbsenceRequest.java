@@ -1,7 +1,4 @@
-package com.absencia.diginamic.Model.AbsenceRequest;
-
-import com.absencia.diginamic.Model.Absence.Absence;
-import com.absencia.diginamic.Model.User.User;
+package com.absencia.diginamic.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -5,11 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = { "com.absencia.diginamic" })
-public class DiginamicApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(DiginamicApplication.class, args);
+@ComponentScan(basePackages={"com.absencia.diginamic"})
+public class Application {
+	public static void main(final String[] args) {
+		SpringApplication.run(Application.class, args);
 	}
-
 }
