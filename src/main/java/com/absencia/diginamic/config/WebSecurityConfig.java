@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -39,9 +40,13 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        CorsConfiguration corsConfig = new CorsConfiguration();
+        corsConfig.applyPermitDefaultValues();
+
         return http
             // TODO: Re-enable it?
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(request -> corsConfig))
             .exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/login").permitAll()
