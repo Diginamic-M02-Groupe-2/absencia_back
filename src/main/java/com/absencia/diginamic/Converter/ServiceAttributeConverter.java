@@ -1,6 +1,6 @@
 package com.absencia.diginamic.Converter;
 
-import com.absencia.diginamic.Model.Service;
+import com.absencia.diginamic.Model.User.Service;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

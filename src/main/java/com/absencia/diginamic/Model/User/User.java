@@ -1,4 +1,4 @@
-package com.absencia.diginamic.Model;
+package com.absencia.diginamic.Model.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,47 +37,53 @@ public class User {
 		return id;
 	}
 
-	public void setId(final Long id) {
-		this.id = id;
-	}
-
 	public String getFirstName() {
 		return firstName;
 	}
 
-	public void setFirstName(final String firstName) {
+	public User setFirstName(final String firstName) {
 		this.firstName = firstName;
+
+		return this;
 	}
 
 	public String getLastName() {
 		return lastName;
 	}
 
-	public void setLastName(final String lastName) {
+	public User setLastName(final String lastName) {
 		this.lastName = lastName;
+
+		return this;
 	}
 
 	public String getEmail() {
 		return email;
 	}
 
-	public void setEmail(final String email) {
+	public User setEmail(final String email) {
 		this.email = email;
+
+		return this;
 	}
 
 	public String getPassword() {
 		return password;
 	}
 
-	public void setPassword(final String password) {
+	public User setPassword(final String password) {
 		this.password = password;
+
+		return this;
 	}
 
 	public Service getService() {
 		return service;
 	}
 
-	public void setService(final Service service) {
+	public User setService(final Service service) {
 		this.service = service;
+
+		return this;
 	}
 }
