@@ -1,14 +1,19 @@
 package com.absencia.diginamic.model;
 
-import java.util.Set;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import java.util.Set;
 
 @Entity
 public class Manager extends User {
 	@OneToMany(mappedBy="manager")
 	private Set<Employee> employees;
+
+	public Manager() {
+		super();
+
+		setRole(Role.MANAGER);
+	}
 
 	public Set<Employee> getEmployees() {
 		return employees;
