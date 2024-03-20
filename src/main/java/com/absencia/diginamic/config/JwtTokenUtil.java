@@ -1,6 +1,7 @@
 package com.absencia.diginamic.config;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.SecureDigestAlgorithm;
@@ -14,8 +15,10 @@ import java.io.Serializable;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
 import java.util.function.Function;
@@ -28,7 +31,9 @@ import javax.crypto.spec.SecretKeySpec;
 public class JwtTokenUtil implements Serializable {
 
     public String getEmailFromToken(String token) {
-        return getAllClaimsFromToken(token).get("username").toString();
+        Claims claims = getAllClaimsFromToken(token);
+        Object usernameObject = claims.get("username");
+        return usernameObject != null ? usernameObject.toString() : null;
     }
 
     public Date getExpirationDateFromToken(String token) {
@@ -70,29 +75,62 @@ public class JwtTokenUtil implements Serializable {
     public String generateToken(final String email) {
         return Jwts
             .builder()
-            .subject(email)
-            // .claim("username", email)
+            //.subject(email)
+            .claim("username", email)
             // TODO: Store roles in JWT
             // .issuer("admin")
             .issuedAt(new Date())
             .expiration(new Date((new Date()).getTime() + JWTConstants.ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
-            .signWith(getPrivateKey())
+            .signWith(getPrivateKey(), SignatureAlgorithm.RS256)
             .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getEmailFromToken(token);
         return (username.equals(userDetails.getUsername())
-                && !isTokenExpired(token));
+                && !isTokenExpired(token)
+                && verifyTokenSignature(token, getPublicKey()));
+    }
+
+    private Boolean verifyTokenSignature(String token, PublicKey publicKey) {
+        try {
+            Jwts.parser().setSigningKey(publicKey).build().parseClaimsJws(token);
+            return true;
+        } catch (JwtException e) {
+            return false;
+        }
     }
 
     private Claims getAllClaimsFromToken(final String token) {
         return Jwts
             .parser()
-            // .verifyWith(getSecretKey())
+            .setSigningKey(getPublicKey())
             .build()
-            .parseSignedClaims(token)
+            .parseClaimsJws(token)
             .getPayload();
+    }
+
+    private static PublicKey getPublicKey() {
+        String publicKeyString = JWTConstants.PUBLIC_KEY.replaceAll("\\n", "");
+        byte[] keyBytes = Base64.getDecoder().decode(publicKeyString);
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory;
+
+        try {
+            keyFactory = KeyFactory.getInstance("RSA");
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println(e.getClass().getName());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        try {
+            return keyFactory.generatePublic(spec);
+        } catch (InvalidKeySpecException e) {
+            System.out.println(e.getClass().getName());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     private Boolean isTokenExpired(String token) {

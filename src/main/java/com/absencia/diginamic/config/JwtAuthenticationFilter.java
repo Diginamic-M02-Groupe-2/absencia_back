@@ -25,6 +25,7 @@ import java.util.Arrays;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    @Autowired
     private UserDetailsService userDetailsService;
 
     @Autowired
@@ -43,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 logger.error(authToken);
                 username = jwtTokenUtil.getEmailFromToken(authToken);
-                logger.error(username);
+                logger.error("username: " + username);
             } catch (IllegalArgumentException e) {
                 logger.error("an error occured during getting username from token", e);
             } catch (ExpiredJwtException e) {
