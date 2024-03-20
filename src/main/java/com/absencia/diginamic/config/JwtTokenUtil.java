@@ -2,7 +2,7 @@ package com.absencia.diginamic.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-
+import io.jsonwebtoken.SignatureAlgorithm;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -66,8 +66,12 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private Claims getAllClaimsFromToken(final String token) {
-    
-        return Jwts.parser().verifyWith(getPrivateKey()).setSigningKey(JWTConstants.SIGNING_KEY).build().parseSignedClaims(token).getBody();
+        return Jwts
+            .parser()
+            .decryptWith(getPrivateKey())
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
     }
 
     private Boolean isTokenExpired(String token) {
