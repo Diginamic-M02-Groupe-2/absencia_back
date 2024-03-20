@@ -30,6 +30,9 @@ public class User {
 	private String password;
 
 	@Enumerated(EnumType.ORDINAL)
+	private Role role;
+
+	@Enumerated(EnumType.ORDINAL)
 	private Service service;
 
 	public Long getId() {
@@ -72,6 +75,16 @@ public class User {
 
 	public User setPassword(final String password) {
 		this.password = password;
+
+		return this;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public User setRole(final Role role) {
+		this.role = role;
 
 		return this;
 	}
