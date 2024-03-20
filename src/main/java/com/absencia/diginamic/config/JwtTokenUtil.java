@@ -2,7 +2,7 @@ package com.absencia.diginamic.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -10,16 +10,21 @@ import org.springframework.stereotype.Component;
 import com.absencia.diginamic.constants.JWTConstants;
 
 import java.io.Serializable;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.function.Function;
 
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.SecretKey;
+
 
 @Component
 public class JwtTokenUtil implements Serializable {
 
     public String getEmailFromToken(String token) {
-        return getClaimFromToken(token, Claims::getSubject);
+        return getAllClaimsFromToken(token).get("username").toString();
     }
 
     public Date getExpirationDateFromToken(String token) {
@@ -28,17 +33,30 @@ public class JwtTokenUtil implements Serializable {
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
+
         return claimsResolver.apply(claims);
+    }
+
+    private static PrivateKey getPrivateKey() {
+        try {
+            byte[] keyBytes = Base64.getDecoder().decode(JWTConstants.SIGNING_KEY);
+            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePrivate(spec);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public String generateToken(final String email) {
         return Jwts.builder()
-            .claim("email", email)
-            .issuer("admin")
-            .issuedAt(new Date(System.currentTimeMillis()))
-            .expiration(new Date(System.currentTimeMillis() + JWTConstants.ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
-            .signWith(SignatureAlgorithm.HS256, JWTConstants.SIGNING_KEY)
-            .compact();
+                .claim("username", email)
+                .issuer("admin")
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + JWTConstants.ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
+                .signWith(getPrivateKey())
+                .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
@@ -48,12 +66,8 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private Claims getAllClaimsFromToken(final String token) {
-        return Jwts
-                .parser()
-                .verifyWith(new SecretKeySpec(JWTConstants.SIGNING_KEY.getBytes(), "HmacSHA256"))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+    
+        return Jwts.parser().verifyWith(getPrivateKey()).setSigningKey(JWTConstants.SIGNING_KEY).build().parseSignedClaims(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
