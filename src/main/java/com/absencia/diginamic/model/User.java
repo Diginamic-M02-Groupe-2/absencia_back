@@ -1,5 +1,6 @@
 package com.absencia.diginamic.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -27,6 +28,7 @@ public class User {
 	private String email;
 
 	@Column(length = 255)
+	@JsonIgnore
 	private String password;
 
 	@Enumerated(EnumType.ORDINAL)
