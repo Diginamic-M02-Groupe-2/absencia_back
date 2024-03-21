@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.SecureDigestAlgorithm;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,6 @@ import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -69,20 +69,23 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private static SecretKey getSecretKey() {
-        return new SecretKeySpec(Base64.getDecoder().decode(JWTConstants.SIGNING_KEY), SignatureAlgorithm.RS256.getJcaName());
+        // mettre le signing key dans application.propeties
+        // on peut utiliser @value pour recuperer
+        // Ici mettre la secret key
+        return new SecretKeySpec(Base64.getDecoder().decode(), "SHA256withRSA");
     }
 
     public String generateToken(final String email) {
         return Jwts
-            .builder()
-            //.subject(email)
-            .claim("username", email)
-            // TODO: Store roles in JWT
-            // .issuer("admin")
-            .issuedAt(new Date())
-            .expiration(new Date((new Date()).getTime() + JWTConstants.ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
-            .signWith(getPrivateKey(), SignatureAlgorithm.RS256)
-            .compact();
+                .builder()
+                // .subject(email)
+                .claim("username", email)
+                // TODO: Store roles in JWT
+                // .issuer("admin")
+                .issuedAt(new Date())
+                .expiration(new Date((new Date()).getTime() + JWTConstants.ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
+                .signWith(getPrivateKey(), SignatureAlgorithm.RS256)
+                .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
@@ -103,11 +106,11 @@ public class JwtTokenUtil implements Serializable {
 
     private Claims getAllClaimsFromToken(final String token) {
         return Jwts
-            .parser()
-            .setSigningKey(getPublicKey())
-            .build()
-            .parseClaimsJws(token)
-            .getPayload();
+                .parser()
+                .setSigningKey(getPublicKey())
+                .build()
+                .parseClaimsJws(token)
+                .getPayload();
     }
 
     private static PublicKey getPublicKey() {
