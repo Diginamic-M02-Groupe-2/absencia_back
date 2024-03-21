@@ -3,6 +3,7 @@ package com.absencia.diginamic.config;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,8 +25,10 @@ import java.util.Arrays;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Override
@@ -35,16 +38,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String header = req.getHeader(JWTConstants.HEADER_STRING);
         String username = null;
         String authToken = null;
+
         if (header != null && header.startsWith(JWTConstants.TOKEN_PREFIX)) {
             authToken = header.replace(JWTConstants.TOKEN_PREFIX, "");
             try {
+                logger.error(authToken);
                 username = jwtTokenUtil.getEmailFromToken(authToken);
+                logger.error("username: " + username);
             } catch (IllegalArgumentException e) {
                 logger.error("an error occured during getting username from token", e);
             } catch (ExpiredJwtException e) {
                 logger.warn("the token is expired and not valid anymore", e);
             } catch (SignatureException e) {
-                logger.error("Authentication Failed. Email or Password not valid.");
+                logger.error("Authentication Failed. Email or Password not valid.", e);
             }
         } else {
             logger.warn("couldn't find bearer string, will ignore the header");
