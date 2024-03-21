@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.validation.constraints.Email;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -24,6 +25,7 @@ public class User {
 	@Column(length = 255)
 	private String lastName;
 
+	@Email
 	@Column(length = 128, unique = true)
 	private String email;
 
