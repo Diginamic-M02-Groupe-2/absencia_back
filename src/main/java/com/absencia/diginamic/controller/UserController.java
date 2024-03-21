@@ -21,7 +21,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/user")
+    @GetMapping("/current-user")
     public ResponseEntity<User> getCurrentUser(Authentication authentication, Principal userPrincipal) {
 
         System.out.println(userPrincipal.toString());
