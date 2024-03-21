@@ -1,11 +1,17 @@
 package com.absencia.diginamic.repository;
 
 import com.absencia.diginamic.model.AbsenceRequest;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.absencia.diginamic.model.User;
 
+import java.util.Date;
 import java.util.List;
 
-public interface AbsenceRequestRepository extends JpaRepository<AbsenceRequest, Long> {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-    List<AbsenceRequest> findByUserId(Long userId);
+@Repository
+public interface AbsenceRequestRepository extends JpaRepository<AbsenceRequest, Long> {
+	AbsenceRequest findOneById(final Long id);
+	List<AbsenceRequest> findByUser(final User user);
+	long countByUserAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndDeletedAtIsNull(final User user, final Date startedAt, final Date endedAt);
 }
