@@ -1,6 +1,9 @@
 package com.absencia.diginamic.controller;
 
 import com.absencia.diginamic.model.User;
+
+import java.security.Principal;
+
 import org.aspectj.bridge.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +22,10 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/user")
-    public ResponseEntity<User> getCurrentUser(Authentication authentication) {
+    public ResponseEntity<User> getCurrentUser(Authentication authentication, Principal userPrincipal) {
+
+        System.out.println(userPrincipal.toString());
+
         String username = authentication.getName();
         User currentUser = userService.findOne(username);
         return ResponseEntity.ok(currentUser);
