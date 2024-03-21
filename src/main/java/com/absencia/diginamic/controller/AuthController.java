@@ -36,7 +36,6 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@RequestBody final LoginUser loginUser) {
         final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser.getEmail(), loginUser.getPassword());
         final Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         final String token = jwtTokenUtil.generateToken(loginUser.getEmail());

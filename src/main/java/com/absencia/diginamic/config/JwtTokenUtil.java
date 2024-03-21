@@ -4,15 +4,18 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecureDigestAlgorithm;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.ssl.SslBundleProperties.Key;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.absencia.diginamic.constants.JWTConstants;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -30,6 +33,9 @@ import javax.crypto.spec.SecretKeySpec;
 @Component
 public class JwtTokenUtil implements Serializable {
 
+    @Value("${jwt.secret}")
+    private String secretKey;
+
     public String getEmailFromToken(String token) {
         Claims claims = getAllClaimsFromToken(token);
         Object usernameObject = claims.get("username");
@@ -46,33 +52,9 @@ public class JwtTokenUtil implements Serializable {
         return claimsResolver.apply(claims);
     }
 
-    private static PrivateKey getPrivateKey() {
-        byte[] keyBytes = Base64.getDecoder().decode(JWTConstants.SIGNING_KEY);
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory;
-
-        try {
-            keyFactory = KeyFactory.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println(e.getClass().getName());
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
-        try {
-            return keyFactory.generatePrivate(spec);
-        } catch (InvalidKeySpecException e) {
-            System.out.println(e.getClass().getName());
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static SecretKey getSecretKey() {
-        // mettre le signing key dans application.propeties
-        // on peut utiliser @value pour recuperer
-        // Ici mettre la secret key
-        return new SecretKeySpec(Base64.getDecoder().decode(), "SHA256withRSA");
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = this.secretKey.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateToken(final String email) {
@@ -84,7 +66,7 @@ public class JwtTokenUtil implements Serializable {
                 // .issuer("admin")
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + JWTConstants.ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
-                .signWith(getPrivateKey(), SignatureAlgorithm.RS256)
+                .signWith(getSigningKey())
                 .compact();
     }
 
