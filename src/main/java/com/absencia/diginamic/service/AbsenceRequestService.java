@@ -1,10 +1,10 @@
 package com.absencia.diginamic.service;
 
-import com.absencia.diginamic.dto.AbsenceRequestResponse;
+import com.absencia.diginamic.model.AbsenceRequest;
 
 import java.util.List;
 
 public interface AbsenceRequestService {
-    List<AbsenceRequestResponse> getAbsencesByUserId(Long userId);
+    List<AbsenceRequest> getAbsencesByUserId(Long userId);
 
 }

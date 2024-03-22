@@ -20,12 +20,10 @@ public class AbsenceRequestImpl implements AbsenceRequestService {
     private UserRepository userRepository;
 
     @Override
-    public List<AbsenceRequestResponse> getAbsencesByUserId(Long userId) {
-        List<AbsenceRequest> absencesRequests = absenceRequestRepository.findByUserId(userId);
-        List<AbsenceRequestResponse> absencesRequestPayload = absencesRequests.stream()
-                .map(this::mapToAbsencesRequestPayload)
-                .collect(Collectors.toList());
-        return absencesRequestPayload;
+    public List<AbsenceRequest> getAbsencesByUserId(Long userId) {
+        final List<AbsenceRequest> absenceRequests = absenceRequestRepository.findByUserId(userId);
+
+        return absenceRequests;
     }
 
     private AbsenceRequestResponse mapToAbsencesRequestPayload(AbsenceRequest absenceRequest) {
