@@ -1,11 +1,6 @@
 package com.absencia.diginamic.controller;
 
-import com.absencia.diginamic.dto.AbsenceRequestResponse;
-<<<<<<< HEAD
-import com.absencia.diginamic.dto.ErrorResponse;
-=======
 import com.absencia.diginamic.model.AbsenceRequest;
->>>>>>> 2ba0e37 (feat: Use JsonView annotation on AbsenceRequest)
 import com.absencia.diginamic.service.UserService;
 import com.absencia.diginamic.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -13,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.absencia.diginamic.service.AbsenceRequestService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -38,11 +32,12 @@ public class AbsenceRequestController {
 
     @GetMapping("/absence-requests/{userId}")
     @JsonView(View.AbsenceRequest.class)
-    public ResponseEntity<List<?>> getAbsencesByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getAbsencesByUserId(@PathVariable Long userId) {
         if (!userService.userExists(userId)) {
             logger.error("Utilisateur non trouvé avec l'ID : {}", userId);
-            ErrorResponse errorResponse = new ErrorResponse("L'Utilisateur fourni n'existe pas");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonList(errorResponse));
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("message", "L'Utilisateur fourni n'existe pas"));
         }
 
         final List<AbsenceRequest> absencesRequests  = absenceRequestService.getAbsencesByUserId(userId);
