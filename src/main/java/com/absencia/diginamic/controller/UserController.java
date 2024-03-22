@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-	@Autowired
 	private UserService userService;
+
+	@Autowired
+	public UserController(final UserService userService) {
+		this.userService = userService;
+	}
 
 	@GetMapping("/current")
 	public ResponseEntity<User> getCurrentUser(final Authentication authentication) {

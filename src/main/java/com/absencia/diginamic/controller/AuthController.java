@@ -15,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,7 +44,7 @@ public class AuthController {
 	}
 
 	@PostMapping(value="/logout")
-	public ResponseEntity<Map<String, String>> logout(@RequestHeader(name="Authorization") final String token) {
+	public ResponseEntity<Map<String, String>> logout() {
 		SecurityContextHolder.getContext().setAuthentication(null);
 
 		return ResponseEntity.ok(Map.of("message", "Vous avez été déconnecté(e)."));

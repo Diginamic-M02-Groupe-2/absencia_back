@@ -11,8 +11,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AbsenceRequestService {
-	@Autowired
 	private AbsenceRequestRepository absenceRequestRepository;
+
+	@Autowired
+	public AbsenceRequestService(final AbsenceRequestRepository absenceRequestRepository) {
+		this.absenceRequestRepository = absenceRequestRepository;
+	}
 
 	public void save(final AbsenceRequest absenceRequest) {
 		absenceRequestRepository.save(absenceRequest);

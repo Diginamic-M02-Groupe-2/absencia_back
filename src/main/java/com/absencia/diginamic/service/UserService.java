@@ -10,8 +10,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserService implements UserDetailsService {
-	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	public UserService(final UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
 	public User loadUserByUsername(final String username) throws UsernameNotFoundException {
 		final User user = userRepository.findOneByEmailAndDeletedAtIsNull(username);

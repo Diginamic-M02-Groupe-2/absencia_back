@@ -30,11 +30,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/absence-requests")
 public class AbsenceRequestController {
-	@Autowired
 	private AbsenceRequestService absenceRequestService;
+	private UserService userService;
 
 	@Autowired
-	private UserService userService;
+	public AbsenceRequestController(final AbsenceRequestService absenceRequestService, final UserService userService) {
+		this.absenceRequestService = absenceRequestService;
+		this.userService = userService;
+	}
 
 	@GetMapping("/{id}")
 	@JsonView(View.AbsenceRequest.class)

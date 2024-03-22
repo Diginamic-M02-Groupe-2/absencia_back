@@ -20,49 +20,54 @@ import org.springframework.web.cors.CorsConfiguration;
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
-    @Autowired
-    private UserService userService;
+	private JwtAuthenticationEntryPoint unauthorizedHandler;
+	private JwtTokenUtil jwtTokenUtil;
+	private UserService userService;
 
-    @Autowired
-    private JwtAuthenticationEntryPoint unauthorizedHandler;
+	@Autowired
+	public WebSecurityConfig(final JwtAuthenticationEntryPoint unauthorizedHandler, final JwtTokenUtil jwtTokenUtil, final UserService userService) {
+		this.unauthorizedHandler = unauthorizedHandler;
+		this.jwtTokenUtil = jwtTokenUtil;
+		this.userService = userService;
+	}
 
-    @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http, BCryptPasswordEncoder bCryptPasswordEncoder)
-            throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder = http
-                .getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(userService)
-                .passwordEncoder(bCryptPasswordEncoder);
-        return authenticationManagerBuilder.build();
-    }
+	@Bean
+	public AuthenticationManager authenticationManager(HttpSecurity http, BCryptPasswordEncoder bCryptPasswordEncoder)
+			throws Exception {
+		AuthenticationManagerBuilder authenticationManagerBuilder = http
+				.getSharedObject(AuthenticationManagerBuilder.class);
+		authenticationManagerBuilder.userDetailsService(userService)
+				.passwordEncoder(bCryptPasswordEncoder);
+		return authenticationManagerBuilder.build();
+	}
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors
-                        .configurationSource(corsConfigurer -> new CorsConfiguration().applyPermitDefaultValues()))
-                .exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/login").permitAll()
-                        .anyRequest().authenticated())
-                .logout(logout -> logout.logoutUrl("/api/logout"))
-                .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		return http
+				.csrf(csrf -> csrf.disable())
+				.cors(cors -> cors
+						.configurationSource(corsConfigurer -> new CorsConfiguration().applyPermitDefaultValues()))
+				.exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
+				.authorizeHttpRequests(authorize -> authorize
+						.requestMatchers("/api/login").permitAll()
+						.anyRequest().authenticated())
+				.logout(logout -> logout.logoutUrl("/api/logout"))
+				.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
+				.build();
+	}
 
-    @Bean
-    public JwtAuthenticationFilter authenticationTokenFilterBean() throws Exception {
-        return new JwtAuthenticationFilter();
-    }
+	@Bean
+	public JwtAuthenticationFilter authenticationTokenFilterBean() throws Exception {
+		return new JwtAuthenticationFilter(jwtTokenUtil, userService);
+	}
 
-    @Bean
-    public BCryptPasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	public BCryptPasswordEncoder encoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    @Bean
-    public SessionCreationPolicy sessionCreationPolicy() {
-        return SessionCreationPolicy.STATELESS;
-    }
+	@Bean
+	public SessionCreationPolicy sessionCreationPolicy() {
+		return SessionCreationPolicy.STATELESS;
+	}
 }

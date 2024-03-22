@@ -8,8 +8,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AbsenceService {
-	@Autowired
 	private AbsenceRepository absenceRepository;
+
+	@Autowired
+	public AbsenceService(final AbsenceRepository absenceRepository) {
+		this.absenceRepository = absenceRepository;
+	}
 
 	public void save(final Absence absence) {
 		absenceRepository.save(absence);
