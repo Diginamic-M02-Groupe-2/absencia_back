@@ -23,7 +23,7 @@ public class AbsenceRequestController {
     @Autowired
     private AbsenceRequestService absenceRequestService;
 
-    @GetMapping("/absences-requests/{userId}")
+    @GetMapping("/absence-requests/{userId}")
     public ResponseEntity<List<AbsenceRequestResponse>> getAbsencesByUserId(@PathVariable Long userId) {
         if (!absenceRequestService.userExists(userId)) {
             logger.error("Utilisateur non trouvé avec l'ID : {}", userId);
