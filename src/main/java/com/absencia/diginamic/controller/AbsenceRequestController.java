@@ -1,8 +1,15 @@
 package com.absencia.diginamic.controller;
 
 import com.absencia.diginamic.dto.AbsenceRequestResponse;
+<<<<<<< HEAD
 import com.absencia.diginamic.dto.ErrorResponse;
+=======
+import com.absencia.diginamic.model.AbsenceRequest;
+>>>>>>> 2ba0e37 (feat: Use JsonView annotation on AbsenceRequest)
 import com.absencia.diginamic.service.UserService;
+import com.absencia.diginamic.view.View;
+import com.fasterxml.jackson.annotation.JsonView;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.absencia.diginamic.service.AbsenceRequestService;
@@ -30,6 +37,7 @@ public class AbsenceRequestController {
     private UserService userService;
 
     @GetMapping("/absence-requests/{userId}")
+    @JsonView(View.AbsenceRequest.class)
     public ResponseEntity<List<?>> getAbsencesByUserId(@PathVariable Long userId) {
         if (!userService.userExists(userId)) {
             logger.error("Utilisateur non trouvé avec l'ID : {}", userId);
@@ -37,7 +45,7 @@ public class AbsenceRequestController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonList(errorResponse));
         }
 
-        List<AbsenceRequestResponse> absencesRequests  = absenceRequestService.getAbsencesByUserId(userId);
+        final List<AbsenceRequest> absencesRequests  = absenceRequestService.getAbsencesByUserId(userId);
 
         return ResponseEntity.ok(absencesRequests);
     }
