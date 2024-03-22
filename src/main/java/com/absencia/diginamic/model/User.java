@@ -1,6 +1,7 @@
 package com.absencia.diginamic.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.validation.constraints.Email;
+
+import java.util.Date;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -38,6 +41,10 @@ public class User {
 
 	@Enumerated(EnumType.ORDINAL)
 	private Service service;
+
+	@Column(nullable=true)
+	@JsonIgnore
+	private Date deletedAt;
 
 	public Long getId() {
 		return id;
@@ -99,6 +106,16 @@ public class User {
 
 	public User setService(final Service service) {
 		this.service = service;
+
+		return this;
+	}
+
+	public Date getDeletedAt() {
+		return deletedAt;
+	}
+
+	public User setDeletedAt(final Date deletedAt) {
+		this.deletedAt = deletedAt;
 
 		return this;
 	}
