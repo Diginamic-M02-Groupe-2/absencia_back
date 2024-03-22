@@ -2,7 +2,9 @@ package com.absencia.diginamic.controller;
 
 import com.absencia.diginamic.config.JwtTokenUtil;
 import com.absencia.diginamic.config.WebSecurityConfig;
-import com.absencia.diginamic.dto.LoginUser;
+import com.absencia.diginamic.dto.LoginRequest;
+
+import jakarta.validation.Valid;
 
 import java.util.Map;
 
@@ -32,13 +34,13 @@ public class AuthController {
 	}
 
 	@PostMapping(value="/login")
-	public ResponseEntity<Map<String, String>> login(@RequestBody final LoginUser loginUser) {
-		final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser.getEmail(), loginUser.getPassword());
+	public ResponseEntity<Map<String, String>> login(@RequestBody @Valid final LoginRequest request) {
+		final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.email, request.password);
 		final Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		final String token = jwtTokenUtil.generateToken(loginUser.getEmail());
+		final String token = jwtTokenUtil.generateToken(request.email);
 
 		return ResponseEntity.ok(Map.of("token", token));
 	}
