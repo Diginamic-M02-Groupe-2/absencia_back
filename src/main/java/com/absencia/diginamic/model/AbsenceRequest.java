@@ -1,5 +1,7 @@
 package com.absencia.diginamic.model;
 
+import com.absencia.diginamic.view.View;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -18,6 +20,7 @@ import java.util.Date;
 public class AbsenceRequest {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonView(View.AbsenceRequest.class)
 	private Long id;
 
 	@ManyToOne
@@ -26,12 +29,15 @@ public class AbsenceRequest {
 
 	@ManyToOne
 	@JoinColumn(nullable=false)
+	@JsonView(View.AbsenceRequest.class)
 	private Absence absence;
 
 	@Enumerated(EnumType.ORDINAL)
+	@JsonView(View.AbsenceRequest.class)
 	private AbsenceRequestStatus status;
 
 	@Column(length=255, nullable=true)
+	@JsonView(View.AbsenceRequest.class)
 	private String reason;
 
 	@Column(nullable=true)

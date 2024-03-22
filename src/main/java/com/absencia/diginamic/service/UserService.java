@@ -6,5 +6,6 @@ public interface UserService {
 
     User findOne(String email);
     User createUser(User user);
-    
+    boolean userExists(Long userId);
+
 }

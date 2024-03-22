@@ -58,4 +58,9 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         return userRepository.save(user);
     }
 
+    @Override
+    public boolean userExists(Long userId) {
+        return userRepository.existsById(userId);
+    }
+
 }
