@@ -35,7 +35,7 @@ public class AbsenceRequestController {
     @JsonView(View.AbsenceRequest.class)
     public ResponseEntity<?> getAbsencesByUserId(@PathVariable Long userId) {
         if (!userService.userExists(userId)) {
-            logger.error("Utilisateur non trouvé avec l'ID : {}", userId);
+            logger.error("utilisateur non trouvé avec l'ID : {}", userId);
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "L'utilisateur fourni n'existe pas"));
