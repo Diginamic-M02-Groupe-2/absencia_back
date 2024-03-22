@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.absencia.diginamic.service.AbsenceRequestService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,7 +37,7 @@ public class AbsenceRequestController {
         if (!userService.userExists(userId)) {
             logger.error("Utilisateur non trouvé avec l'ID : {}", userId);
             return ResponseEntity
-                    .badRequest()
+                    .status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "L'Utilisateur fourni n'existe pas"));
         }
 
