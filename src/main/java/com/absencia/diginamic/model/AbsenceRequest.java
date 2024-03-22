@@ -1,5 +1,7 @@
 package com.absencia.diginamic.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +11,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+
+import java.util.Date;
 
 @Entity
 public class AbsenceRequest {
@@ -29,6 +33,10 @@ public class AbsenceRequest {
 
 	@Column(length=255, nullable=true)
 	private String reason;
+
+	@Column(nullable=true)
+	@JsonIgnore
+	private Date deletedAt;
 
 	public Long getId() {
 		return id;
@@ -70,6 +78,16 @@ public class AbsenceRequest {
 
 	public AbsenceRequest setReason(final String reason) {
 		this.reason = reason;
+
+		return this;
+	}
+
+	public Date getDeletedAt() {
+		return deletedAt;
+	}
+
+	public AbsenceRequest setDeletedAt(final Date deletedAt) {
+		this.deletedAt = deletedAt;
 
 		return this;
 	}
