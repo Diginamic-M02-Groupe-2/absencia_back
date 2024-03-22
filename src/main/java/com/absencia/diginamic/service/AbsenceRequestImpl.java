@@ -35,6 +35,7 @@ public class AbsenceRequestImpl implements AbsenceRequestService {
 
     private AbsenceRequestResponse mapToAbsencesRequestPayload(AbsenceRequest absenceRequest) {
         return new AbsenceRequestResponse(
+                absenceRequest.getId(),
                 absenceRequest.getAbsence(),
                 absenceRequest.getStatus(),
                 absenceRequest.getReason()

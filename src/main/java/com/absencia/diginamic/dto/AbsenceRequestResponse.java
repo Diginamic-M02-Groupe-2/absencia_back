@@ -9,7 +9,10 @@ public class AbsenceRequestResponse {
     private AbsenceRequestStatus status;
     private String reason;
 
-    public AbsenceRequestResponse(Absence absence, AbsenceRequestStatus status, String reason) {
+    private Long id;
+
+    public AbsenceRequestResponse(Long id, Absence absence, AbsenceRequestStatus status, String reason) {
+        this.id = id;
         this.absence = absence;
         this.status = status;
         this.reason = reason;
@@ -37,5 +40,13 @@ public class AbsenceRequestResponse {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
