@@ -38,7 +38,7 @@ public class AbsenceRequestController {
             logger.error("Utilisateur non trouvé avec l'ID : {}", userId);
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "L'Utilisateur fourni n'existe pas"));
+                    .body(Map.of("message", "L'utilisateur fourni n'existe pas"));
         }
 
         final List<AbsenceRequest> absencesRequests  = absenceRequestService.getAbsencesByUserId(userId);
