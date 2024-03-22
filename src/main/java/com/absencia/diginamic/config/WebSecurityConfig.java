@@ -1,7 +1,5 @@
 package com.absencia.diginamic.config;
 
-import com.absencia.diginamic.service.AbsenceRequestService;
-import com.absencia.diginamic.service.AbsenceRequestServiceImpl;
 import com.absencia.diginamic.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,10 +69,5 @@ public class WebSecurityConfig {
 	@Bean
 	public SessionCreationPolicy sessionCreationPolicy() {
 		return SessionCreationPolicy.STATELESS;
-	}
-
-	@Bean
-	public AbsenceRequestService absenceRequestService() {
-		return new AbsenceRequestServiceImpl();
 	}
 }

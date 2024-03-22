@@ -20,17 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.absencia.diginamic.model.AbsenceRequest;
-import com.absencia.diginamic.service.AbsenceRequestService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -106,13 +100,18 @@ public class AbsenceRequestController {
 		return ResponseEntity.ok(Map.of("message", "Votre demande d'absence a été créée."));
 	}
 
-	@DeleteMapping("/absence-requests/{id}")
-    public ResponseEntity<AbsenceRequest> deleteAbsenceRequest(@PathVariable Long id, Authentication authentication) {
-        AbsenceRequest deletedAbsenceRequest = absenceRequestService.delete(id);
-        if (deletedAbsenceRequest != null) {
-            return ResponseEntity.ok(deletedAbsenceRequest);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteAbsenceRequest(@PathVariable final Long id) {
+		final AbsenceRequest absenceRequest = absenceRequestService.find(id);
+
+		if (absenceRequest == null || absenceRequest.getDeletedAt() != null) {
+			return ResponseEntity
+				.status(HttpStatus.BAD_REQUEST)
+				.body(Map.of("message", "La demande d'absence n'existe pas ou plus."));
+		}
+
+		absenceRequestService.delete(absenceRequest);
+
+		return ResponseEntity.ok(Map.of("message", "La demande d'absence a été supprimée."));
+	}
 }
