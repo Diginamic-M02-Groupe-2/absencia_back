@@ -4,6 +4,7 @@ import com.absencia.diginamic.model.AbsenceRequest;
 import com.absencia.diginamic.model.User;
 import com.absencia.diginamic.repository.AbsenceRequestRepository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,12 @@ public class AbsenceRequestService {
 
 	public void save(final AbsenceRequest absenceRequest) {
 		absenceRequestRepository.save(absenceRequest);
+	}
+
+	public void delete(final AbsenceRequest absenceRequest) {
+		absenceRequest.setDeletedAt(new Date());
+
+		save(absenceRequest);
 	}
 
 	public AbsenceRequest find(final Long id) {

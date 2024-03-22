@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -97,5 +98,20 @@ public class AbsenceRequestController {
 		absenceRequestService.save(absenceRequest);
 
 		return ResponseEntity.ok(Map.of("message", "Votre demande d'absence a été créée."));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteAbsenceRequest(@PathVariable final Long id) {
+		final AbsenceRequest absenceRequest = absenceRequestService.find(id);
+
+		if (absenceRequest == null || absenceRequest.getDeletedAt() != null) {
+			return ResponseEntity
+				.status(HttpStatus.BAD_REQUEST)
+				.body(Map.of("message", "La demande d'absence n'existe pas ou plus."));
+		}
+
+		absenceRequestService.delete(absenceRequest);
+
+		return ResponseEntity.ok(Map.of("message", "La demande d'absence a été supprimée."));
 	}
 }
