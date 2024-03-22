@@ -2,9 +2,11 @@ package com.absencia.diginamic.controller;
 
 import com.absencia.diginamic.config.JwtTokenUtil;
 import com.absencia.diginamic.config.WebSecurityConfig;
-import com.absencia.diginamic.dto.LoginResponse;
-import com.absencia.diginamic.dto.LoginUser;
-import com.absencia.diginamic.dto.LogoutResponse;
+import com.absencia.diginamic.dto.LoginRequest;
+
+import jakarta.validation.Valid;
+
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -15,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,30 +24,31 @@ import org.springframework.web.bind.annotation.RestController;
 @Import(WebSecurityConfig.class)
 @RequestMapping("/api")
 public class AuthController {
-    private AuthenticationManager authenticationManager;
-    private JwtTokenUtil jwtTokenUtil;
+	private AuthenticationManager authenticationManager;
+	private JwtTokenUtil jwtTokenUtil;
 
-    @Autowired
-    public AuthController(final AuthenticationManager authenticationManager, final JwtTokenUtil jwtTokenUtil) {
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenUtil = jwtTokenUtil;
-    }
+	@Autowired
+	public AuthController(final AuthenticationManager authenticationManager, final JwtTokenUtil jwtTokenUtil) {
+		this.authenticationManager = authenticationManager;
+		this.jwtTokenUtil = jwtTokenUtil;
+	}
 
-    @PostMapping(value="/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody final LoginUser loginUser) {
-        final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser.getEmail(), loginUser.getPassword());
-        final Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+	@PostMapping(value="/login")
+	public ResponseEntity<Map<String, String>> login(@RequestBody @Valid final LoginRequest request) {
+		final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.email, request.password);
+		final Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
-        final String token = jwtTokenUtil.generateToken(loginUser.getEmail());
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return ResponseEntity.ok(new LoginResponse(token));
-    }
+		final String token = jwtTokenUtil.generateToken(request.email);
 
-    @PostMapping(value="/logout")
-    public ResponseEntity<LogoutResponse> logout(@RequestHeader(name="Authorization") final String token) {
-        SecurityContextHolder.getContext().setAuthentication(null);
+		return ResponseEntity.ok(Map.of("token", token));
+	}
 
-        return ResponseEntity.ok(new LogoutResponse());
-    }
+	@PostMapping(value="/logout")
+	public ResponseEntity<Map<String, String>> logout() {
+		SecurityContextHolder.getContext().setAuthentication(null);
+
+		return ResponseEntity.ok(Map.of("message", "Vous avez été déconnecté(e)."));
+	}
 }

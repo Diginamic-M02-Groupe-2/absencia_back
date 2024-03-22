@@ -4,6 +4,7 @@ import com.absencia.diginamic.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,21 +14,35 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQuery;
 
 import java.util.Date;
 
 @Entity
+@NamedQuery(
+	name="AbsenceRequest.countByUserAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndDeletedAtIsNull",
+	query="""
+		SELECT COUNT(1)
+		FROM AbsenceRequest ar
+		LEFT JOIN ar.absence a
+		WHERE ar.user = :user
+		AND a.startedAt <= :endedAt
+		AND a.endedAt >= :startedAt
+		AND ar.deletedAt IS NULL
+		AND a.deletedAt IS NULL
+	"""
+)
 public class AbsenceRequest {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@JsonView(View.AbsenceRequest.class)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(cascade=CascadeType.PERSIST)
 	@JoinColumn(nullable=false)
 	private User user;
 
-	@ManyToOne
+	@ManyToOne(cascade=CascadeType.PERSIST)
 	@JoinColumn(nullable=false)
 	@JsonView(View.AbsenceRequest.class)
 	private Absence absence;

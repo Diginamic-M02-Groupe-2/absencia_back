@@ -13,11 +13,18 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.validation.constraints.Email;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User {
+public class User implements UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -45,6 +52,46 @@ public class User {
 	@Column(nullable=true)
 	@JsonIgnore
 	private Date deletedAt;
+
+	@Override
+	@JsonIgnore
+	public String getUsername() {
+		return email;
+	}
+
+	@Override
+	@JsonIgnore
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	@JsonIgnore
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	@JsonIgnore
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	@JsonIgnore
+	public boolean isEnabled() {
+		return deletedAt == null;
+	}
+
+	@Override
+	@JsonIgnore
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		final Set<GrantedAuthority> authorities = new HashSet<>();
+
+		authorities.add(new SimpleGrantedAuthority(this.role.toString()));
+
+		return authorities;
+	}
 
 	public Long getId() {
 		return id;

@@ -1,19 +1,11 @@
 package com.absencia.diginamic.config;
 
+import com.absencia.diginamic.constants.JWTConstants;
+
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SecureDigestAlgorithm;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.ssl.SslBundleProperties.Key;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-
-import com.absencia.diginamic.constants.JWTConstants;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -23,12 +15,11 @@ import java.util.function.Function;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
 @Component
 public class JwtTokenUtil implements Serializable {
-
-    // @Value("${jwt.secret}")
-    // private String secretKey;
-
     public String getEmailFromToken(String token) {
         Claims claims = getAllClaimsFromToken(token);
 
@@ -52,16 +43,13 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private SecretKey getSecretKey() {
-        return new SecretKeySpec(JWTConstants.SECRET_KEY.getBytes(), SignatureAlgorithm.HS512.getJcaName());
+        return new SecretKeySpec(JWTConstants.SECRET_KEY.getBytes(), "HmacSHA512");
     }
 
     public String generateToken(final String email) {
         return Jwts
                 .builder()
-                // .subject(email)
                 .claim("username", email)
-                // TODO: Store roles in JWT
-                // .issuer("admin")
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + JWTConstants.ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
                 .signWith(getSigningKey())
