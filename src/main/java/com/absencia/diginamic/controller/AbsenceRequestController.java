@@ -1,6 +1,7 @@
 package com.absencia.diginamic.controller;
 
 import com.absencia.diginamic.dto.AbsenceRequestResponse;
+import com.absencia.diginamic.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.absencia.diginamic.service.AbsenceRequestService;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -23,11 +23,14 @@ public class AbsenceRequestController {
     @Autowired
     private AbsenceRequestService absenceRequestService;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping("/absence-requests/{userId}")
     public ResponseEntity<List<AbsenceRequestResponse>> getAbsencesByUserId(@PathVariable Long userId) {
-        if (!absenceRequestService.userExists(userId)) {
+        if (!userService.userExists(userId)) {
             logger.error("Utilisateur non trouvé avec l'ID : {}", userId);
-            return ResponseEntity.ok(Collections.emptyList());
+            return ResponseEntity.notFound().build();
         }
 
         List<AbsenceRequestResponse> absencesRequests  = absenceRequestService.getAbsencesByUserId(userId);

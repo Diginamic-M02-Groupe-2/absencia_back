@@ -28,11 +28,6 @@ public class AbsenceRequestImpl implements AbsenceRequestService {
         return absencesRequestPayload;
     }
 
-    @Override
-    public boolean userExists(Long userId) {
-        return userRepository.existsById(userId);
-    }
-
     private AbsenceRequestResponse mapToAbsencesRequestPayload(AbsenceRequest absenceRequest) {
         return new AbsenceRequestResponse(
                 absenceRequest.getId(),
