@@ -1,14 +1,14 @@
 package com.absencia.diginamic.model;
 
 public enum AbsenceRequestStatus {
-	INITIAL,
-	PENDING,
-	APPROVED,
-	REJECTED;
+	INITIAL(0),
+	PENDING(1),
+	APPROVED(2),
+	REJECTED(3);
 
 	public final int value;
 
-	private AbsenceRequestStatus() {
-		this.value = ordinal();
+	private AbsenceRequestStatus(final int value) {
+		this.value = value;
 	}
 }

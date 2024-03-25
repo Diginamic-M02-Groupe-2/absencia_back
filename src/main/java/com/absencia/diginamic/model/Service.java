@@ -1,15 +1,15 @@
 package com.absencia.diginamic.model;
 
 public enum Service {
-	MANAGEMENT,
-	DEVELOPMENT,
-	DESIGN,
-	MARKETING,
-	SALES;
+	MANAGEMENT(0),
+	DEVELOPMENT(1),
+	DESIGN(2),
+	MARKETING(3),
+	SALES(4);
 
 	public final int value;
 
-	private Service() {
-		this.value = ordinal();
+	private Service(final int value) {
+		this.value = value;
 	}
 }
