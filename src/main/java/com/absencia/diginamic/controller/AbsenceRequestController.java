@@ -54,9 +54,8 @@ public class AbsenceRequestController {
 
 	// TODO: Verify that the start date is not a public holiday, a TOIL day or a week-end
 	// TODO: Verify that the end date is not a public holiday, a TOIL day or a week-end
-	@PostMapping(value="", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value="", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> postAbsenceRequest(@ModelAttribute @Valid final PostAbsenceRequestRequest request) {
-
 		// Verify that the start date is lesser than the end date
 		if (request.getStartedAt().compareTo(request.getEndedAt()) > 0) {
 			return ResponseEntity
@@ -65,7 +64,7 @@ public class AbsenceRequestController {
 		}
 
 		// Verify that reason is not null when the absence type is UNPAID_LEAVE
-		if (request.getType() == AbsenceType.UNPAID_LEAVE && request.getReason() == null) {
+		if (request.getType() == AbsenceType.UNPAID_LEAVE && (request.getReason() == null || request.getReason().trim().isEmpty())) {
 			return ResponseEntity
 					.badRequest()
 					.body(Map.of("reason", "Veuillez spécifier une raison pour votre demande de congés sans solde."));

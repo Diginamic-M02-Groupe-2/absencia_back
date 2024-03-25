@@ -28,7 +28,7 @@ public class PostAbsenceRequestRequest {
 		return startedAt;
 	}
 
-	public void setStartedAt(Date startedAt) {
+	public void setStartedAt(final Date startedAt) {
 		this.startedAt = startedAt;
 	}
 
@@ -36,7 +36,7 @@ public class PostAbsenceRequestRequest {
 		return endedAt;
 	}
 
-	public void setEndedAt(Date endedAt) {
+	public void setEndedAt(final Date endedAt) {
 		this.endedAt = endedAt;
 	}
 
@@ -44,7 +44,7 @@ public class PostAbsenceRequestRequest {
 		return type;
 	}
 
-	public void setType(AbsenceType type) {
+	public void setType(final AbsenceType type) {
 		this.type = type;
 	}
 
@@ -52,7 +52,7 @@ public class PostAbsenceRequestRequest {
 		return reason;
 	}
 
-	public void setReason(String reason) {
+	public void setReason(final String reason) {
 		this.reason = reason;
 	}
 }

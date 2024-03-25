@@ -1,6 +1,5 @@
 package com.absencia.diginamic.model;
 
-import com.absencia.diginamic.converter.AbsenceTypeAttributeConverter;
 import com.absencia.diginamic.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,7 +17,6 @@ public class Absence {
 
 	@Enumerated(EnumType.ORDINAL)
 	@JsonView(View.AbsenceRequest.class)
-	@Convert(converter = AbsenceTypeAttributeConverter.class)
 	private AbsenceType type;
 
 	@JsonView(View.AbsenceRequest.class)
