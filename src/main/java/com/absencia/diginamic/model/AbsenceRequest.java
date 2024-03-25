@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
-import java.util.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,18 +16,33 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQuery;
 
+import java.util.Date;
+
 @Entity
+@NamedQuery(
+	name="AbsenceRequest.countByUserAndStatusAndTypeAndDeletedAtIsNull",
+	query="""
+		SELECT COUNT(1)
+		FROM AbsenceRequest ar
+		LEFT JOIN ar.absence a
+		WHERE ar.deletedAt IS NULL
+		AND ar.user = :user
+		AND ar.status = :status
+		AND a.deletedAt IS NULL
+		AND a.type = :type
+	"""
+)
 @NamedQuery(
 	name="AbsenceRequest.countByUserAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndDeletedAtIsNull",
 	query="""
 		SELECT COUNT(1)
 		FROM AbsenceRequest ar
 		LEFT JOIN ar.absence a
-		WHERE ar.user = :user
+		WHERE ar.deletedAt IS NULL
+		AND ar.user = :user
+		AND a.deletedAt IS NULL
 		AND a.startedAt <= :endedAt
 		AND a.endedAt >= :startedAt
-		AND ar.deletedAt IS NULL
-		AND a.deletedAt IS NULL
 	"""
 )
 public class AbsenceRequest {
