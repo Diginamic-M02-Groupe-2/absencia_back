@@ -1,6 +1,8 @@
 package com.absencia.diginamic.service;
 
 import com.absencia.diginamic.model.AbsenceRequest;
+import com.absencia.diginamic.model.AbsenceRequestStatus;
+import com.absencia.diginamic.model.AbsenceType;
 import com.absencia.diginamic.model.User;
 import com.absencia.diginamic.repository.AbsenceRequestRepository;
 
@@ -35,6 +37,10 @@ public class AbsenceRequestService {
 
 	public List<AbsenceRequest> findByUser(final User user) {
 		return absenceRequestRepository.findByUser(user);
+	}
+
+	public long countRemainingPaidLeaves(final User user) {
+		return absenceRequestRepository.countByUserAndStatusAndTypeAndDeletedAtIsNull(user, AbsenceRequestStatus.APPROVED, AbsenceType.PAID_LEAVE);
 	}
 
 	public boolean isOverlapping(final AbsenceRequest absenceRequest) {
