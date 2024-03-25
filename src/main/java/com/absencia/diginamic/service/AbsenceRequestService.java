@@ -43,6 +43,14 @@ public class AbsenceRequestService {
 		return absenceRequestRepository.countByUserAndStatusAndTypeAndDeletedAtIsNull(user, AbsenceRequestStatus.APPROVED, AbsenceType.PAID_LEAVE);
 	}
 
+	public long countRemainingEmployeeWtr(final User user) {
+		return absenceRequestRepository.countByUserAndStatusAndTypeAndDeletedAtIsNull(user, AbsenceRequestStatus.APPROVED, AbsenceType.EMPLOYEE_WTR);
+	}
+
+	public long countRemainingEmployerWtr(final User user) {
+		return absenceRequestRepository.countByUserAndStatusAndTypeAndDeletedAtIsNull(user, AbsenceRequestStatus.APPROVED, AbsenceType.EMPLOYER_WTR);
+	}
+
 	public boolean isOverlapping(final AbsenceRequest absenceRequest) {
 		final long count = absenceRequestRepository.countByUserAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndDeletedAtIsNull(absenceRequest.getUser(), absenceRequest.getAbsence().getStartedAt(), absenceRequest.getAbsence().getEndedAt());
 

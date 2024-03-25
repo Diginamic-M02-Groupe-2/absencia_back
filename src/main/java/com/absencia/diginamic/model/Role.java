@@ -1,13 +1,13 @@
 package com.absencia.diginamic.model;
 
 public enum Role {
-	ADMINISTRATOR,
-	EMPLOYEE,
-	MANAGER;
+	ADMINISTRATOR(0),
+	EMPLOYEE(1),
+	MANAGER(2);
 
 	public final int value;
 
-	private Role() {
-		this.value = ordinal();
+	private Role(final int value) {
+		this.value = value;
 	}
 }
