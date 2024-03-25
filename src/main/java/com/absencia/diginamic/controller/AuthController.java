@@ -43,7 +43,7 @@ public class AuthController {
 		return ResponseEntity.ok(Map.of("token", token));
 	}
 
-	@PostMapping(value="/logout", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value="/logout")
 	public ResponseEntity<Map<String, String>> logout() {
 		SecurityContextHolder.getContext().setAuthentication(null);
 

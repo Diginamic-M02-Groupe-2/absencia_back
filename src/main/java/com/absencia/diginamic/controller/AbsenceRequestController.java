@@ -1,6 +1,5 @@
 package com.absencia.diginamic.controller;
 
-import com.absencia.diginamic.converter.AbsenceTypeAttributeConverter;
 import com.absencia.diginamic.dto.PostAbsenceRequestRequest;
 import com.absencia.diginamic.model.Absence;
 import com.absencia.diginamic.model.AbsenceRequest;
@@ -30,13 +29,10 @@ public class AbsenceRequestController {
 	private AbsenceRequestService absenceRequestService;
 	private UserService userService;
 
-	private AbsenceTypeAttributeConverter absenceTypeAttributeConverter;
-
 	@Autowired
-	public AbsenceRequestController(final AbsenceRequestService absenceRequestService, final UserService userService, final AbsenceTypeAttributeConverter absenceTypeAttributeConverter) {
+	public AbsenceRequestController(final AbsenceRequestService absenceRequestService, final UserService userService) {
 		this.absenceRequestService = absenceRequestService;
 		this.userService = userService;
-		this.absenceTypeAttributeConverter = absenceTypeAttributeConverter;
 	}
 
 	@GetMapping("/{id}")
@@ -61,8 +57,6 @@ public class AbsenceRequestController {
 	@PostMapping(value="", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> postAbsenceRequest(@ModelAttribute @Valid final PostAbsenceRequestRequest request) {
 
-		AbsenceType type = absenceTypeAttributeConverter.convertToEntityAttribute(request.getType());
-
 		// Verify that the start date is lesser than the end date
 		if (request.getStartedAt().compareTo(request.getEndedAt()) > 0) {
 			return ResponseEntity
@@ -71,7 +65,7 @@ public class AbsenceRequestController {
 		}
 
 		// Verify that reason is not null when the absence type is UNPAID_LEAVE
-		if (type == AbsenceType.UNPAID_LEAVE && request.getReason() == null) {
+		if (request.getType() == AbsenceType.UNPAID_LEAVE && request.getReason() == null) {
 			return ResponseEntity
 					.badRequest()
 					.body(Map.of("reason", "Veuillez spécifier une raison pour votre demande de congés sans solde."));
@@ -81,7 +75,7 @@ public class AbsenceRequestController {
 		final Absence absence = new Absence()
 				.setStartedAt(request.getStartedAt())
 				.setEndedAt(request.getEndedAt())
-				.setType(type);
+				.setType(request.getType());
 		final AbsenceRequest absenceRequest = new AbsenceRequest()
 				.setUser(user)
 				.setAbsence(absence)

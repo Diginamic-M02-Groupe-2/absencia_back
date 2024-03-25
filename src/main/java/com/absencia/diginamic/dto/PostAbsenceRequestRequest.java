@@ -19,7 +19,7 @@ public class PostAbsenceRequestRequest {
 	private Date endedAt;
 
 	@NotNull(message="Veuillez sélectionner un type d'absence.")
-	private Integer type;
+	private AbsenceType type;
 
 	@Length(max=255, message="Ce champ ne doit pas dépasser 255 caractères.")
 	private String reason;
@@ -40,11 +40,11 @@ public class PostAbsenceRequestRequest {
 		this.endedAt = endedAt;
 	}
 
-	public Integer getType() {
+	public AbsenceType getType() {
 		return type;
 	}
 
-	public void setType(Integer type) {
+	public void setType(AbsenceType type) {
 		this.type = type;
 	}
 
