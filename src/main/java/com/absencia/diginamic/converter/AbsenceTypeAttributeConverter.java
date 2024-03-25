@@ -4,8 +4,10 @@ import com.absencia.diginamic.model.AbsenceType;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import org.springframework.stereotype.Component;
 
 @Converter
+@Component
 public class AbsenceTypeAttributeConverter implements AttributeConverter<AbsenceType, Integer> {
 	@Override
 	public Integer convertToDatabaseColumn(final AbsenceType absenceType) {

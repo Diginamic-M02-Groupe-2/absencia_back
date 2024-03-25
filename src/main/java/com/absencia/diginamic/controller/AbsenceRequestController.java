@@ -1,5 +1,6 @@
 package com.absencia.diginamic.controller;
 
+import com.absencia.diginamic.converter.AbsenceTypeAttributeConverter;
 import com.absencia.diginamic.dto.PostAbsenceRequestRequest;
 import com.absencia.diginamic.model.Absence;
 import com.absencia.diginamic.model.AbsenceRequest;
@@ -20,13 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/absence-requests")
@@ -34,10 +29,13 @@ public class AbsenceRequestController {
 	private AbsenceRequestService absenceRequestService;
 	private UserService userService;
 
+	private AbsenceTypeAttributeConverter absenceTypeAttributeConverter;
+
 	@Autowired
-	public AbsenceRequestController(final AbsenceRequestService absenceRequestService, final UserService userService) {
+	public AbsenceRequestController(final AbsenceRequestService absenceRequestService, final UserService userService, final AbsenceTypeAttributeConverter absenceTypeAttributeConverter) {
 		this.absenceRequestService = absenceRequestService;
 		this.userService = userService;
+		this.absenceTypeAttributeConverter = absenceTypeAttributeConverter;
 	}
 
 	@GetMapping("/{id}")
@@ -60,39 +58,42 @@ public class AbsenceRequestController {
 	// TODO: Verify that the start date is not a public holiday, a TOIL day or a week-end
 	// TODO: Verify that the end date is not a public holiday, a TOIL day or a week-end
 	@PostMapping("")
-	public ResponseEntity<?> postAbsenceRequest(@RequestBody @Valid final PostAbsenceRequestRequest request) {
+	public ResponseEntity<?> postAbsenceRequest(@ModelAttribute @Valid final PostAbsenceRequestRequest request) {
+
+		AbsenceType type = absenceTypeAttributeConverter.convertToEntityAttribute(request.getType());
+
 		// Verify that the start date is lesser than the end date
-		if (request.startedAt.compareTo(request.endedAt) > 0) {
+		if (request.getStartedAt().compareTo(request.getEndedAt()) > 0) {
 			return ResponseEntity
-				.badRequest()
-				.body(Map.of("startedAt", "Veuillez sélectionner une période valide."));
+					.badRequest()
+					.body(Map.of("startedAt", "Veuillez sélectionner une période valide."));
 		}
 
 		// Verify that reason is not null when the absence type is UNPAID_LEAVE
-		if (request.type == AbsenceType.UNPAID_LEAVE && request.reason == null) {
+		if (type == AbsenceType.UNPAID_LEAVE && request.getReason() == null) {
 			return ResponseEntity
-				.badRequest()
-				.body(Map.of("reason", "Veuillez spécifier une raison pour votre demande de congés sans solde."));
+					.badRequest()
+					.body(Map.of("reason", "Veuillez spécifier une raison pour votre demande de congés sans solde."));
 		}
 
 		final User user = userService.loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		final Absence absence = new Absence()
-			.setStartedAt(request.startedAt)
-			.setEndedAt(request.endedAt)
-			.setType(request.type);
+				.setStartedAt(request.getStartedAt())
+				.setEndedAt(request.getEndedAt())
+				.setType(type);
 		final AbsenceRequest absenceRequest = new AbsenceRequest()
-			.setUser(user)
-			.setAbsence(absence)
-			.setReason(request.reason)
-			.setStatus(AbsenceRequestStatus.INITIAL);
+				.setUser(user)
+				.setAbsence(absence)
+				.setReason(request.getReason())
+				.setStatus(AbsenceRequestStatus.INITIAL);
 
 		// Verify that the period does not overlap with another existing request this user has made
 		final boolean isOverlapping = absenceRequestService.isOverlapping(absenceRequest);
 
 		if (isOverlapping) {
 			return ResponseEntity
-				.badRequest()
-				.body(Map.of("startedAt", "Cette période est déjà prise par une demande d'absence. Veuillez en sélectionner une autre."));
+					.badRequest()
+					.body(Map.of("startedAt", "Cette période est déjà prise par une demande d'absence. Veuillez en sélectionner une autre."));
 		}
 
 		absenceRequestService.save(absenceRequest);

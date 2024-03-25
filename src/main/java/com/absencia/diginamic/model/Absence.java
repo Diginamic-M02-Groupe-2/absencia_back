@@ -1,16 +1,11 @@
 package com.absencia.diginamic.model;
 
+import com.absencia.diginamic.converter.AbsenceTypeAttributeConverter;
 import com.absencia.diginamic.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.Date;
 
@@ -23,6 +18,7 @@ public class Absence {
 
 	@Enumerated(EnumType.ORDINAL)
 	@JsonView(View.AbsenceRequest.class)
+	@Convert(converter = AbsenceTypeAttributeConverter.class)
 	private AbsenceType type;
 
 	@JsonView(View.AbsenceRequest.class)
