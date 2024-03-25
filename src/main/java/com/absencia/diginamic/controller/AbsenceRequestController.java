@@ -1,11 +1,12 @@
 package com.absencia.diginamic.controller;
 
-import com.absencia.diginamic.dto.PostAbsenceRequestRequest;
-import com.absencia.diginamic.model.Absence;
-import com.absencia.diginamic.model.AbsenceRequest;
-import com.absencia.diginamic.model.AbsenceRequestStatus;
-import com.absencia.diginamic.model.AbsenceType;
-import com.absencia.diginamic.model.User;
+import com.absencia.diginamic.entity.Absence;
+import com.absencia.diginamic.entity.AbsenceRequest;
+import com.absencia.diginamic.entity.AbsenceRequestStatus;
+import com.absencia.diginamic.entity.AbsenceType;
+import com.absencia.diginamic.entity.User;
+import com.absencia.diginamic.model.PatchAbsenceRequestModel;
+import com.absencia.diginamic.model.PostAbsenceRequestModel;
 import com.absencia.diginamic.service.AbsenceRequestService;
 import com.absencia.diginamic.service.UserService;
 import com.absencia.diginamic.view.View;
@@ -52,42 +53,42 @@ public class AbsenceRequestController {
 		return ResponseEntity.ok(absencesRequests);
 	}
 
-	// TODO: Verify that the start date is not a public holiday, a TOIL day or a week-end
-	// TODO: Verify that the end date is not a public holiday, a TOIL day or a week-end
+	// TODO: Verify that the start date is not a public holiday, a WTR day or a week-end
+	// TODO: Verify that the end date is not a public holiday, a WTR day or a week-end
 	@PostMapping(value="", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> postAbsenceRequest(@ModelAttribute @Valid final PostAbsenceRequestRequest request) {
+	public ResponseEntity<?> postAbsenceRequest(@ModelAttribute @Valid final PostAbsenceRequestModel request) {
 		// Verify that the start date is lesser than the end date
 		if (request.getStartedAt().compareTo(request.getEndedAt()) > 0) {
 			return ResponseEntity
-					.badRequest()
-					.body(Map.of("startedAt", "Veuillez sélectionner une période valide."));
+				.badRequest()
+				.body(Map.of("startedAt", "Veuillez sélectionner une période valide."));
 		}
 
-		// Verify that reason is not null when the absence type is UNPAID_LEAVE
+		// Verify that reason is not null or empty when the absence type is UNPAID_LEAVE
 		if (request.getType() == AbsenceType.UNPAID_LEAVE && (request.getReason() == null || request.getReason().trim().isEmpty())) {
 			return ResponseEntity
-					.badRequest()
-					.body(Map.of("reason", "Veuillez spécifier une raison pour votre demande de congés sans solde."));
+				.badRequest()
+				.body(Map.of("reason", "Veuillez spécifier une raison pour votre demande de congés sans solde."));
 		}
 
 		final User user = userService.loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		final Absence absence = new Absence()
-				.setStartedAt(request.getStartedAt())
-				.setEndedAt(request.getEndedAt())
-				.setType(request.getType());
+			.setStartedAt(request.getStartedAt())
+			.setEndedAt(request.getEndedAt())
+			.setType(request.getType());
 		final AbsenceRequest absenceRequest = new AbsenceRequest()
-				.setUser(user)
-				.setAbsence(absence)
-				.setReason(request.getReason())
-				.setStatus(AbsenceRequestStatus.INITIAL);
+			.setUser(user)
+			.setAbsence(absence)
+			.setReason(request.getReason())
+			.setStatus(AbsenceRequestStatus.INITIAL);
 
-		// Verify that the period does not overlap with another existing request this user has made
-		final boolean isOverlapping = absenceRequestService.isOverlapping(absenceRequest);
+		final boolean isOverlappingAnotherAbsenceRequest = absenceRequestService.isOverlapping(absenceRequest);
 
-		if (isOverlapping) {
+		// Verify that the period does not overlap with another request this user has made
+		if (isOverlappingAnotherAbsenceRequest) {
 			return ResponseEntity
-					.badRequest()
-					.body(Map.of("startedAt", "Cette période est déjà prise par une demande d'absence. Veuillez en sélectionner une autre."));
+				.badRequest()
+				.body(Map.of("startedAt", "Cette période est déjà prise par une demande d'absence. Veuillez en sélectionner une autre."));
 		}
 
 		absenceRequestService.save(absenceRequest);
@@ -95,14 +96,98 @@ public class AbsenceRequestController {
 		return ResponseEntity.ok(Map.of("message", "Votre demande d'absence a été créée."));
 	}
 
+	// TODO: Verify that the start date is not a public holiday, a WTR day or a week-end
+	// TODO: Verify that the end date is not a public holiday, a WTR day or a week-end
+	@PatchMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> patchAbsenceRequest(@PathVariable final Long id, @ModelAttribute @Valid final PatchAbsenceRequestModel request) {
+		final AbsenceRequest absenceRequest = absenceRequestService.find(id);
+
+		// Verify that this absence request exists and is not deleted
+		if (absenceRequest == null || absenceRequest.getDeletedAt() != null) {
+			return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(Map.of("message", "Cette demande d'absence n'existe pas ou plus."));
+		}
+
+		final User user = userService.loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+
+		// Verify that the absence request is owned by this user
+		if (!absenceRequest.getUser().equals(user)) {
+			return ResponseEntity
+				.status(HttpStatus.UNAUTHORIZED)
+				.body(Map.of("message", "Cette demande d'absence ne vous appartient pas."));
+		}
+
+		// Verify that the absence request is not waiting for approval
+		if (absenceRequest.getStatus() == AbsenceRequestStatus.PENDING) {
+			return ResponseEntity
+				.status(HttpStatus.UNAUTHORIZED)
+				.body(Map.of("message", "Cette demande d'absence est en cours de validation."));
+		}
+
+		// Verify that the absence request is not approved
+		if (absenceRequest.getStatus() == AbsenceRequestStatus.APPROVED) {
+			return ResponseEntity
+				.status(HttpStatus.UNAUTHORIZED)
+				.body(Map.of("message", "Cette demande d'absence a été validée."));
+		}
+
+		final boolean isOverlappingAnotherAbsenceRequest = absenceRequestService.isOverlapping(absenceRequest);
+
+		// Verify that the period does not overlap with another request this user has made
+		if (isOverlappingAnotherAbsenceRequest) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("startedAt", "Cette période est déjà prise par une demande d'absence. Veuillez en sélectionner une autre."));
+		}
+
+		// Verify that the start date is lesser than the end date
+		if (request.getStartedAt().compareTo(request.getEndedAt()) > 0) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("startedAt", "Veuillez sélectionner une période valide."));
+		}
+
+		// Verify that reason is not null or empty when the absence type is UNPAID_LEAVE
+		if (request.getType() == AbsenceType.UNPAID_LEAVE && (request.getReason() == null || request.getReason().trim().isEmpty())) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("reason", "Veuillez spécifier une raison pour votre demande de congés sans solde."));
+		}
+
+		final Absence absence = absenceRequest.getAbsence();
+
+		absence
+			.setStartedAt(request.getStartedAt())
+			.setEndedAt(request.getEndedAt())
+			.setType(request.getType());
+		absenceRequest
+			.setStatus(AbsenceRequestStatus.INITIAL)
+			.setReason(request.getReason());
+
+		absenceRequestService.save(absenceRequest);
+
+		return ResponseEntity.ok(Map.of("message", "La demande d'absence a été modifiée."));
+	}
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteAbsenceRequest(@PathVariable final Long id) {
 		final AbsenceRequest absenceRequest = absenceRequestService.find(id);
 
+		// Verify that this absence request exists and is not deleted
 		if (absenceRequest == null || absenceRequest.getDeletedAt() != null) {
 			return ResponseEntity
-				.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("message", "La demande d'absence n'existe pas ou plus."));
+				.status(HttpStatus.NOT_FOUND)
+				.body(Map.of("message", "Cette demande d'absence n'existe pas ou plus."));
+		}
+
+		final User user = userService.loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+
+		// Verify that the absence request is owned by this user
+		if (!absenceRequest.getUser().equals(user)) {
+			return ResponseEntity
+				.status(HttpStatus.UNAUTHORIZED)
+				.body(Map.of("message", "Cette demande d'absence ne vous appartient pas."));
 		}
 
 		absenceRequestService.delete(absenceRequest);

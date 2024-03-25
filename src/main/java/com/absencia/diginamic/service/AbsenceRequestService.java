@@ -1,9 +1,9 @@
 package com.absencia.diginamic.service;
 
-import com.absencia.diginamic.model.AbsenceRequest;
-import com.absencia.diginamic.model.AbsenceRequestStatus;
-import com.absencia.diginamic.model.AbsenceType;
-import com.absencia.diginamic.model.User;
+import com.absencia.diginamic.entity.AbsenceRequest;
+import com.absencia.diginamic.entity.AbsenceRequestStatus;
+import com.absencia.diginamic.entity.AbsenceType;
+import com.absencia.diginamic.entity.User;
 import com.absencia.diginamic.repository.AbsenceRequestRepository;
 
 import java.util.Date;
@@ -52,7 +52,12 @@ public class AbsenceRequestService {
 	}
 
 	public boolean isOverlapping(final AbsenceRequest absenceRequest) {
-		final long count = absenceRequestRepository.countByUserAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndDeletedAtIsNull(absenceRequest.getUser(), absenceRequest.getAbsence().getStartedAt(), absenceRequest.getAbsence().getEndedAt());
+		final long count = absenceRequestRepository.countByIdAndUserAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndDeletedAtIsNull(
+			absenceRequest.getId(),
+			absenceRequest.getUser(),
+			absenceRequest.getAbsence().getStartedAt(),
+			absenceRequest.getAbsence().getEndedAt()
+		);
 
 		return count != 0;
 	}

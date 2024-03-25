@@ -1,4 +1,4 @@
-package com.absencia.diginamic.model;
+package com.absencia.diginamic.entity;
 
 import com.absencia.diginamic.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -28,6 +28,15 @@ public class Absence {
 	@Column(nullable=true)
 	@JsonIgnore
 	private Date deletedAt;
+
+	@Override
+	public boolean equals(final Object absence) {
+		if (!(absence instanceof Absence)) {
+			return false;
+		}
+
+		return this.id.equals(((Absence) absence).getId());
+	}
 
 	public Long getId() {
 		return id;

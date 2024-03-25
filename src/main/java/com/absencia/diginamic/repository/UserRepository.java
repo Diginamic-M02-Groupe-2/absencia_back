@@ -1,8 +1,8 @@
 package com.absencia.diginamic.repository;
 
-import com.absencia.diginamic.model.User;
-
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.absencia.diginamic.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     User findOneById(final Long id);

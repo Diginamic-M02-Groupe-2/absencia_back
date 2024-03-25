@@ -1,6 +1,6 @@
-package com.absencia.diginamic.dto;
+package com.absencia.diginamic.model;
 
-import com.absencia.diginamic.model.AbsenceType;
+import com.absencia.diginamic.entity.AbsenceType;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -9,13 +9,13 @@ import java.util.Date;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class PostAbsenceRequestRequest {
+public class PatchAbsenceRequestModel {
 	@NotNull(message="Veuillez sélectionner une date de début.")
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+	@DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
 	private Date startedAt;
 
 	@NotNull(message="Veuillez sélectionner une date de fin.")
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+	@DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
 	private Date endedAt;
 
 	@NotNull(message="Veuillez sélectionner un type d'absence.")
