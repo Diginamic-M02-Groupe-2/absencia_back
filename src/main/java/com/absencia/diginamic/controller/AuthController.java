@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,7 +31,7 @@ public class AuthController {
 		this.jwtTokenUtil = jwtTokenUtil;
 	}
 
-	@PostMapping(value="/login")
+	@PostMapping(value="/login", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Map<String, String>> login(@ModelAttribute @Valid final LoginRequest request) {
 		final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
 		final Authentication authentication = authenticationManager.authenticate(authenticationToken);

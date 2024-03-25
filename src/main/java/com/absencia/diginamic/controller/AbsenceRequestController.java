@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -57,7 +58,7 @@ public class AbsenceRequestController {
 
 	// TODO: Verify that the start date is not a public holiday, a TOIL day or a week-end
 	// TODO: Verify that the end date is not a public holiday, a TOIL day or a week-end
-	@PostMapping("")
+	@PostMapping(value="", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> postAbsenceRequest(@ModelAttribute @Valid final PostAbsenceRequestRequest request) {
 
 		AbsenceType type = absenceTypeAttributeConverter.convertToEntityAttribute(request.getType());
