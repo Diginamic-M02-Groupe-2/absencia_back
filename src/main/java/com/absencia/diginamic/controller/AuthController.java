@@ -10,15 +10,13 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Import(WebSecurityConfig.class)
@@ -33,14 +31,14 @@ public class AuthController {
 		this.jwtTokenUtil = jwtTokenUtil;
 	}
 
-	@PostMapping(value="/login")
-	public ResponseEntity<Map<String, String>> login(@RequestBody @Valid final LoginRequest request) {
-		final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.email, request.password);
+	@PostMapping(value="/login", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<Map<String, String>> login(@ModelAttribute @Valid final LoginRequest request) {
+		final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
 		final Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		final String token = jwtTokenUtil.generateToken(request.email);
+		final String token = jwtTokenUtil.generateToken(request.getEmail());
 
 		return ResponseEntity.ok(Map.of("token", token));
 	}
