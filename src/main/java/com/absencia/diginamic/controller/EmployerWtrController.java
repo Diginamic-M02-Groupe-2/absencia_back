@@ -48,7 +48,7 @@ public class EmployerWtrController {
 		return ResponseEntity.ok(Map.of("message", "TODO"));
 	}
 
-	@DeleteMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	@DeleteMapping(value="/{id}")
 	public ResponseEntity<?> deleteEmployerWtr(@PathVariable final long id) {
 		// TODO: Verify that the user is an administrator
 
