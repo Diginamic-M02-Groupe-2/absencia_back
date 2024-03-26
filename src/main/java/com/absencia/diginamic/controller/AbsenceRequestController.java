@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,7 +51,11 @@ public class AbsenceRequestController {
 
 		final List<AbsenceRequest> absencesRequests = absenceRequestService.findByUser(user);
 
-		return ResponseEntity.ok(absencesRequests);
+		List<AbsenceRequest> filteredAbsenceRequests = absencesRequests.stream()
+				.filter(absenceRequest -> absenceRequest.getDeletedAt() == null)
+				.collect(Collectors.toList());
+
+		return ResponseEntity.ok(filteredAbsenceRequests);
 	}
 
 	// TODO: Verify that the start date is not a public holiday, a WTR day or a week-end

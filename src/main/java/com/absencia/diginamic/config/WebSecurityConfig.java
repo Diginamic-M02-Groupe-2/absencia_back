@@ -16,6 +16,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.Collections;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -46,7 +48,13 @@ public class WebSecurityConfig {
 		return http
 				.csrf(csrf -> csrf.disable())
 				.cors(cors -> cors
-						.configurationSource(corsConfigurer -> new CorsConfiguration().applyPermitDefaultValues()))
+						.configurationSource(request -> {
+							CorsConfiguration config = new CorsConfiguration();
+							config.setAllowedOrigins(Collections.singletonList("*")); // Autorise toutes les origines
+							config.setAllowedMethods(Collections.singletonList("*")); // Autorise toutes les méthodes (GET, POST, etc.)
+							config.setAllowedHeaders(Collections.singletonList("*")); // Autorise tous les en-têtes
+							return config;
+						}))
 				.exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers("/api/login").permitAll()
