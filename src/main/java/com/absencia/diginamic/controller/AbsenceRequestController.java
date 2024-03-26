@@ -34,11 +34,17 @@ public class AbsenceRequestController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<AbsenceRequest>> getAbsenceRequests(final Authentication authentication) {
+	public ResponseEntity<Map<String, ?>> getAbsenceRequests(final Authentication authentication) {
 		final User user = userService.loadUserByUsername(authentication.getName());
 		final List<AbsenceRequest> absenceRequests = absenceRequestService.findByUser(user);
+		final long remainingPaidLeaves = absenceRequestService.countRemainingPaidLeaves(user);
+		final long remainingEmployeeWtr = absenceRequestService.countRemainingEmployeeWtr(user);
 
-		return ResponseEntity.ok(absenceRequests);
+		return ResponseEntity.ok(Map.of(
+			"absenceRequests", absenceRequests,
+			"remainingPaidLeaves", remainingPaidLeaves,
+			"remainingEmployeeWtr", remainingEmployeeWtr
+		));
 	}
 
 	// TODO: Verify that the start date is not a public holiday, a WTR day or a week-end
