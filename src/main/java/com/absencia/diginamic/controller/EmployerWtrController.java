@@ -1,18 +1,18 @@
 package com.absencia.diginamic.controller;
 
+import com.absencia.diginamic.entity.EmployerWtr;
 import com.absencia.diginamic.model.PatchEmployerWtrModel;
 import com.absencia.diginamic.model.PostEmployerWtrModel;
 import com.absencia.diginamic.service.EmployerWtrService;
 
 import jakarta.validation.Valid;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,13 +25,12 @@ public class EmployerWtrController {
 		this.employerWtrService = employerWtrService;
 	}
 
+	// TODO: Include non-approved employer WTR?
 	@GetMapping("/{year}")
-	public ResponseEntity<Map<String, String>> getEmployerWtr(@PathVariable final int year) {
-		// TODO: Get employer WTR that are:
-		// - within the range of the provided year
-		// - not deleted
+	public ResponseEntity<List<EmployerWtr>> getEmployerWtr(@PathVariable final int year) {
+		final List<EmployerWtr> employerWtr = employerWtrService.findByYear(year);
 
-		return ResponseEntity.ok(Map.of("message", "TODO"));
+		return ResponseEntity.ok(employerWtr);
 	}
 
 	@PostMapping(consumes=MediaType.MULTIPART_FORM_DATA_VALUE)

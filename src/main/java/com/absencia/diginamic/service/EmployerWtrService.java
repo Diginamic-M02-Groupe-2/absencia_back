@@ -4,6 +4,7 @@ import com.absencia.diginamic.entity.EmployerWtr;
 import com.absencia.diginamic.repository.EmployerWtrRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -28,6 +29,10 @@ public class EmployerWtrService {
 		employerWtr.setDeletedAt(LocalDate.now());
 
 		save(employerWtr);
+	}
+
+	public List<EmployerWtr> findByYear(final int year) {
+		return employerWtrRepository.findByYear(year);
 	}
 
 	public long countRemainingEmployerWtr() {
