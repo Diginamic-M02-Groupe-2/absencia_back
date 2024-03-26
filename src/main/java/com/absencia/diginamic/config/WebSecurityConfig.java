@@ -46,8 +46,15 @@ public class WebSecurityConfig {
 	public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
 		return http
 			.csrf(csrf -> csrf.disable())
-			.cors(cors -> cors
-				.configurationSource(corsConfigurer -> new CorsConfiguration().applyPermitDefaultValues()))
+			.cors(cors -> cors.configurationSource(corsConfigurer -> {
+				final CorsConfiguration corsConfiguration = new CorsConfiguration();
+
+				corsConfiguration.applyPermitDefaultValues();
+				corsConfiguration.addAllowedMethod("PATCH");
+				corsConfiguration.addAllowedMethod("DELETE");
+
+				return corsConfiguration;
+			}))
 			.exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
 			.authorizeHttpRequests(authorize -> authorize
 				.requestMatchers("/api/login").permitAll()
