@@ -59,10 +59,11 @@ public class AbsenceRequestController {
 				.body(Map.of("reason", "Veuillez spécifier une raison pour votre demande de congés sans solde."));
 		}
 
+		final User user = userService.loadUserByUsername(authentication.getName());
 		final AbsenceRequest absenceRequest = new AbsenceRequest();
 
 		absenceRequest
-			.setUser(userService.loadUserByUsername(authentication.getName()))
+			.setUser(user)
 			.setType(model.getType())
 			.setStartedAt(model.getStartedAt())
 			.setEndedAt(model.getEndedAt())
@@ -86,8 +87,8 @@ public class AbsenceRequestController {
 	public ResponseEntity<?> patchAbsenceRequest(final Authentication authentication, @PathVariable final Long id, @ModelAttribute @Valid final PatchAbsenceRequestModel model) {
 		final AbsenceRequest absenceRequest = absenceRequestService.find(id);
 
-		// Verify that this absence request exists and is not deleted
-		if (absenceRequest == null || absenceRequest.getDeletedAt() != null) {
+		// Verify that this absence request exists
+		if (absenceRequest == null) {
 			return ResponseEntity
 				.status(HttpStatus.NOT_FOUND)
 				.body(Map.of("message", "Cette demande d'absence n'existe pas ou plus."));
@@ -116,15 +117,6 @@ public class AbsenceRequestController {
 				.body(Map.of("message", "Cette demande d'absence a été validée."));
 		}
 
-		final boolean isOverlappingAnotherAbsenceRequest = absenceRequestService.isOverlapping(absenceRequest);
-
-		// Verify that the period does not overlap with another request this user has made
-		if (isOverlappingAnotherAbsenceRequest) {
-			return ResponseEntity
-				.badRequest()
-				.body(Map.of("startedAt", "Cette période est déjà prise par une demande d'absence. Veuillez en sélectionner une autre."));
-		}
-
 		// Verify that the start date is lesser than the end date
 		if (model.getStartedAt().compareTo(model.getEndedAt()) > 0) {
 			return ResponseEntity
@@ -146,6 +138,13 @@ public class AbsenceRequestController {
 			.setEndedAt(model.getEndedAt())
 			.setReason(model.getReason());
 
+		// Verify that the period does not overlap with another request this user has made
+		if (absenceRequestService.isOverlapping(absenceRequest)) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("startedAt", "Cette période est déjà prise. Veuillez en sélectionner une autre."));
+		}
+
 		absenceRequestService.save(absenceRequest);
 
 		return ResponseEntity.ok(Map.of("message", "La demande d'absence a été modifiée."));
@@ -155,8 +154,8 @@ public class AbsenceRequestController {
 	public ResponseEntity<?> deleteAbsenceRequest(final Authentication authentication, @PathVariable final Long id) {
 		final AbsenceRequest absenceRequest = absenceRequestService.find(id);
 
-		// Verify that this absence request exists and is not deleted
-		if (absenceRequest == null || absenceRequest.getDeletedAt() != null) {
+		// Verify that this absence request exists
+		if (absenceRequest == null) {
 			return ResponseEntity
 				.status(HttpStatus.NOT_FOUND)
 				.body(Map.of("message", "Cette demande d'absence n'existe pas ou plus."));
