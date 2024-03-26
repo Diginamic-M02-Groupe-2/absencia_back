@@ -26,7 +26,7 @@ public class EmployerWtrController {
 	}
 
 	@GetMapping("/{year}")
-	public ResponseEntity<?> getEmployerWtr(@PathVariable final int year) {
+	public ResponseEntity<Map<String, String>> getEmployerWtr(@PathVariable final int year) {
 		// TODO: Get employer WTR that are:
 		// - within the range of the provided year
 		// - not deleted
@@ -35,21 +35,21 @@ public class EmployerWtrController {
 	}
 
 	@PostMapping(consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> postEmployerWtr(@ModelAttribute @Valid final PostEmployerWtrModel model) {
+	public ResponseEntity<Map<String, String>> postEmployerWtr(@ModelAttribute @Valid final PostEmployerWtrModel model) {
 		// TODO: Verify that the user is an administrator
 
 		return ResponseEntity.ok(Map.of("message", "TODO"));
 	}
 
 	@PatchMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> patchEmployerWtr(@PathVariable final long id, @ModelAttribute @Valid final PatchEmployerWtrModel model) {
+	public ResponseEntity<Map<String, String>> patchEmployerWtr(@PathVariable final long id, @ModelAttribute @Valid final PatchEmployerWtrModel model) {
 		// TODO: Verify that the user is an administrator
 
 		return ResponseEntity.ok(Map.of("message", "TODO"));
 	}
 
 	@DeleteMapping(value="/{id}")
-	public ResponseEntity<?> deleteEmployerWtr(@PathVariable final long id) {
+	public ResponseEntity<Map<String, String>> deleteEmployerWtr(@PathVariable final long id) {
 		// TODO: Verify that the user is an administrator
 
 		return ResponseEntity.ok(Map.of("message", "TODO"));
