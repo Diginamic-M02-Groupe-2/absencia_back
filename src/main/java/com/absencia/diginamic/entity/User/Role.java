@@ -1,4 +1,4 @@
-package com.absencia.diginamic.entity;
+package com.absencia.diginamic.entity.User;
 
 public enum Role {
 	ADMINISTRATOR(0),

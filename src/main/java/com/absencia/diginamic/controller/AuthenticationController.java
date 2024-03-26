@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Import(WebSecurityConfig.class)
 @RequestMapping("/api")
-public class AuthController {
+public class AuthenticationController {
 	private AuthenticationManager authenticationManager;
 	private JwtTokenUtil jwtTokenUtil;
 
 	@Autowired
-	public AuthController(final AuthenticationManager authenticationManager, final JwtTokenUtil jwtTokenUtil) {
+	public AuthenticationController(final AuthenticationManager authenticationManager, final JwtTokenUtil jwtTokenUtil) {
 		this.authenticationManager = authenticationManager;
 		this.jwtTokenUtil = jwtTokenUtil;
 	}

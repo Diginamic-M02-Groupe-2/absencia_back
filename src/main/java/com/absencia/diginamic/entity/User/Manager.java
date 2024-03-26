@@ -1,10 +1,13 @@
-package com.absencia.diginamic.entity;
+package com.absencia.diginamic.entity.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
 import java.util.Set;
 
 @Entity
+@Table(name="user_manager")
 public class Manager extends User {
 	@OneToMany(mappedBy="manager")
 	private Set<Employee> employees;

@@ -4,19 +4,19 @@ import com.absencia.diginamic.entity.AbsenceType;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
 public class PatchAbsenceRequestModel {
 	@NotNull(message="Veuillez sélectionner une date de début.")
-	@DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
-	private Date startedAt;
+	@DateTimeFormat(iso=DateTimeFormat.ISO.DATE)
+	private LocalDate startedAt;
 
 	@NotNull(message="Veuillez sélectionner une date de fin.")
-	@DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
-	private Date endedAt;
+	@DateTimeFormat(iso=DateTimeFormat.ISO.DATE)
+	private LocalDate endedAt;
 
 	@NotNull(message="Veuillez sélectionner un type d'absence.")
 	private AbsenceType type;
@@ -24,19 +24,19 @@ public class PatchAbsenceRequestModel {
 	@Length(max=255, message="Ce champ ne doit pas dépasser 255 caractères.")
 	private String reason;
 
-	public Date getStartedAt() {
+	public LocalDate getStartedAt() {
 		return startedAt;
 	}
 
-	public void setStartedAt(final Date startedAt) {
+	public void setStartedAt(final LocalDate startedAt) {
 		this.startedAt = startedAt;
 	}
 
-	public Date getEndedAt() {
+	public LocalDate getEndedAt() {
 		return endedAt;
 	}
 
-	public void setEndedAt(final Date endedAt) {
+	public void setEndedAt(final LocalDate endedAt) {
 		this.endedAt = endedAt;
 	}
 
