@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,10 +38,10 @@ public class AbsenceRequestController {
 		this.userService = userService;
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping("")
 	@JsonView(View.AbsenceRequest.class)
-	public ResponseEntity<?> getAbsenceRequests(@PathVariable final Long id) {
-		final User user = userService.find(id);
+	public ResponseEntity<?> getAbsenceRequests(final Authentication authentication) {
+		final User user = userService.findOneByEmailAndDeletedAtIsNull(authentication.getName());
 
 		// Verify that the user exists and is not deleted
 		if (user == null || !user.isEnabled()) {
