@@ -3,13 +3,14 @@ package com.absencia.diginamic.service;
 import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.AbsenceRequestStatus;
 import com.absencia.diginamic.entity.AbsenceType;
-import com.absencia.diginamic.entity.User;
+import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.repository.AbsenceRequestRepository;
 
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,7 +22,7 @@ public class AbsenceRequestService {
 		this.absenceRequestRepository = absenceRequestRepository;
 	}
 
-	public void save(final AbsenceRequest absenceRequest) {
+	public void save(@NonNull final AbsenceRequest absenceRequest) {
 		absenceRequestRepository.save(absenceRequest);
 	}
 
@@ -40,23 +41,19 @@ public class AbsenceRequestService {
 	}
 
 	public long countRemainingPaidLeaves(final User user) {
-		return absenceRequestRepository.countByUserAndStatusAndTypeAndDeletedAtIsNull(user, AbsenceRequestStatus.APPROVED, AbsenceType.PAID_LEAVE);
+		return absenceRequestRepository.countByUserAndTypeAndStatusAndDeletedAtIsNull(user, AbsenceType.PAID_LEAVE, AbsenceRequestStatus.APPROVED);
 	}
 
 	public long countRemainingEmployeeWtr(final User user) {
-		return absenceRequestRepository.countByUserAndStatusAndTypeAndDeletedAtIsNull(user, AbsenceRequestStatus.APPROVED, AbsenceType.EMPLOYEE_WTR);
-	}
-
-	public long countRemainingEmployerWtr(final User user) {
-		return absenceRequestRepository.countByUserAndStatusAndTypeAndDeletedAtIsNull(user, AbsenceRequestStatus.APPROVED, AbsenceType.EMPLOYER_WTR);
+		return absenceRequestRepository.countByUserAndTypeAndStatusAndDeletedAtIsNull(user, AbsenceType.EMPLOYEE_WTR, AbsenceRequestStatus.APPROVED);
 	}
 
 	public boolean isOverlapping(final AbsenceRequest absenceRequest) {
 		final long count = absenceRequestRepository.countByIdAndUserAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndDeletedAtIsNull(
 			absenceRequest.getId(),
 			absenceRequest.getUser(),
-			absenceRequest.getAbsence().getStartedAt(),
-			absenceRequest.getAbsence().getEndedAt()
+			absenceRequest.getStartedAt(),
+			absenceRequest.getEndedAt()
 		);
 
 		return count != 0;

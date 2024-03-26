@@ -1,16 +1,13 @@
 package com.absencia.diginamic.controller;
 
-import com.absencia.diginamic.entity.Absence;
 import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.AbsenceRequestStatus;
 import com.absencia.diginamic.entity.AbsenceType;
-import com.absencia.diginamic.entity.User;
+import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.model.PatchAbsenceRequestModel;
 import com.absencia.diginamic.model.PostAbsenceRequestModel;
 import com.absencia.diginamic.service.AbsenceRequestService;
 import com.absencia.diginamic.service.UserService;
-import com.absencia.diginamic.view.View;
-import com.fasterxml.jackson.annotation.JsonView;
 
 import jakarta.validation.Valid;
 
@@ -37,7 +34,6 @@ public class AbsenceRequestController {
 	}
 
 	@GetMapping("/{id}")
-	@JsonView(View.AbsenceRequest.class)
 	public ResponseEntity<?> getAbsenceRequests(@PathVariable final Long id) {
 		final User user = userService.find(id);
 
@@ -72,16 +68,12 @@ public class AbsenceRequestController {
 		}
 
 		final User user = userService.loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-		final Absence absence = new Absence()
-			.setStartedAt(request.getStartedAt())
-			.setEndedAt(request.getEndedAt())
-			.setType(request.getType());
 		final AbsenceRequest absenceRequest = new AbsenceRequest()
 			.setUser(user)
-			.setAbsence(absence)
-			.setReason(request.getReason())
-			.setStatus(AbsenceRequestStatus.INITIAL);
-
+			.setType(request.getType())
+			.setStartedAt(request.getStartedAt())
+			.setEndedAt(request.getEndedAt())
+			.setReason(request.getReason());
 		final boolean isOverlappingAnotherAbsenceRequest = absenceRequestService.isOverlapping(absenceRequest);
 
 		// Verify that the period does not overlap with another request this user has made
@@ -155,14 +147,11 @@ public class AbsenceRequestController {
 				.body(Map.of("reason", "Veuillez spécifier une raison pour votre demande de congés sans solde."));
 		}
 
-		final Absence absence = absenceRequest.getAbsence();
-
-		absence
+		absenceRequest
+			.setType(request.getType())
+			.setStatus(AbsenceRequestStatus.INITIAL)
 			.setStartedAt(request.getStartedAt())
 			.setEndedAt(request.getEndedAt())
-			.setType(request.getType());
-		absenceRequest
-			.setStatus(AbsenceRequestStatus.INITIAL)
 			.setReason(request.getReason());
 
 		absenceRequestService.save(absenceRequest);

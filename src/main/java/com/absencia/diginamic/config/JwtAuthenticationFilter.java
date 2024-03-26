@@ -1,8 +1,8 @@
 package com.absencia.diginamic.config;
 
 import com.absencia.diginamic.constants.JWTConstants;
-import com.absencia.diginamic.entity.Role;
-import com.absencia.diginamic.entity.User;
+import com.absencia.diginamic.entity.User.Role;
+import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.service.UserService;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			logger.warn("couldn't find bearer string, will ignore the header");
 		}
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			final User user = userService.findOneByEmailAndDeletedAtIsNull(username);
+			final User user = userService.loadUserByUsername(username);
 
 			if (jwtTokenUtil.validateToken(authToken, user)) {
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

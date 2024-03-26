@@ -1,7 +1,6 @@
 package com.absencia.diginamic.entity;
 
-import com.absencia.diginamic.view.View;
-import com.fasterxml.jackson.annotation.JsonView;
+import com.absencia.diginamic.entity.User.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -20,16 +19,14 @@ import java.util.Date;
 
 @Entity
 @NamedQuery(
-	name="AbsenceRequest.countByUserAndStatusAndTypeAndDeletedAtIsNull",
+	name="AbsenceRequest.countByUserAndTypeAndStatusAndDeletedAtIsNull",
 	query="""
 		SELECT COUNT(1)
 		FROM AbsenceRequest ar
-		LEFT JOIN ar.absence a
 		WHERE ar.deletedAt IS NULL
 		AND ar.user = :user
+		AND ar.type = :type
 		AND ar.status = :status
-		AND a.deletedAt IS NULL
-		AND a.type = :type
 	"""
 )
 @NamedQuery(
@@ -37,41 +34,43 @@ import java.util.Date;
 	query="""
 		SELECT COUNT(1)
 		FROM AbsenceRequest ar
-		LEFT JOIN ar.absence a
 		WHERE ar.deletedAt IS NULL
 		AND ar.id != :id
 		AND ar.user = :user
-		AND a.deletedAt IS NULL
-		AND a.startedAt <= :endedAt
-		AND a.endedAt >= :startedAt
+		AND ar.startedAt <= :endedAt
+		AND ar.endedAt >= :startedAt
 	"""
 )
 public class AbsenceRequest {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@JsonView(View.AbsenceRequest.class)
 	private Long id;
 
 	@ManyToOne(cascade=CascadeType.PERSIST)
 	@JoinColumn(nullable=false)
+	@JsonIgnore
 	private User user;
 
-	@ManyToOne(cascade=CascadeType.PERSIST)
-	@JoinColumn(nullable=false)
-	@JsonView(View.AbsenceRequest.class)
-	private Absence absence;
+	@Enumerated(EnumType.ORDINAL)
+	private AbsenceType type;
 
 	@Enumerated(EnumType.ORDINAL)
-	@JsonView(View.AbsenceRequest.class)
 	private AbsenceRequestStatus status;
 
+	private Date startedAt;
+
+	private Date endedAt;
+
 	@Column(length=255, nullable=true)
-	@JsonView(View.AbsenceRequest.class)
 	private String reason;
 
 	@Column(nullable=true)
 	@JsonIgnore
 	private Date deletedAt;
+
+	public AbsenceRequest() {
+		status = AbsenceRequestStatus.INITIAL;
+	}
 
 	@Override
 	public boolean equals(final Object absenceRequest) {
@@ -79,14 +78,10 @@ public class AbsenceRequest {
 			return false;
 		}
 
-		return this.id.equals(((AbsenceRequest) absenceRequest).getId());
+		return id.equals(((AbsenceRequest) absenceRequest).getId());
 	}
 
 	public Long getId() {
-		return id;
-	}
-
-	public Long setId(Long id) {
 		return id;
 	}
 
@@ -100,12 +95,12 @@ public class AbsenceRequest {
 		return this;
 	}
 
-	public Absence getAbsence() {
-		return absence;
+	public AbsenceType getType() {
+		return type;
 	}
 
-	public AbsenceRequest setAbsence(final Absence absence) {
-		this.absence = absence;
+	public AbsenceRequest setType(final AbsenceType type) {
+		this.type = type;
 
 		return this;
 	}
@@ -116,6 +111,26 @@ public class AbsenceRequest {
 
 	public AbsenceRequest setStatus(final AbsenceRequestStatus status) {
 		this.status = status;
+
+		return this;
+	}
+
+	public Date getStartedAt() {
+		return startedAt;
+	}
+
+	public AbsenceRequest setStartedAt(final Date startedAt) {
+		this.startedAt = startedAt;
+
+		return this;
+	}
+
+	public Date getEndedAt() {
+		return endedAt;
+	}
+
+	public AbsenceRequest setEndedAt(final Date endedAt) {
+		this.endedAt = endedAt;
 
 		return this;
 	}

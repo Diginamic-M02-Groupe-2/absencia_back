@@ -1,4 +1,4 @@
-package com.absencia.diginamic.entity;
+package com.absencia.diginamic.entity.User;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -14,7 +14,6 @@ import jakarta.persistence.InheritanceType;
 import jakarta.validation.constraints.Email;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,23 +22,23 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy=InheritanceType.JOINED)
 public class User implements UserDetails {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(length = 255)
+	@Column(length=255)
 	private String firstName;
 
-	@Column(length = 255)
+	@Column(length=255)
 	private String lastName;
 
+	@Column(length=128, unique=true)
 	@Email
-	@Column(length = 128, unique = true)
 	private String email;
 
-	@Column(length = 255)
+	@Column(length=255)
 	@JsonIgnore
 	private String password;
 
@@ -49,17 +48,13 @@ public class User implements UserDetails {
 	@Enumerated(EnumType.ORDINAL)
 	private Service service;
 
-	@Column(nullable=true)
-	@JsonIgnore
-	private Date deletedAt;
-
 	@Override
 	public boolean equals(final Object user) {
 		if (!(user instanceof User)) {
 			return false;
 		}
 
-		return this.id.equals(((User) user).getId());
+		return id.equals(((User) user).getId());
 	}
 
 	@Override
@@ -89,7 +84,7 @@ public class User implements UserDetails {
 	@Override
 	@JsonIgnore
 	public boolean isEnabled() {
-		return deletedAt == null;
+		return true;
 	}
 
 	@Override
@@ -97,7 +92,7 @@ public class User implements UserDetails {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		final Set<GrantedAuthority> authorities = new HashSet<>();
 
-		authorities.add(new SimpleGrantedAuthority(this.role.toString()));
+		authorities.add(new SimpleGrantedAuthority(role.toString()));
 
 		return authorities;
 	}
@@ -162,16 +157,6 @@ public class User implements UserDetails {
 
 	public User setService(final Service service) {
 		this.service = service;
-
-		return this;
-	}
-
-	public Date getDeletedAt() {
-		return deletedAt;
-	}
-
-	public User setDeletedAt(final Date deletedAt) {
-		this.deletedAt = deletedAt;
 
 		return this;
 	}
