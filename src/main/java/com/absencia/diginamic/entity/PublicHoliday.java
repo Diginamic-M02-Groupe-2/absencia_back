@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 public class PublicHoliday {
@@ -14,7 +14,7 @@ public class PublicHoliday {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 
-	private Date date;
+	private LocalDate date;
 
 	@Column(length=255)
 	private String label;
@@ -38,11 +38,11 @@ public class PublicHoliday {
 		return id;
 	}
 
-	public Date getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public PublicHoliday setDate(final Date date) {
+	public PublicHoliday setDate(final LocalDate date) {
 		this.date = date;
 
 		return this;

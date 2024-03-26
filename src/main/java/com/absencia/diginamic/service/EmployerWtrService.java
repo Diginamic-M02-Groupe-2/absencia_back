@@ -3,7 +3,7 @@ package com.absencia.diginamic.service;
 import com.absencia.diginamic.entity.EmployerWtr;
 import com.absencia.diginamic.repository.EmployerWtrRepository;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmployerWtrService {
-	public static final long MAX_EMPLOYER_WTR = 10;
+	public static final long MAX_EMPLOYER_WTR = 5;
 
 	private EmployerWtrRepository employerWtrRepository;
 
@@ -25,7 +25,7 @@ public class EmployerWtrService {
 	}
 
 	public void delete(final EmployerWtr employerWtr) {
-		employerWtr.setDeletedAt(new Date());
+		employerWtr.setDeletedAt(LocalDate.now());
 
 		save(employerWtr);
 	}

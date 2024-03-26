@@ -15,30 +15,30 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQuery;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @NamedQuery(
-	name="AbsenceRequest.countByUserAndTypeAndStatusAndDeletedAtIsNull",
+	name="AbsenceRequest.countRemaining",
 	query="""
 		SELECT COUNT(1)
 		FROM AbsenceRequest ar
 		WHERE ar.deletedAt IS NULL
 		AND ar.user = :user
 		AND ar.type = :type
-		AND ar.status = :status
+		AND ar.status = AbsenceRequestStatus.APPROVED
 	"""
 )
 @NamedQuery(
-	name="AbsenceRequest.countByIdAndUserAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndDeletedAtIsNull",
+	name="AbsenceRequest.countOverlapping",
 	query="""
 		SELECT COUNT(1)
 		FROM AbsenceRequest ar
 		WHERE ar.deletedAt IS NULL
-		AND ar.id != :id
+		AND (:id IS NULL OR ar.id != :id)
 		AND ar.user = :user
-		AND ar.startedAt <= :endedAt
-		AND ar.endedAt >= :startedAt
+		AND ar.startedAt < :endedAt
+		AND ar.endedAt > :startedAt
 	"""
 )
 public class AbsenceRequest {
@@ -57,16 +57,16 @@ public class AbsenceRequest {
 	@Enumerated(EnumType.ORDINAL)
 	private AbsenceRequestStatus status;
 
-	private Date startedAt;
+	private LocalDate startedAt;
 
-	private Date endedAt;
+	private LocalDate endedAt;
 
 	@Column(length=255, nullable=true)
 	private String reason;
 
 	@Column(nullable=true)
 	@JsonIgnore
-	private Date deletedAt;
+	private LocalDate deletedAt;
 
 	public AbsenceRequest() {
 		status = AbsenceRequestStatus.INITIAL;
@@ -115,21 +115,21 @@ public class AbsenceRequest {
 		return this;
 	}
 
-	public Date getStartedAt() {
+	public LocalDate getStartedAt() {
 		return startedAt;
 	}
 
-	public AbsenceRequest setStartedAt(final Date startedAt) {
+	public AbsenceRequest setStartedAt(final LocalDate startedAt) {
 		this.startedAt = startedAt;
 
 		return this;
 	}
 
-	public Date getEndedAt() {
+	public LocalDate getEndedAt() {
 		return endedAt;
 	}
 
-	public AbsenceRequest setEndedAt(final Date endedAt) {
+	public AbsenceRequest setEndedAt(final LocalDate endedAt) {
 		this.endedAt = endedAt;
 
 		return this;
@@ -145,11 +145,11 @@ public class AbsenceRequest {
 		return this;
 	}
 
-	public Date getDeletedAt() {
+	public LocalDate getDeletedAt() {
 		return deletedAt;
 	}
 
-	public AbsenceRequest setDeletedAt(final Date deletedAt) {
+	public AbsenceRequest setDeletedAt(final LocalDate deletedAt) {
 		this.deletedAt = deletedAt;
 
 		return this;

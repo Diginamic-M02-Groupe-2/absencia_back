@@ -11,7 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.NamedQuery;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @NamedQuery(
@@ -31,14 +31,14 @@ public class EmployerWtr {
 	@Enumerated(EnumType.ORDINAL)
 	private EmployerWtrStatus status;
 
-	private Date date;
+	private LocalDate date;
 
 	@Column(length=255)
 	private String label;
 
 	@Column(nullable=true)
 	@JsonIgnore
-	private Date deletedAt;
+	private LocalDate deletedAt;
 
 	public EmployerWtr() {
 		status = EmployerWtrStatus.INITIAL;
@@ -67,11 +67,11 @@ public class EmployerWtr {
 		return this;
 	}
 
-	public Date getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public EmployerWtr setDate(final Date date) {
+	public EmployerWtr setDate(final LocalDate date) {
 		this.date = date;
 
 		return this;
@@ -87,11 +87,11 @@ public class EmployerWtr {
 		return this;
 	}
 
-	public Date getDeletedAt() {
+	public LocalDate getDeletedAt() {
 		return deletedAt;
 	}
 
-	public EmployerWtr setDeletedAt(final Date deletedAt) {
+	public EmployerWtr setDeletedAt(final LocalDate deletedAt) {
 		this.deletedAt = deletedAt;
 
 		return this;

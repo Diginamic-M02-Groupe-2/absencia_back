@@ -20,69 +20,71 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenUtil implements Serializable {
-    public String getEmailFromToken(String token) {
-        Claims claims = getAllClaimsFromToken(token);
+	public String getEmailFromToken(final String token) {
+		Claims claims = getAllClaimsFromToken(token);
+		Object usernameObject = claims.get("username");
 
-        Object usernameObject = claims.get("username");
-        return usernameObject != null ? usernameObject.toString() : null;
-    }
+		return usernameObject != null ? usernameObject.toString() : null;
+	}
 
-    public Date getExpirationDateFromToken(String token) {
-        return getClaimFromToken(token, Claims::getExpiration);
-    }
+	public Date getExpirationDateFromToken(final String token) {
+		return getClaimFromToken(token, Claims::getExpiration);
+	}
 
-    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = getAllClaimsFromToken(token);
+	public <T> T getClaimFromToken(final String token, final Function<Claims, T> claimsResolver) {
+		final Claims claims = getAllClaimsFromToken(token);
 
-        return claimsResolver.apply(claims);
-    }
+		return claimsResolver.apply(claims);
+	}
 
-    private SecretKey getSigningKey() {
-        byte[] keyBytes = JWTConstants.SECRET_KEY.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
+	private SecretKey getSigningKey() {
+		byte[] keyBytes = JWTConstants.SECRET_KEY.getBytes(StandardCharsets.UTF_8);
+		return Keys.hmacShaKeyFor(keyBytes);
+	}
 
-    private SecretKey getSecretKey() {
-        return new SecretKeySpec(JWTConstants.SECRET_KEY.getBytes(), "HmacSHA512");
-    }
+	private SecretKey getSecretKey() {
+		return new SecretKeySpec(JWTConstants.SECRET_KEY.getBytes(), "HmacSHA512");
+	}
 
-    public String generateToken(final String email) {
-        return Jwts
-                .builder()
-                .claim("username", email)
-                .issuedAt(new Date())
-                .expiration(new Date((new Date()).getTime() + JWTConstants.ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
-                .signWith(getSigningKey())
-                .compact();
-    }
+	public String generateToken(final String email) {
+		return Jwts
+			.builder()
+			.claim("username", email)
+			.issuedAt(new Date())
+			.expiration(new Date((new Date()).getTime() + JWTConstants.ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
+			.signWith(getSigningKey())
+			.compact();
+	}
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getEmailFromToken(token);
-        if (username.equals(userDetails.getUsername()) && !isTokenExpired(token)
-                && verifyTokenSignature(token, getSecretKey())) {
-            return true;
-        }
-        return false;
-    }
+	public Boolean validateToken(final String token, final UserDetails userDetails) {
+		final String username = getEmailFromToken(token);
 
-    private Boolean verifyTokenSignature(String token, SecretKey secret) {
-        try {
-            Jwts.parser().verifyWith(secret).build().parseSignedClaims(token);
-            return true;
-        } catch (JwtException e) {
-            return false;
-        }
-    }
+		return (
+			username.equals(userDetails.getUsername()) &&
+			!isTokenExpired(token) &&
+			verifyTokenSignature(token, getSecretKey())
+		);
+	}
 
-    private Claims getAllClaimsFromToken(final String token) {
-        return Jwts.parser()
-                .verifyWith(getSecretKey())
-                .build()
-                .parseSignedClaims(token).getPayload();
-    }
+	private Boolean verifyTokenSignature(final String token, final SecretKey secret) {
+		try {
+			Jwts.parser().verifyWith(secret).build().parseSignedClaims(token);
 
-    private Boolean isTokenExpired(String token) {
-        final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(new Date());
-    }
+			return true;
+		} catch (JwtException e) {
+			return false;
+		}
+	}
+
+	private Claims getAllClaimsFromToken(final String token) {
+		return Jwts.parser()
+			.verifyWith(getSecretKey())
+			.build()
+			.parseSignedClaims(token).getPayload();
+	}
+
+	private Boolean isTokenExpired(final String token) {
+		final Date expiration = getExpirationDateFromToken(token);
+		return expiration.before(new Date());
+	}
 }
