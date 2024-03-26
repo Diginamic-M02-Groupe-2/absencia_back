@@ -2,8 +2,6 @@ package com.absencia.diginamic.config;
 
 import com.absencia.diginamic.service.UserService;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,7 +50,8 @@ public class WebSecurityConfig {
 				final CorsConfiguration corsConfiguration = new CorsConfiguration();
 
 				corsConfiguration.applyPermitDefaultValues();
-				corsConfiguration.setAllowedMethods(List.of("PATCH", "DELETE"));
+				corsConfiguration.addAllowedMethod("PATCH");
+				corsConfiguration.addAllowedMethod("DELETE");
 
 				return corsConfiguration;
 			}))
