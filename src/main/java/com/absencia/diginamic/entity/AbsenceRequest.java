@@ -1,4 +1,4 @@
-package com.absencia.diginamic.model;
+package com.absencia.diginamic.entity;
 
 import com.absencia.diginamic.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -33,12 +33,13 @@ import java.util.Date;
 	"""
 )
 @NamedQuery(
-	name="AbsenceRequest.countByUserAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndDeletedAtIsNull",
+	name="AbsenceRequest.countByIdAndUserAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndDeletedAtIsNull",
 	query="""
 		SELECT COUNT(1)
 		FROM AbsenceRequest ar
 		LEFT JOIN ar.absence a
 		WHERE ar.deletedAt IS NULL
+		AND ar.id != :id
 		AND ar.user = :user
 		AND a.deletedAt IS NULL
 		AND a.startedAt <= :endedAt
@@ -71,6 +72,15 @@ public class AbsenceRequest {
 	@Column(nullable=true)
 	@JsonIgnore
 	private Date deletedAt;
+
+	@Override
+	public boolean equals(final Object absenceRequest) {
+		if (!(absenceRequest instanceof AbsenceRequest)) {
+			return false;
+		}
+
+		return this.id.equals(((AbsenceRequest) absenceRequest).getId());
+	}
 
 	public Long getId() {
 		return id;

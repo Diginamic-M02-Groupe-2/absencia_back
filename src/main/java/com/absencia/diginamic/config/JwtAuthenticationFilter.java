@@ -1,8 +1,8 @@
 package com.absencia.diginamic.config;
 
 import com.absencia.diginamic.constants.JWTConstants;
-import com.absencia.diginamic.model.Role;
-import com.absencia.diginamic.model.User;
+import com.absencia.diginamic.entity.Role;
+import com.absencia.diginamic.entity.User;
 import com.absencia.diginamic.service.UserService;
 
 import io.jsonwebtoken.ExpiredJwtException;

@@ -1,4 +1,4 @@
-package com.absencia.diginamic.model;
+package com.absencia.diginamic.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -52,6 +52,15 @@ public class User implements UserDetails {
 	@Column(nullable=true)
 	@JsonIgnore
 	private Date deletedAt;
+
+	@Override
+	public boolean equals(final Object user) {
+		if (!(user instanceof User)) {
+			return false;
+		}
+
+		return this.id.equals(((User) user).getId());
+	}
 
 	@Override
 	@JsonIgnore

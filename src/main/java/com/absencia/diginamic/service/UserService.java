@@ -1,6 +1,6 @@
 package com.absencia.diginamic.service;
 
-import com.absencia.diginamic.model.User;
+import com.absencia.diginamic.entity.User;
 import com.absencia.diginamic.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;

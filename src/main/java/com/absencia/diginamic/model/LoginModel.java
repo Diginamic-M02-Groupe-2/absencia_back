@@ -1,9 +1,9 @@
-package com.absencia.diginamic.dto;
+package com.absencia.diginamic.model;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public class LoginRequest {
+public class LoginModel {
 	@NotBlank(message="Veuillez saisir votre email.")
 	@NotNull(message="Veuillez saisir votre email.")
 	private String email;

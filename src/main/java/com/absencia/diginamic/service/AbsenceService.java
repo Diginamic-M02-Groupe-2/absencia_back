@@ -1,6 +1,6 @@
 package com.absencia.diginamic.service;
 
-import com.absencia.diginamic.model.Absence;
+import com.absencia.diginamic.entity.Absence;
 import com.absencia.diginamic.repository.AbsenceRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
