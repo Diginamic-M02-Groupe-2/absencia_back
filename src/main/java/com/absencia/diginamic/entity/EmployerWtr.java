@@ -31,6 +31,10 @@ import java.time.LocalDate;
 		AND ew.status = EmployerWtrStatus.APPROVED
 	"""
 )
+@NamedQuery(
+		name = "EmployerWtr.existsByDateFromOther",
+		query = "SELECT COUNT(ew) > 0 FROM EmployerWtr ew WHERE ew.id <> :id AND ew.date = :date"
+)
 public class EmployerWtr {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
