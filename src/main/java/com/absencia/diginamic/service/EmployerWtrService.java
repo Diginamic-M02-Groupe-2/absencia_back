@@ -1,6 +1,7 @@
 package com.absencia.diginamic.service;
 
 import com.absencia.diginamic.entity.EmployerWtr;
+import com.absencia.diginamic.model.PostEmployerWtrModel;
 import com.absencia.diginamic.repository.EmployerWtrRepository;
 
 import java.time.LocalDate;
@@ -25,6 +26,14 @@ public class EmployerWtrService {
 		employerWtrRepository.save(employerWtr);
 	}
 
+	public void saveEmployerWtr(@NonNull final PostEmployerWtrModel PostEmployerWtr) {
+		EmployerWtr employerWtr = new EmployerWtr();
+		employerWtr.setDate(PostEmployerWtr.getDate());
+		employerWtr.setLabel(PostEmployerWtr.getLabel());
+
+		employerWtrRepository.save(employerWtr);
+	}
+
 	public void delete(final EmployerWtr employerWtr) {
 		employerWtr.setDeletedAt(LocalDate.now());
 
@@ -39,5 +48,9 @@ public class EmployerWtrService {
 		final long count = employerWtrRepository.countApproved();
 
 		return MAX_EMPLOYER_WTR - count;
+	}
+
+	public boolean existsEmployerWtrForDate(LocalDate date) {
+		return employerWtrRepository.existsByDate(date);
 	}
 }
