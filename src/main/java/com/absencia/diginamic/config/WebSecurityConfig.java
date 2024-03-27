@@ -2,6 +2,7 @@ package com.absencia.diginamic.config;
 
 import com.absencia.diginamic.service.UserService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,7 +60,10 @@ public class WebSecurityConfig {
 			.authorizeHttpRequests(authorize -> authorize
 				.requestMatchers("/api/login").permitAll()
 				.anyRequest().authenticated())
-			.logout(logout -> logout.logoutUrl("/api/logout"))
+			.logout((logout -> logout
+				.logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> {
+						httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+					})))
 			.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
 			.build();
 	}
