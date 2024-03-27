@@ -33,7 +33,7 @@ import java.time.LocalDate;
 )
 @NamedQuery(
 		name = "EmployerWtr.existsByDateFromOther",
-		query = "SELECT COUNT(ew) > 0 FROM EmployerWtr ew WHERE ew.id <> :id AND ew.date = :date"
+		query = "SELECT COUNT(ew) > 0 FROM EmployerWtr ew WHERE ew.id <> :id AND ew.date = :date AND ew.deletedAT IS NULL"
 )
 public class EmployerWtr {
 	@Id
