@@ -15,8 +15,8 @@ import java.time.LocalDate;
 
 @Entity
 @NamedQuery(
-		name="EmployerWtr.findByYear",
-		query="""
+	name="EmployerWtr.findByYear",
+	query="""
         SELECT ew
         FROM EmployerWtr ew
         WHERE YEAR(ew.date) = :year
