@@ -50,7 +50,7 @@ public class EmployerWtrService {
 		return MAX_EMPLOYER_WTR - count;
 	}
 
-	public boolean existsEmployerWtrForDate(LocalDate date) {
+	public boolean isOverlapping(LocalDate date) {
 		return employerWtrRepository.existsByDate(date);
 	}
 }

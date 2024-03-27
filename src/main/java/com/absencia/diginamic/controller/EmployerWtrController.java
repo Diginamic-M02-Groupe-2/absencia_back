@@ -61,7 +61,7 @@ public class EmployerWtrController {
 		}
 
 		// Vérification qu'aucun autre jour férié ou RTT employeur n'existe à cette date
-		if (employerWtrService.existsEmployerWtrForDate(model.getDate())) {
+		if (employerWtrService.isOverlapping(model.getDate())) {
 			return ResponseEntity.badRequest().body(Map.of("message", "Un autre RTT employeur existe déjà à cette date."));
 		}
 
