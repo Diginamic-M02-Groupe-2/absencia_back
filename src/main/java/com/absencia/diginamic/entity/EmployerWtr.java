@@ -15,12 +15,13 @@ import java.time.LocalDate;
 
 @Entity
 @NamedQuery(
-	name="EmployerWtr.findByYear",
-	query="""
-		SELECT ew
-		FROM EmployerWtr ew
-		WHERE YEAR(ew.date) = :year
-	"""
+		name="EmployerWtr.findByYear",
+		query="""
+        SELECT ew
+        FROM EmployerWtr ew
+        WHERE YEAR(ew.date) = :year
+        AND (ew.deletedAt IS NULL OR ew.deletedAt > :deletedAt)
+    """
 )
 @NamedQuery(
 	name="EmployerWtr.countApproved",
