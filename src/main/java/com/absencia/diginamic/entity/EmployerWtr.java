@@ -20,7 +20,7 @@ import java.time.LocalDate;
         SELECT ew
         FROM EmployerWtr ew
         WHERE YEAR(ew.date) = :year
-        AND (ew.deletedAt IS NULL OR ew.deletedAt > :deletedAt)
+        AND ew.deletedAt IS NULL
     """
 )
 @NamedQuery(
