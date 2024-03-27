@@ -59,7 +59,6 @@ public class WebSecurityConfig {
 			.authorizeHttpRequests(authorize -> authorize
 				.requestMatchers("/api/login").permitAll()
 				.anyRequest().authenticated())
-			.logout(logout -> logout.logoutUrl("/api/logout"))
 			.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
 			.build();
 	}
