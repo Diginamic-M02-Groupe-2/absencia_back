@@ -1,5 +1,7 @@
 package com.absencia.diginamic.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,7 +10,17 @@ import jakarta.persistence.Id;
 
 import java.time.LocalDate;
 
+import org.hibernate.annotations.NamedQuery;
+
 @Entity
+@NamedQuery(
+	name="PublicHoliday.findByYear",
+	query="""
+		SELECT ph
+		FROM PublicHoliday ph
+		WHERE YEAR(ph.date) = :year
+	"""
+)
 public class PublicHoliday {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -19,6 +31,7 @@ public class PublicHoliday {
 	@Column(length=255)
 	private String label;
 
+	@JsonIgnore
 	private boolean worked;
 
 	public PublicHoliday() {

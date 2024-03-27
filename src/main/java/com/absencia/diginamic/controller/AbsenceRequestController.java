@@ -34,17 +34,23 @@ public class AbsenceRequestController {
 	}
 
 	@GetMapping
-	public ResponseEntity<?> getAbsenceRequests(final Authentication authentication) {
+	public ResponseEntity<Map<String, ?>> getAbsenceRequests(final Authentication authentication) {
 		final User user = userService.loadUserByUsername(authentication.getName());
 		final List<AbsenceRequest> absenceRequests = absenceRequestService.findByUser(user);
+		final long remainingPaidLeaves = absenceRequestService.countRemainingPaidLeaves(user);
+		final long remainingEmployeeWtr = absenceRequestService.countRemainingEmployeeWtr(user);
 
-		return ResponseEntity.ok(absenceRequests);
+		return ResponseEntity.ok(Map.of(
+			"absenceRequests", absenceRequests,
+			"remainingPaidLeaves", remainingPaidLeaves,
+			"remainingEmployeeWtr", remainingEmployeeWtr
+		));
 	}
 
 	// TODO: Verify that the start date is not a public holiday, a WTR day or a week-end
 	// TODO: Verify that the end date is not a public holiday, a WTR day or a week-end
 	@PostMapping(consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> postAbsenceRequest(final Authentication authentication, @ModelAttribute @Valid final PostAbsenceRequestModel model) {
+	public ResponseEntity<Map<String, String>> postAbsenceRequest(final Authentication authentication, @ModelAttribute @Valid final PostAbsenceRequestModel model) {
 		// Verify that the start date is lesser than the end date
 		if (model.getStartedAt().compareTo(model.getEndedAt()) > 0) {
 			return ResponseEntity
@@ -84,7 +90,7 @@ public class AbsenceRequestController {
 	// TODO: Verify that the start date is not a public holiday, a WTR day or a week-end
 	// TODO: Verify that the end date is not a public holiday, a WTR day or a week-end
 	@PatchMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> patchAbsenceRequest(final Authentication authentication, @PathVariable final Long id, @ModelAttribute @Valid final PatchAbsenceRequestModel model) {
+	public ResponseEntity<Map<String, String>> patchAbsenceRequest(final Authentication authentication, @PathVariable final Long id, @ModelAttribute @Valid final PatchAbsenceRequestModel model) {
 		final AbsenceRequest absenceRequest = absenceRequestService.find(id);
 
 		// Verify that this absence request exists
@@ -151,7 +157,7 @@ public class AbsenceRequestController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteAbsenceRequest(final Authentication authentication, @PathVariable final Long id) {
+	public ResponseEntity<Map<String, String>> deleteAbsenceRequest(final Authentication authentication, @PathVariable final Long id) {
 		final AbsenceRequest absenceRequest = absenceRequestService.find(id);
 
 		// Verify that this absence request exists

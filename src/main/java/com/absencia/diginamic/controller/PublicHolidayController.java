@@ -1,10 +1,12 @@
 package com.absencia.diginamic.controller;
 
+import com.absencia.diginamic.entity.PublicHoliday;
 import com.absencia.diginamic.model.PatchPublicHolidayModel;
 import com.absencia.diginamic.service.PublicHolidayService;
 
 import jakarta.validation.Valid;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +25,14 @@ public class PublicHolidayController {
 	}
 
 	@GetMapping("/{year}")
-	public ResponseEntity<?> getPublicHolidays(@PathVariable final int year) {
-		// TODO: Get public holidays that are:
-		// - within the range of the provided year
-		// - not deleted
+	public ResponseEntity<List<PublicHoliday>> getPublicHolidays(@PathVariable final int year) {
+		final List<PublicHoliday> publicHolidays = publicHolidayService.findByYear(year);
 
-		return ResponseEntity.ok(Map.of("message", "TODO"));
+		return ResponseEntity.ok(publicHolidays);
 	}
 
 	@PatchMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> patchPublicHoliday(@PathVariable final long id, @ModelAttribute @Valid final PatchPublicHolidayModel model) {
+	public ResponseEntity<Map<String, String>> patchPublicHoliday(@PathVariable final long id, @ModelAttribute @Valid final PatchPublicHolidayModel model) {
 		// TODO: Verify that the user is an administrator
 
 		return ResponseEntity.ok(Map.of("message", "TODO"));

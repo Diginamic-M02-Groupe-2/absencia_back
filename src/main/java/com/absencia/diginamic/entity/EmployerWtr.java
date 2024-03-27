@@ -15,6 +15,14 @@ import java.time.LocalDate;
 
 @Entity
 @NamedQuery(
+	name="EmployerWtr.findByYear",
+	query="""
+		SELECT ew
+		FROM EmployerWtr ew
+		WHERE YEAR(ew.date) = :year
+	"""
+)
+@NamedQuery(
 	name="EmployerWtr.countApproved",
 	query="""
 		SELECT COUNT(1)
