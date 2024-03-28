@@ -10,6 +10,8 @@ import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.service.AbsenceRequestService;
 import com.absencia.diginamic.entity.AbsenceRequestStatus;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -21,9 +23,12 @@ public class ScheduledTasks {
 
     private Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
     List<AbsenceRequest> initialRequest = new ArrayList<>();
+    private final AbsenceRequestService absenceRequestService;
 
     @Autowired
-    private AbsenceRequestService absenceRequestService;
+    public ScheduledTasks(AbsenceRequestService absenceRequestService) {
+        this.absenceRequestService = absenceRequestService;
+    }
 
     @Scheduled(cron = "0 0 0 * * *")
     private void nightBatch() {
@@ -47,17 +52,19 @@ public class ScheduledTasks {
     }
 
     private void handleCommonAbsences(AbsenceRequest request) {
-        if (nbDayLeft(request)) { //vérifie si le nombre de jours restants pour la demande est supérieur à zéro. 
+        if (hasEnoughDays(request)) { 
             request.setStatus(AbsenceRequestStatus.PENDING); // Si la condition est remplie, ça signifie qu'il reste des jours disponibles, donc la demande est mise à l'état "EN_ATTENTE_VALIDATION" 
         } else {
             request.setStatus(AbsenceRequestStatus.REJECTED); //Si la condition précédente n'est pas bonne, ça signifie qu'il ne reste plus de jours disponibles pour cette demande, donc la demande est mise à l'état "REJECTED"
         }
     }
 
-    private boolean nbDayLeft(AbsenceRequest request) {
+    private boolean hasEnoughDays(AbsenceRequest request) {
         User user = request.getUser();
         AbsenceType type = request.getType();
-    
+        LocalDate startDate = request.getStartedAt();
+        LocalDate endDate = request.getEndedAt();
+
         // obtenir le nombre de jours restants pour l'utilisateur et le type d'absence
         long remainingDays = 0;
         if (type == AbsenceType.PAID_LEAVE) {
@@ -65,9 +72,11 @@ public class ScheduledTasks {
         } else if (type == AbsenceType.EMPLOYEE_WTR) {
             remainingDays = absenceRequestService.countRemainingEmployeeWtr(user);
         }
-    
+
+        // Calculer la durée de la demande d'absence
+        long requestedDays = ChronoUnit.DAYS.between(startDate, endDate) + 1; // Ajouter 1 car on inclut également le dernier jour
+
         // Vérifie si l'utilisateur a suffisamment de jours disponibles
-        return remainingDays > 0;
+        return remainingDays >= requestedDays;
     }
-    
 }
