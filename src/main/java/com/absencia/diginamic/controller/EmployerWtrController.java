@@ -96,11 +96,12 @@ public class EmployerWtrController {
 			return ResponseEntity.badRequest().body(Map.of("message", "Une autre RTT employeur existe déjà à cette date."));
 		}
 
-		EmployerWtr employerWtr = employerWtrService.findOneByIdAndDeletedAtIsNull(id);
+		final EmployerWtr employerWtr = employerWtrService.findOneByIdAndDeletedAtIsNull(id);
 
 		// Mise à jour des champs
-		employerWtr.setDate(model.getDate());
-		employerWtr.setLabel(model.getLabel());
+		employerWtr
+				.setDate(model.getDate())
+				.setLabel(model.getLabel());
 
 		// Enregistrement des modifications
 		employerWtrService.save(employerWtr);
