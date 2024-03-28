@@ -2,6 +2,7 @@ package com.absencia.diginamic.service;
 
 import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.EmployerWtr;
+import com.absencia.diginamic.model.PostEmployerWtrModel;
 import com.absencia.diginamic.repository.EmployerWtrRepository;
 
 import java.time.LocalDate;
@@ -44,6 +45,10 @@ public class EmployerWtrService {
 		final long count = employerWtrRepository.countApproved();
 
 		return MAX_EMPLOYER_WTR - count;
+	}
+
+	public boolean isDateConflicting(LocalDate date) {
+		return employerWtrRepository.existsByDate(date);
 	}
 
 	public boolean isDateConflictingWithOther(final Long id, LocalDate date) {

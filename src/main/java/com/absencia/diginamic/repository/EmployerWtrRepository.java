@@ -13,6 +13,8 @@ public interface EmployerWtrRepository extends JpaRepository<EmployerWtr, Long> 
 	List<EmployerWtr> findByYear(final int year);
 	long countApproved();
 
+	boolean existsByDate(LocalDate date);
+	
 	boolean isDateConflictingWithOther(final Long id, LocalDate date);
 
 	EmployerWtr findOneByIdAndDeletedAtIsNull(final Long id);

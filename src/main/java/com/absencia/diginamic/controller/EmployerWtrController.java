@@ -37,9 +37,37 @@ public class EmployerWtrController {
 
 	@PostMapping(consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Map<String, String>> postEmployerWtr(@ModelAttribute @Valid final PostEmployerWtrModel model) {
-		// TODO: Verify that the user is an administrator
+		// TODO : Gérer les roles admin
+		/* Vérification de l'utilisateur administrateur
+		if (!userService.isAdmin()) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "L'utilisateur n'est pas autorisé à effectuer cette action."));
+		}*/
 
-		return ResponseEntity.ok(Map.of("message", "TODO"));
+		// Vérification que la date n'est pas dans le passé
+		LocalDate currentDate = LocalDate.now();
+		if (model.getDate().isBefore(currentDate)) {
+			return ResponseEntity.badRequest().body(Map.of("date", "La date ne peut pas être dans le passé."));
+		}
+
+		// Vérification que la date n'est pas un week-end
+		DayOfWeek dayOfWeek = model.getDate().getDayOfWeek();
+		if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+			return ResponseEntity.badRequest().body(Map.of("date", "La date ne peut pas être un week-end."));
+		}
+
+		// Vérification qu'aucun autre jour férié ou RTT employeur n'existe à cette date
+		if (employerWtrService.isDateConflicting(model.getDate())) {
+			return ResponseEntity.badRequest().body(Map.of("date", "Une autre RTT employeur existe déjà à cette date."));
+		}
+
+		// Sauvegarde de l'objet EmployerWtr
+		final EmployerWtr employerWtr = new EmployerWtr();
+		employerWtr
+				.setDate(model.getDate())
+				.setLabel(model.getLabel());
+		employerWtrService.save(employerWtr);
+
+		return ResponseEntity.ok(Map.of("message", "La RTT employeur a été créée."));
 	}
 
 	@PatchMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -68,11 +96,12 @@ public class EmployerWtrController {
 			return ResponseEntity.badRequest().body(Map.of("message", "Une autre RTT employeur existe déjà à cette date."));
 		}
 
-		EmployerWtr employerWtr = employerWtrService.findOneByIdAndDeletedAtIsNull(id);
+		final EmployerWtr employerWtr = employerWtrService.findOneByIdAndDeletedAtIsNull(id);
 
 		// Mise à jour des champs
-		employerWtr.setDate(model.getDate());
-		employerWtr.setLabel(model.getLabel());
+		employerWtr
+				.setDate(model.getDate())
+				.setLabel(model.getLabel());
 
 		// Enregistrement des modifications
 		employerWtrService.save(employerWtr);
