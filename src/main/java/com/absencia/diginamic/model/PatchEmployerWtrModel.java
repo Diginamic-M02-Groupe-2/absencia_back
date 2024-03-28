@@ -8,7 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 
 public class PatchEmployerWtrModel {
-    @NotNull(message = "La date est requise.")
+    @NotNull(message = "Ce champ est requis.")
     @DateTimeFormat(iso=DateTimeFormat.ISO.DATE)
     private LocalDate date;
 
