@@ -61,9 +61,10 @@ public class EmployerWtrController {
 		}
 
 		// Sauvegarde de l'objet EmployerWtr
-		EmployerWtr employerWtr = new EmployerWtr();
-		employerWtr.setDate(model.getDate());
-		employerWtr.setLabel(model.getLabel());
+		final EmployerWtr employerWtr = new EmployerWtr();
+		employerWtr
+				.setDate(model.getDate())
+				.setLabel(model.getLabel());
 		employerWtrService.save(employerWtr);
 
 		return ResponseEntity.ok(Map.of("message", "La RTT employeur a été créée."));
