@@ -55,13 +55,13 @@ public class AbsenceRequestService {
 	}
 
 	public boolean isOverlapping(final AbsenceRequest absenceRequest) {
-		final long count = absenceRequestRepository.countOverlapping(
+		final boolean isOverlapping = absenceRequestRepository.countOverlapping(
 			absenceRequest.getId(), // Ignore this absence request
 			absenceRequest.getUser(), // Filter by the same user
 			absenceRequest.getStartedAt(),
 			absenceRequest.getEndedAt()
 		);
 
-		return count != 0;
+		return isOverlapping;
 	}
 }
