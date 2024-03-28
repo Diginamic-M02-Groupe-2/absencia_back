@@ -43,14 +43,14 @@ public class PublicHolidayController {
 
 		Optional<PublicHoliday> publicHolidayOptional = publicHolidayService.findById(id);
 		if (publicHolidayOptional.isEmpty()) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Le jour férié n'existe pas'."));
+			return ResponseEntity.badRequest().body(Map.of("message", "Ce jour férié n'existe pas."));
 		}
 
 		PublicHoliday publicHoliday = publicHolidayOptional.get();
 
 		// Vérification de la date dans le passé
 		if (publicHoliday.getDate().isBefore(LocalDate.now())) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Le jour férié ne peut pas être dans le passé."));
+			return ResponseEntity.badRequest().body(Map.of("message", "Ce jour férié est déjà passé."));
 		}
 
 		// Mise à jour du statut du jour férié
