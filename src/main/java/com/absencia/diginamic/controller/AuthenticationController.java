@@ -10,12 +10,14 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,14 +35,19 @@ public class AuthenticationController {
 
 	@PostMapping(value="/login", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Map<String, String>> login(@ModelAttribute @Valid final LoginModel request) {
-		final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
-		final Authentication authentication = authenticationManager.authenticate(authenticationToken);
+		try {
+			final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
+			final Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
-		SecurityContextHolder.getContext().setAuthentication(authentication);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			final String token = jwtTokenUtil.generateToken(request.getEmail());
 
-		final String token = jwtTokenUtil.generateToken(request.getEmail());
-
-		return ResponseEntity.ok(Map.of("token", token));
+			return ResponseEntity.ok(Map.of("token", token));
+		} catch (AuthenticationException e) {
+			return ResponseEntity
+					.status(HttpStatus.FORBIDDEN)
+					.body(Map.of("email", "Identifiants invalides."));
+		}
 	}
 
 	@PostMapping(value="/logout")
