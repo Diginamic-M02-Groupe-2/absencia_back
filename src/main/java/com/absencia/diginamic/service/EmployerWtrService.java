@@ -1,5 +1,6 @@
 package com.absencia.diginamic.service;
 
+import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.EmployerWtr;
 import com.absencia.diginamic.model.PostEmployerWtrModel;
 import com.absencia.diginamic.repository.EmployerWtrRepository;
@@ -22,6 +23,10 @@ public class EmployerWtrService {
 		this.employerWtrRepository = employerWtrRepository;
 	}
 
+	public EmployerWtr findOneByIdAndDeletedAtIsNull(final Long id) {
+		return employerWtrRepository.findOneByIdAndDeletedAtIsNull(id);
+	}
+
 	public void save(@NonNull final EmployerWtr employerWtr) {
 		employerWtrRepository.save(employerWtr);
 	}
@@ -42,7 +47,11 @@ public class EmployerWtrService {
 		return MAX_EMPLOYER_WTR - count;
 	}
 
-	public boolean isOverlapping(LocalDate date) {
+	public boolean isDateConflicting(LocalDate date) {
 		return employerWtrRepository.existsByDate(date);
+	}
+
+	public boolean isDateConflictingWithOther(final Long id, LocalDate date) {
+		return employerWtrRepository.isDateConflictingWithOther(id, date);
 	}
 }
