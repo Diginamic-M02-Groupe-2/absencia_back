@@ -32,7 +32,7 @@ import java.time.LocalDate;
 	"""
 )
 @NamedQuery(
-		name = "EmployerWtr.existsByDateFromOther",
+		name = "EmployerWtr.isDateConflictingWithOther",
 		query = "SELECT COUNT(ew) > 0 FROM EmployerWtr ew WHERE ew.id <> :id AND ew.date = :date AND ew.deletedAT IS NULL"
 )
 public class EmployerWtr {

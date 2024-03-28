@@ -46,7 +46,7 @@ public class EmployerWtrService {
 		return MAX_EMPLOYER_WTR - count;
 	}
 
-	public boolean isOverlappingByOther(final Long id, LocalDate date) {
-		return employerWtrRepository.existsByDateFromOther(id, date);
+	public boolean isDateConflictingWithOther(final Long id, LocalDate date) {
+		return employerWtrRepository.isDateConflictingWithOther(id, date);
 	}
 }
