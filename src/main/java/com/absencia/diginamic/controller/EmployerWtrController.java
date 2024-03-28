@@ -43,30 +43,28 @@ public class EmployerWtrController {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "L'utilisateur n'est pas autorisé à effectuer cette action."));
 		}*/
 
-		// Vérification que tous les champs requis sont renseignés
-		if (model.getDate() == null || model.getLabel() == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Tous les champs requis doivent être renseignés."));
-		}
-
 		// Vérification que la date n'est pas dans le passé
 		LocalDate currentDate = LocalDate.now();
 		if (model.getDate().isBefore(currentDate)) {
-			return ResponseEntity.badRequest().body(Map.of("message", "La date ne peut pas être dans le passé."));
+			return ResponseEntity.badRequest().body(Map.of("date", "La date ne peut pas être dans le passé."));
 		}
 
 		// Vérification que la date n'est pas un week-end
 		DayOfWeek dayOfWeek = model.getDate().getDayOfWeek();
 		if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-			return ResponseEntity.badRequest().body(Map.of("message", "La date ne peut pas être un week-end."));
+			return ResponseEntity.badRequest().body(Map.of("date", "La date ne peut pas être un week-end."));
 		}
 
 		// Vérification qu'aucun autre jour férié ou RTT employeur n'existe à cette date
 		if (employerWtrService.isOverlapping(model.getDate())) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Un autre RTT employeur existe déjà à cette date."));
+			return ResponseEntity.badRequest().body(Map.of("date", "Une autre RTT employeur existe déjà à cette date."));
 		}
 
 		// Sauvegarde de l'objet EmployerWtr
-		employerWtrService.saveEmployerWtr(model);
+		EmployerWtr employerWtr = new EmployerWtr();
+		employerWtr.setDate(model.getDate());
+		employerWtr.setLabel(model.getLabel());
+		employerWtrService.save(employerWtr);
 
 		return ResponseEntity.ok(Map.of("message", "La RTT employeur a été créée."));
 	}

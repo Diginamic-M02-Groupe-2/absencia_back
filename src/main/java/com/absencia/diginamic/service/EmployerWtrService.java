@@ -26,14 +26,6 @@ public class EmployerWtrService {
 		employerWtrRepository.save(employerWtr);
 	}
 
-	public void saveEmployerWtr(@NonNull final PostEmployerWtrModel PostEmployerWtr) {
-		EmployerWtr employerWtr = new EmployerWtr();
-		employerWtr.setDate(PostEmployerWtr.getDate());
-		employerWtr.setLabel(PostEmployerWtr.getLabel());
-
-		employerWtrRepository.save(employerWtr);
-	}
-
 	public void delete(final EmployerWtr employerWtr) {
 		employerWtr.setDeletedAt(LocalDate.now());
 
