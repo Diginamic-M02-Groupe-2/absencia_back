@@ -2,6 +2,7 @@ package com.absencia.diginamic.repository;
 
 import com.absencia.diginamic.entity.PublicHoliday;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,4 +14,6 @@ public interface PublicHolidayRepository extends JpaRepository<PublicHoliday, Lo
 	List<PublicHoliday> findByYear(final int year);
 
 	Optional<PublicHoliday> findById(final Long id);
+
+	boolean existsByDate(LocalDate date);
 }
