@@ -1,8 +1,6 @@
 package com.absencia.diginamic.service;
 
-import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.EmployerWtr;
-import com.absencia.diginamic.model.PostEmployerWtrModel;
 import com.absencia.diginamic.repository.EmployerWtrRepository;
 
 import java.time.LocalDate;

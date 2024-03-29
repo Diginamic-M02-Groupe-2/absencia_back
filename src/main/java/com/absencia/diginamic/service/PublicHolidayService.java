@@ -4,7 +4,6 @@ import com.absencia.diginamic.entity.PublicHoliday;
 import com.absencia.diginamic.repository.PublicHolidayRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
