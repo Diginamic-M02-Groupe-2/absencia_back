@@ -4,6 +4,7 @@ import com.absencia.diginamic.entity.PublicHoliday;
 import com.absencia.diginamic.repository.PublicHolidayRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -16,6 +17,10 @@ public class PublicHolidayService {
 	@Autowired
 	public PublicHolidayService(final PublicHolidayRepository publicHolidayRepository) {
 		this.publicHolidayRepository = publicHolidayRepository;
+	}
+
+	public Optional<PublicHoliday> findById(final Long id) {
+		return publicHolidayRepository.findById(id);
 	}
 
 	public void save(@NonNull final PublicHoliday publicHoliday) {

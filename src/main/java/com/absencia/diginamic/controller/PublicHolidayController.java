@@ -6,8 +6,10 @@ import com.absencia.diginamic.service.PublicHolidayService;
 
 import jakarta.validation.Valid;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -34,7 +36,27 @@ public class PublicHolidayController {
 	@PatchMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Map<String, String>> patchPublicHoliday(@PathVariable final long id, @ModelAttribute @Valid final PatchPublicHolidayModel model) {
 		// TODO: Verify that the user is an administrator
+		/* Vérification de l'utilisateur administrateur
+		if (!userService.isAdmin()) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "L'utilisateur n'est pas autorisé à effectuer cette action."));
+		}*/
 
-		return ResponseEntity.ok(Map.of("message", "TODO"));
+		Optional<PublicHoliday> publicHolidayOptional = publicHolidayService.findById(id);
+		if (publicHolidayOptional.isEmpty()) {
+			return ResponseEntity.badRequest().body(Map.of("message", "Ce jour férié n'existe pas."));
+		}
+
+		PublicHoliday publicHoliday = publicHolidayOptional.get();
+
+		// Vérification de la date dans le passé
+		if (publicHoliday.getDate().isBefore(LocalDate.now())) {
+			return ResponseEntity.badRequest().body(Map.of("message", "Ce jour férié est déjà passé."));
+		}
+
+		// Mise à jour du statut du jour férié
+		publicHoliday.setWorked(model.isWorked());
+		publicHolidayService.save(publicHoliday);
+
+		return ResponseEntity.ok(Map.of("message", "Le jour férié a été modifié."));
 	}
 }
