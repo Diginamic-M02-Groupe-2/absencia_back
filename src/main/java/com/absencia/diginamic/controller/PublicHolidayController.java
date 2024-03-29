@@ -13,6 +13,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,13 +34,8 @@ public class PublicHolidayController {
 	}
 
 	@PatchMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	@Secured("ADMINISTRATOR")
 	public ResponseEntity<Map<String, String>> patchPublicHoliday(@PathVariable final long id, @ModelAttribute @Valid final PatchPublicHolidayModel model) {
-		// TODO: Verify that the user is an administrator
-		/* Vérification de l'utilisateur administrateur
-		if (!userService.isAdmin()) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "L'utilisateur n'est pas autorisé à effectuer cette action."));
-		}*/
-
 		final PublicHoliday publicHoliday = publicHolidayService.findOneById(id);
 
 		if (publicHoliday == null) {
