@@ -19,6 +19,16 @@ import java.time.LocalDate;
 
 @Entity
 @NamedQuery(
+	name="AbsenceRequest.findInitial",
+	query="""
+		SELECT ar
+		FROM AbsenceRequest ar
+		WHERE ar.deletedAt IS NULL
+		AND ar.status = AbsenceRequestStatus.INITIAL
+		ORDER BY ar.startedAt ASC
+	"""
+)
+@NamedQuery(
 	name="AbsenceRequest.countRemaining",
 	query="""
 		SELECT COUNT(1)

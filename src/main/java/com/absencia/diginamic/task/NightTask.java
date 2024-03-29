@@ -31,7 +31,11 @@ public class NightTask {
 
 	@Scheduled(cron="0 0 0 * * *")
 	public void run() {
-		System.out.println("From NightTask");
+		final List<AbsenceRequest> initialRequest = absenceRequestService.findInitial();
+
+		for (final AbsenceRequest request : initialRequest) {
+			System.out.println("Processing AbsenceRequest ID: " + request.getId());
+		}
 
 		/* logger.info("Scheduled task nightBatch started.");
 		//Assure que les demandes soient traitées dans l'odre chronologique des dates de début
