@@ -3,14 +3,10 @@ package com.absencia.diginamic.controller;
 import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.AbsenceRequestStatus;
 import com.absencia.diginamic.entity.AbsenceType;
-import com.absencia.diginamic.entity.PublicHoliday;
 import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.model.PatchAbsenceRequestModel;
 import com.absencia.diginamic.model.PostAbsenceRequestModel;
-import com.absencia.diginamic.service.AbsenceRequestService;
-import com.absencia.diginamic.service.EmployerWtrService;
-import com.absencia.diginamic.service.PublicHolidayService;
-import com.absencia.diginamic.service.UserService;
+import com.absencia.diginamic.service.*;
 
 import jakarta.validation.Valid;
 
@@ -18,7 +14,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,13 +30,17 @@ public class AbsenceRequestController {
 	private EmployerWtrService employerWtrService;
 	private PublicHolidayService publicHolidayService;
 
+	private WeekEndService weekEndService;
+
 	@Autowired
 	public AbsenceRequestController(final AbsenceRequestService absenceRequestService, final UserService userService,
-									final EmployerWtrService employerWtrService, final PublicHolidayService publicHolidayService) {
+									final EmployerWtrService employerWtrService, final PublicHolidayService publicHolidayService,
+									final WeekEndService weekEndService) {
 		this.absenceRequestService = absenceRequestService;
 		this.userService = userService;
 		this.employerWtrService = employerWtrService;
 		this.publicHolidayService = publicHolidayService;
+		this.weekEndService = weekEndService;
 	}
 
 	@GetMapping
@@ -67,31 +66,40 @@ public class AbsenceRequestController {
 				.body(Map.of("startedAt", "Veuillez sélectionner une période valide."));
 		}
 
-		LocalDate startDate = model.getStartedAt();
-		LocalDate endDate = model.getEndedAt();
-		DayOfWeek dayOfWeek = startDate.getDayOfWeek();
+		if(weekEndService.isDayOfWeek(model.getStartedAt())){
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("startedAt", "La date ne peut pas être un week-end."));
+		}
 
-		// Vérification de chaque jour entre startedAt et endedAt
-		while (!startDate.isAfter(endDate)) {
-			if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-				return ResponseEntity
-						.badRequest()
-						.body(Map.of("startedAt", "La période sélectionnée contient un week-end."));
-			}
+		if(weekEndService.isDayOfWeek(model.getEndedAt())){
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("endedAt", "La date ne peut pas être un week-end."));
+		}
 
-			if (publicHolidayService.isDateConflicting(startDate)) {
-				return ResponseEntity
-						.badRequest()
-						.body(Map.of("startedAt", "La période sélectionnée contient un jour férié."));
-			}
+		if (publicHolidayService.isDateConflicting(model.getStartedAt())) {
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("startedAt", "La date sélectionnée est un jour férié."));
+		}
 
-			if (employerWtrService.isDateConflicting(startDate)) {
-				return ResponseEntity
-						.badRequest()
-						.body(Map.of("startedAt", "La période sélectionnée contient une RTT employeur."));
-			}
+		if (publicHolidayService.isDateConflicting(model.getEndedAt())) {
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("endedAt", "La date sélectionnée est un jour férié."));
+		}
 
-			startDate = startDate.plusDays(1); // Passer au jour suivant
+		if (employerWtrService.isDateConflicting(model.getStartedAt())) {
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("startedAt", "La date sélectionnée est une RTT employeur."));
+		}
+
+		if (employerWtrService.isDateConflicting(model.getEndedAt())) {
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("endedAt", "La date sélectionnée es une RTT employeur."));
 		}
 
 		// Verify that reason is not null or empty when the absence type is UNPAID_LEAVE
@@ -157,31 +165,40 @@ public class AbsenceRequestController {
 				.body(Map.of("message", "Cette demande d'absence a été validée."));
 		}
 
-		LocalDate startDate = model.getStartedAt();
-		LocalDate endDate = model.getEndedAt();
-		DayOfWeek dayOfWeek = startDate.getDayOfWeek();
+		if(weekEndService.isDayOfWeek(model.getStartedAt())){
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("startedAt", "La date ne peut pas être un week-end."));
+		}
 
-		// Vérification de chaque jour entre startedAt et endedAt
-		while (!startDate.isAfter(endDate)) {
-			if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-				return ResponseEntity
-						.badRequest()
-						.body(Map.of("startedAt", "La période sélectionnée contient un week-end."));
-			}
+		if(weekEndService.isDayOfWeek(model.getEndedAt())){
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("endedAt", "La date ne peut pas être un week-end."));
+		}
 
-			if (publicHolidayService.isDateConflicting(startDate)) {
-				return ResponseEntity
-						.badRequest()
-						.body(Map.of("startedAt", "La période sélectionnée contient un jour férié."));
-			}
+		if (publicHolidayService.isDateConflicting(model.getStartedAt())) {
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("startedAt", "La date sélectionnée est un jour férié."));
+		}
 
-			if (employerWtrService.isDateConflicting(startDate)) {
-				return ResponseEntity
-						.badRequest()
-						.body(Map.of("startedAt", "La période sélectionnée contient une RTT employeur."));
-			}
+		if (publicHolidayService.isDateConflicting(model.getEndedAt())) {
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("endedAt", "La date sélectionnée est un jour férié."));
+		}
 
-			startDate = startDate.plusDays(1); // Passer au jour suivant
+		if (employerWtrService.isDateConflicting(model.getStartedAt())) {
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("startedAt", "La date sélectionnée est une RTT employeur."));
+		}
+
+		if (employerWtrService.isDateConflicting(model.getEndedAt())) {
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("endedAt", "La date sélectionnée es une RTT employeur."));
 		}
 
 		// Verify that the start date is lesser than the end date
