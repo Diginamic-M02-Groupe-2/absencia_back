@@ -41,17 +41,21 @@ public class EmployerWtrService {
 		return employerWtrRepository.findByYear(year);
 	}
 
+	public List<EmployerWtr> findInitial() {
+		return employerWtrRepository.findInitial();
+	}
+
 	public long countRemainingEmployerWtr() {
 		final long count = employerWtrRepository.countApproved();
 
 		return MAX_EMPLOYER_WTR - count;
 	}
 
-	public boolean isDateConflicting(LocalDate date) {
+	public boolean isDateConflicting(final LocalDate date) {
 		return employerWtrRepository.existsByDate(date);
 	}
 
-	public boolean isDateConflictingWithOther(final Long id, LocalDate date) {
+	public boolean isDateConflictingWithOther(final Long id, final LocalDate date) {
 		return employerWtrRepository.isDateConflictingWithOther(id, date);
 	}
 }

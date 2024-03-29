@@ -1,87 +1,82 @@
 package com.absencia.diginamic.task;
 
+import com.absencia.diginamic.entity.AbsenceRequest;
+import com.absencia.diginamic.entity.AbsenceRequestStatus;
+import com.absencia.diginamic.entity.AbsenceType;
+import com.absencia.diginamic.entity.EmployerWtr;
+import com.absencia.diginamic.entity.EmployerWtrStatus;
+import com.absencia.diginamic.service.AbsenceRequestService;
+import com.absencia.diginamic.service.EmployerWtrService;
+
+import java.time.Period;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.absencia.diginamic.entity.AbsenceRequest;
-import com.absencia.diginamic.entity.AbsenceType;
-import com.absencia.diginamic.entity.User.User;
-import com.absencia.diginamic.service.AbsenceRequestService;
-import com.absencia.diginamic.entity.AbsenceRequestStatus;
-
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @Component
 public class NightTask {
-	// private static final Logger logger = LoggerFactory.getLogger(NightTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(NightTask.class);
 
 	private final AbsenceRequestService absenceRequestService;
+	private final EmployerWtrService employerWtrService;
 
 	@Autowired
-	public NightTask(AbsenceRequestService absenceRequestService) {
+	public NightTask(final AbsenceRequestService absenceRequestService, final EmployerWtrService employerWtrService) {
 		this.absenceRequestService = absenceRequestService;
+		this.employerWtrService = employerWtrService;
 	}
 
 	@Scheduled(cron="0 0 0 * * *")
 	public void run() {
-		final List<AbsenceRequest> initialRequest = absenceRequestService.findInitial();
+		final List<AbsenceRequest> initialAbsenceRequests = absenceRequestService.findInitial();
 
-		for (final AbsenceRequest request : initialRequest) {
-			System.out.println("Processing AbsenceRequest ID: " + request.getId());
-		}
+		logger.info("Found {} absence requests.", initialAbsenceRequests.size());
 
-		/* logger.info("Scheduled task nightBatch started.");
-		//Assure que les demandes soient traitées dans l'odre chronologique des dates de début
-		initialRequest.sort(Comparator.comparing(request -> request.getStartedAt()));
+		for (final AbsenceRequest absenceRequest : initialAbsenceRequests) {
+			logger.info("Processing absence request #{}...", absenceRequest.getId());
 
-		for (AbsenceRequest request : initialRequest) {
-			logger.info("Processing AbsenceRequest ID: {}", request.getId());
+			if (hasEnoughDays(absenceRequest)) {
+				absenceRequest.setStatus(AbsenceRequestStatus.PENDING);
 
-			if (request.getType() == AbsenceType.PAID_LEAVE || request.getType() == AbsenceType.UNPAID_LEAVE || request.getType() == AbsenceType.EMPLOYEE_WTR) {
-				//S'il reste assez de jours pour le type d'absence demandé, la demande passe au statut  EN_ATTENTE_VALIDATION
-				handleCommonAbsences(request);
-			} else if (request.getType() == AbsenceType.EMPLOYEE_WTR) {
-				//Si le type de l'absence est un RTT employé ça passe automatiquement en approuvé
-				request.setStatus(AbsenceRequestStatus.APPROVED);
+				logger.info("  Marked as pending.", absenceRequest.getId());
+			} else {
+				absenceRequest.setStatus(AbsenceRequestStatus.REJECTED);
+
+				logger.info("  Rejected.");
 			}
-		}
-		logger.info("Scheduled task nightBatch completed."); */
 
+			absenceRequestService.save(absenceRequest);
+		}
+
+		logger.info("Finished processing absence requests.");
+
+		final List<EmployerWtr> employerWtrList = employerWtrService.findInitial();
+
+		for (final EmployerWtr employerWtr : employerWtrList) {
+			logger.info("Processing employer WTR #{}...", employerWtr.getId());
+
+			employerWtr.setStatus(EmployerWtrStatus.APPROVED);
+
+			logger.info("  Marked as approved.");
+
+			employerWtrService.save(employerWtr);
+		}
 	}
 
-	/* private void handleCommonAbsences(AbsenceRequest request) {
-		if (hasEnoughDays(request)) { 
-			request.setStatus(AbsenceRequestStatus.PENDING); // Si la condition est remplie, ça signifie qu'il reste des jours disponibles, donc la demande est mise à l'état "EN_ATTENTE_VALIDATION" 
-		} else {
-			request.setStatus(AbsenceRequestStatus.REJECTED); //Si la condition précédente n'est pas bonne, ça signifie qu'il ne reste plus de jours disponibles pour cette demande, donc la demande est mise à l'état "REJECTED"
-		}
-	}
-
-	private boolean hasEnoughDays(AbsenceRequest request) {
-		User user = request.getUser();
-		AbsenceType type = request.getType();
-		LocalDate startDate = request.getStartedAt();
-		LocalDate endDate = request.getEndedAt();
-
-		// obtenir le nombre de jours restants pour l'utilisateur et le type d'absence
-		long remainingDays = 0;
-		if (type == AbsenceType.PAID_LEAVE) {
-			remainingDays = absenceRequestService.countRemainingPaidLeaves(user);
-		} else if (type == AbsenceType.EMPLOYEE_WTR) {
-			remainingDays = absenceRequestService.countRemainingEmployeeWtr(user);
+	private boolean hasEnoughDays(final AbsenceRequest absenceRequest) {
+		if (absenceRequest.getType() == AbsenceType.UNPAID_LEAVE) {
+			return true;
 		}
 
-		// Calculer la durée de la demande d'absence
-		long requestedDays = ChronoUnit.DAYS.between(startDate, endDate) + 1; // Ajouter 1 car on inclut également le dernier jour
+		final long requestedDays = Period.between(absenceRequest.getStartedAt(), absenceRequest.getEndedAt()).getDays() + 1;
+		final long remainingDays = absenceRequest.getType() == AbsenceType.PAID_LEAVE ?
+			absenceRequestService.countRemainingPaidLeaves(absenceRequest.getUser()) :
+			absenceRequestService.countRemainingEmployeeWtr(absenceRequest.getUser());
 
-		// Vérifie si l'utilisateur a suffisamment de jours disponibles
 		return remainingDays >= requestedDays;
-	} */
+	}
 }
