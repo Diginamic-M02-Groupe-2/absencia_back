@@ -66,13 +66,13 @@ public class AbsenceRequestController {
 				.body(Map.of("startedAt", "Veuillez sélectionner une période valide."));
 		}
 
-		if(weekEndService.isDayOfWeek(model.getStartedAt())){
+		if(weekEndService.isWeekEndDay(model.getStartedAt())){
 			return ResponseEntity
 					.badRequest()
 					.body(Map.of("startedAt", "La date ne peut pas être un week-end."));
 		}
 
-		if(weekEndService.isDayOfWeek(model.getEndedAt())){
+		if(weekEndService.isWeekEndDay(model.getEndedAt())){
 			return ResponseEntity
 					.badRequest()
 					.body(Map.of("endedAt", "La date ne peut pas être un week-end."));
@@ -165,13 +165,13 @@ public class AbsenceRequestController {
 				.body(Map.of("message", "Cette demande d'absence a été validée."));
 		}
 
-		if(weekEndService.isDayOfWeek(model.getStartedAt())){
+		if(weekEndService.isWeekEndDay(model.getStartedAt())){
 			return ResponseEntity
 					.badRequest()
 					.body(Map.of("startedAt", "La date ne peut pas être un week-end."));
 		}
 
-		if(weekEndService.isDayOfWeek(model.getEndedAt())){
+		if(weekEndService.isWeekEndDay(model.getEndedAt())){
 			return ResponseEntity
 					.badRequest()
 					.body(Map.of("endedAt", "La date ne peut pas être un week-end."));

@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Service
 public class WeekEndService {
-    public boolean isDayOfWeek(final LocalDate startDate){
+    public boolean isWeekEndDay(final LocalDate startDate){
         DayOfWeek dayOfWeek = startDate.getDayOfWeek();
         return dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY;
     }
