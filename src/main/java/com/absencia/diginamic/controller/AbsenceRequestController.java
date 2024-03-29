@@ -3,15 +3,17 @@ package com.absencia.diginamic.controller;
 import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.AbsenceRequestStatus;
 import com.absencia.diginamic.entity.AbsenceType;
+import com.absencia.diginamic.entity.User.Employee;
+import com.absencia.diginamic.entity.User.Manager;
 import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.model.PatchAbsenceRequestModel;
 import com.absencia.diginamic.model.PostAbsenceRequestModel;
 import com.absencia.diginamic.service.*;
+import com.absencia.diginamic.view.View;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import jakarta.validation.Valid;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -27,17 +29,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/absence-requests")
 public class AbsenceRequestController {
 	private AbsenceRequestService absenceRequestService;
+	private ManagerService managerService;
 	private UserService userService;
 	private EmployerWtrService employerWtrService;
 	private PublicHolidayService publicHolidayService;
-
 	private WeekEndService weekEndService;
 
 	@Autowired
-	public AbsenceRequestController(final AbsenceRequestService absenceRequestService, final UserService userService,
+	public AbsenceRequestController(final AbsenceRequestService absenceRequestService, final ManagerService managerService, final UserService userService,
 									final EmployerWtrService employerWtrService, final PublicHolidayService publicHolidayService,
 									final WeekEndService weekEndService) {
 		this.absenceRequestService = absenceRequestService;
+		this.managerService = managerService;
 		this.userService = userService;
 		this.employerWtrService = employerWtrService;
 		this.publicHolidayService = publicHolidayService;
@@ -60,10 +63,22 @@ public class AbsenceRequestController {
 
 	@GetMapping("/manager")
 	@Secured("MANAGER")
-	public ResponseEntity<Map<String, String>> getManagerAbsenceRequests(final Authentication authentication) {
-		// TODO
+	@JsonView(View.ManagerAbsenceRequest.class)
+	public ResponseEntity<List<?>> getManagerAbsenceRequests(final Authentication authentication) {
+		final Manager manager = managerService.loadUserByUsername(authentication.getName());
+		final List<Employee> employees = manager.getEmployees();
+		final List<?> response = List.of(
+			employees.stream()
+				.map(employee -> Map.of(
+					"id", employee.getId(),
+					"firstName", employee.getFirstName(),
+					"lastName", employee.getLastName(),
+					"absenceRequests", absenceRequestService.findByUser(employee)
+				))
+				.toArray()
+		);
 
-		return ResponseEntity.ok(Map.of("message", "todo"));
+		return ResponseEntity.ok(response);
 	}
 
 	@PostMapping(consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -141,7 +156,7 @@ public class AbsenceRequestController {
 	}
 
 	@PatchMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<Map<String, String>> patchAbsenceRequest(final Authentication authentication, @PathVariable final Long id, @ModelAttribute @Valid final PatchAbsenceRequestModel model) {
+	public ResponseEntity<Map<String, String>> patchAbsenceRequest(final Authentication authentication, @PathVariable final long id, @ModelAttribute @Valid final PatchAbsenceRequestModel model) {
 		final AbsenceRequest absenceRequest = absenceRequestService.find(id);
 
 		// Verify that this absence request exists
@@ -244,7 +259,7 @@ public class AbsenceRequestController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Map<String, String>> deleteAbsenceRequest(final Authentication authentication, @PathVariable final Long id) {
+	public ResponseEntity<Map<String, String>> deleteAbsenceRequest(final Authentication authentication, @PathVariable final long id) {
 		final AbsenceRequest absenceRequest = absenceRequestService.find(id);
 
 		// Verify that this absence request exists

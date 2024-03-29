@@ -1,6 +1,8 @@
 package com.absencia.diginamic.entity.User;
 
+import com.absencia.diginamic.view.View;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,12 +27,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class User implements UserDetails {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@JsonView(View.ManagerAbsenceRequest.class)
 	private Long id;
 
 	@Column(length=255)
+	@JsonView(View.ManagerAbsenceRequest.class)
 	private String firstName;
 
 	@Column(length=255)
+	@JsonView(View.ManagerAbsenceRequest.class)
 	private String lastName;
 
 	@Column(length=128, unique=true)

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -25,6 +24,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			.stream()
 			.collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
 
-		return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+		return ResponseEntity
+			.badRequest()
+			.body(body);
 	}
 }

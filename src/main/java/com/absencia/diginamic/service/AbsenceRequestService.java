@@ -34,7 +34,7 @@ public class AbsenceRequestService {
 		save(absenceRequest);
 	}
 
-	public AbsenceRequest find(final Long id) {
+	public AbsenceRequest find(final long id) {
 		return absenceRequestRepository.findOneByIdAndDeletedAtIsNull(id);
 	}
 

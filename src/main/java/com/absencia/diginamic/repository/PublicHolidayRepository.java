@@ -10,9 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PublicHolidayRepository extends JpaRepository<PublicHoliday, Long> {
-
-	PublicHoliday findOneById(final Long id);
-
+	PublicHoliday findOneById(final long id);
 	List<PublicHoliday> findByYear(final int year);
 
 	boolean existsByDate(LocalDate date);
