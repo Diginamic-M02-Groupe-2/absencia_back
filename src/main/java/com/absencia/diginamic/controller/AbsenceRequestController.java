@@ -67,7 +67,7 @@ public class AbsenceRequestController {
 				.body(Map.of("startedAt", "Veuillez sélectionner une période valide."));
 		}
 
-		LocalDate startDate = model.getStartedAt().plusDays(1);
+		LocalDate startDate = model.getStartedAt();
 		LocalDate endDate = model.getEndedAt();
 		DayOfWeek dayOfWeek = startDate.getDayOfWeek();
 
@@ -157,7 +157,7 @@ public class AbsenceRequestController {
 				.body(Map.of("message", "Cette demande d'absence a été validée."));
 		}
 
-		LocalDate startDate = model.getStartedAt().plusDays(1);
+		LocalDate startDate = model.getStartedAt();
 		LocalDate endDate = model.getEndedAt();
 		DayOfWeek dayOfWeek = startDate.getDayOfWeek();
 
