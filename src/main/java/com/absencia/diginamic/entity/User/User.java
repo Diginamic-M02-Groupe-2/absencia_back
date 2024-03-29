@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
@@ -92,7 +91,7 @@ public class User implements UserDetails {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		final Set<GrantedAuthority> authorities = new HashSet<>();
 
-		authorities.add(new SimpleGrantedAuthority(role.toString()));
+		authorities.add(role);
 
 		return authorities;
 	}

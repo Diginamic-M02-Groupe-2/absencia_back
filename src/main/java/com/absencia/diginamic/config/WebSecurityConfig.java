@@ -19,7 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity(prePostEnabled=true, securedEnabled=true)
 public class WebSecurityConfig {
 	private JwtAuthenticationEntryPoint unauthorizedHandler;
 	private JwtTokenUtil jwtTokenUtil;
