@@ -1,7 +1,9 @@
 package com.absencia.diginamic.entity;
 
 import com.absencia.diginamic.entity.User.User;
+import com.absencia.diginamic.view.View;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -54,6 +56,7 @@ import java.time.LocalDate;
 public class AbsenceRequest {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private Long id;
 
 	@ManyToOne(cascade=CascadeType.PERSIST)
@@ -62,16 +65,21 @@ public class AbsenceRequest {
 	private User user;
 
 	@Enumerated(EnumType.ORDINAL)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private AbsenceType type;
 
 	@Enumerated(EnumType.ORDINAL)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private AbsenceRequestStatus status;
 
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private LocalDate startedAt;
 
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private LocalDate endedAt;
 
 	@Column(length=255, nullable=true)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private String reason;
 
 	@Column(nullable=true)

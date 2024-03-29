@@ -1,6 +1,8 @@
 package com.absencia.diginamic.entity.User;
 
+import com.absencia.diginamic.view.View;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
@@ -26,12 +27,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class User implements UserDetails {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private Long id;
 
 	@Column(length=255)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private String firstName;
 
 	@Column(length=255)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private String lastName;
 
 	@Column(length=128, unique=true)
@@ -92,7 +96,7 @@ public class User implements UserDetails {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		final Set<GrantedAuthority> authorities = new HashSet<>();
 
-		authorities.add(new SimpleGrantedAuthority(role.toString()));
+		authorities.add(role);
 
 		return authorities;
 	}

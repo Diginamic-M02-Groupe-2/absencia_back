@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AbsenceRequestRepository extends JpaRepository<AbsenceRequest, Long> {
-	AbsenceRequest findOneByIdAndDeletedAtIsNull(final Long id);
+	AbsenceRequest findOneByIdAndDeletedAtIsNull(final long id);
 	List<AbsenceRequest> findByUserAndDeletedAtIsNull(final User user);
 	List<AbsenceRequest> findInitial();
 	boolean isOverlapping(final Long id, final User user, final LocalDate startedAt, final LocalDate endedAt);

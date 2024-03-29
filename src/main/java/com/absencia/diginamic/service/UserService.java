@@ -33,7 +33,7 @@ public class UserService implements UserDetailsService {
 		userRepository.save(user);
 	}
 
-	public User find(final Long id) {
+	public User find(final long id) {
 		return userRepository.findOneById(id);
 	}
 }

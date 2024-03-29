@@ -1,24 +1,19 @@
 package com.absencia.diginamic.entity.User;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name="user_manager")
 public class Manager extends User {
-	@OneToMany(mappedBy="manager")
-	private Set<Employee> employees;
+	@OneToMany(mappedBy="manager", fetch=FetchType.EAGER)
+	private List<Employee> employees;
 
-	public Manager() {
-		super();
-
-		setRole(Role.MANAGER);
-	}
-
-	public Set<Employee> getEmployees() {
+	public List<Employee> getEmployees() {
 		return employees;
 	}
 

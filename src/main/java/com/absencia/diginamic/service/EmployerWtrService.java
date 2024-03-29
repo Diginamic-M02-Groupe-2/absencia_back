@@ -21,7 +21,7 @@ public class EmployerWtrService {
 		this.employerWtrRepository = employerWtrRepository;
 	}
 
-	public EmployerWtr findOneByIdAndDeletedAtIsNull(final Long id) {
+	public EmployerWtr findOneByIdAndDeletedAtIsNull(final long id) {
 		return employerWtrRepository.findOneByIdAndDeletedAtIsNull(id);
 	}
 

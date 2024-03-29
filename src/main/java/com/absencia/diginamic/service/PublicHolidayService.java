@@ -19,7 +19,7 @@ public class PublicHolidayService {
 		this.publicHolidayRepository = publicHolidayRepository;
 	}
 
-	public PublicHoliday findOneById(final Long id) {
+	public PublicHoliday findOneById(final long id) {
 		return publicHolidayRepository.findOneById(id);
 	}
 
