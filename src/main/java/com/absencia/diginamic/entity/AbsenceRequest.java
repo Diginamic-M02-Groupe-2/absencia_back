@@ -30,7 +30,7 @@ import java.time.LocalDate;
 	"""
 )
 @NamedQuery(
-	name="AbsenceRequest.countOverlapping",
+	name="AbsenceRequest.isOverlapping",
 	query="""
 		SELECT CASE WHEN COUNT(ar) > 0 THEN true ELSE false END
 		FROM AbsenceRequest ar
