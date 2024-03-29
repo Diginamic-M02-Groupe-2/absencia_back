@@ -41,12 +41,11 @@ public class PublicHolidayController {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "L'utilisateur n'est pas autorisé à effectuer cette action."));
 		}*/
 
-		Optional<PublicHoliday> publicHolidayOptional = publicHolidayService.findById(id);
-		if (publicHolidayOptional.isEmpty()) {
+		final PublicHoliday publicHoliday = publicHolidayService.findOneById(id);
+
+		if (publicHoliday == null) {
 			return ResponseEntity.badRequest().body(Map.of("message", "Ce jour férié n'existe pas."));
 		}
-
-		PublicHoliday publicHoliday = publicHolidayOptional.get();
 
 		// Vérification de la date dans le passé
 		if (publicHoliday.getDate().isBefore(LocalDate.now())) {
@@ -55,6 +54,7 @@ public class PublicHolidayController {
 
 		// Mise à jour du statut du jour férié
 		publicHoliday.setWorked(model.isWorked());
+
 		publicHolidayService.save(publicHoliday);
 
 		return ResponseEntity.ok(Map.of("message", "Le jour férié a été modifié."));

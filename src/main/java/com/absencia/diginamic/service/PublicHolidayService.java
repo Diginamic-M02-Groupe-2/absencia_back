@@ -19,8 +19,8 @@ public class PublicHolidayService {
 		this.publicHolidayRepository = publicHolidayRepository;
 	}
 
-	public Optional<PublicHoliday> findById(final Long id) {
-		return publicHolidayRepository.findById(id);
+	public PublicHoliday findOneById(final Long id) {
+		return publicHolidayRepository.findOneById(id);
 	}
 
 	public void save(@NonNull final PublicHoliday publicHoliday) {
