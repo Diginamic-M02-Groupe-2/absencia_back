@@ -27,15 +27,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class User implements UserDetails {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@JsonView(View.ManagerAbsenceRequest.class)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private Long id;
 
 	@Column(length=255)
-	@JsonView(View.ManagerAbsenceRequest.class)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private String firstName;
 
 	@Column(length=255)
-	@JsonView(View.ManagerAbsenceRequest.class)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private String lastName;
 
 	@Column(length=128, unique=true)

@@ -63,22 +63,28 @@ public class AbsenceRequestController {
 
 	@GetMapping("/manager")
 	@Secured("MANAGER")
-	@JsonView(View.ManagerAbsenceRequest.class)
-	public ResponseEntity<List<?>> getManagerAbsenceRequests(final Authentication authentication) {
+	@JsonView(View.EmployeeAbsenceRequest.class)
+	public ResponseEntity<List<?>> getEmployeeAbsenceRequests(final Authentication authentication) {
 		final Manager manager = managerService.loadUserByUsername(authentication.getName());
 		final List<Employee> employees = manager.getEmployees();
-		final List<?> response = List.of(
-			employees.stream()
+		final List<?> absenceRequestsByEmployee = List.of(
+			employees
+				.stream()
+				.filter(employee -> employee.getService() == manager.getService())
 				.map(employee -> Map.of(
 					"id", employee.getId(),
 					"firstName", employee.getFirstName(),
 					"lastName", employee.getLastName(),
-					"absenceRequests", absenceRequestService.findByUser(employee)
+					"absenceRequests", absenceRequestService
+						.findByUser(employee)
+						.stream()
+						.filter(absenceRequest -> absenceRequest.getDeletedAt() == null && absenceRequest.getStatus() == AbsenceRequestStatus.PENDING)
+						.toArray()
 				))
 				.toArray()
 		);
 
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(absenceRequestsByEmployee);
 	}
 
 	@PostMapping(consumes=MediaType.MULTIPART_FORM_DATA_VALUE)

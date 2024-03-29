@@ -56,7 +56,7 @@ import java.time.LocalDate;
 public class AbsenceRequest {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@JsonView(View.ManagerAbsenceRequest.class)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private Long id;
 
 	@ManyToOne(cascade=CascadeType.PERSIST)
@@ -65,21 +65,21 @@ public class AbsenceRequest {
 	private User user;
 
 	@Enumerated(EnumType.ORDINAL)
-	@JsonView(View.ManagerAbsenceRequest.class)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private AbsenceType type;
 
 	@Enumerated(EnumType.ORDINAL)
-	@JsonView(View.ManagerAbsenceRequest.class)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private AbsenceRequestStatus status;
 
-	@JsonView(View.ManagerAbsenceRequest.class)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private LocalDate startedAt;
 
-	@JsonView(View.ManagerAbsenceRequest.class)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private LocalDate endedAt;
 
 	@Column(length=255, nullable=true)
-	@JsonView(View.ManagerAbsenceRequest.class)
+	@JsonView(View.EmployeeAbsenceRequest.class)
 	private String reason;
 
 	@Column(nullable=true)
