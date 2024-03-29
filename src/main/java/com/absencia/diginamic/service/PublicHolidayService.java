@@ -3,6 +3,7 @@ package com.absencia.diginamic.service;
 import com.absencia.diginamic.entity.PublicHoliday;
 import com.absencia.diginamic.repository.PublicHolidayRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,9 @@ public class PublicHolidayService {
 
 	public List<PublicHoliday> findByYear(final int year) {
 		return publicHolidayRepository.findByYear(year);
+	}
+
+	public boolean isDateConflicting(LocalDate date) {
+		return publicHolidayRepository.existsByDate(date);
 	}
 }
