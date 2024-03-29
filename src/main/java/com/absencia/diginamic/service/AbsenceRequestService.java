@@ -55,7 +55,7 @@ public class AbsenceRequestService {
 	}
 
 	public boolean isOverlapping(final AbsenceRequest absenceRequest) {
-		final boolean isOverlapping = absenceRequestRepository.countOverlapping(
+		final boolean isOverlapping = absenceRequestRepository.isOverlapping(
 			absenceRequest.getId(), // Ignore this absence request
 			absenceRequest.getUser(), // Filter by the same user
 			absenceRequest.getStartedAt(),
