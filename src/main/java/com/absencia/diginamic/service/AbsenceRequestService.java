@@ -42,6 +42,10 @@ public class AbsenceRequestService {
 		return absenceRequestRepository.findByUserAndDeletedAtIsNull(user);
 	}
 
+	public List<AbsenceRequest> findInitial() {
+		return absenceRequestRepository.findInitial();
+	}
+
 	public long countRemainingPaidLeaves(final User user) {
 		final long count = absenceRequestRepository.countRemaining(user, AbsenceType.PAID_LEAVE);
 
