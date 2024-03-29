@@ -67,46 +67,30 @@ public class AbsenceRequestController {
 				.body(Map.of("startedAt", "Veuillez sélectionner une période valide."));
 		}
 
-		// Vérification que la date de début n'est pas un week-end
-		if (isWeekend(model.getStartedAt())) {
-			return ResponseEntity
-					.badRequest()
-					.body(Map.of("startedAt", "La date ne peut pas être un week-end."));
-		}
+		LocalDate startDate = model.getStartedAt();
+		LocalDate endDate = model.getEndedAt();
 
-		// Vérification que la date de fin n'est pas un week-end
-		if (isWeekend(model.getEndedAt())) {
-			return ResponseEntity
-					.badRequest()
-					.body(Map.of("endedAt", "La date ne peut pas être un week-end."));
-		}
+		// Vérification de chaque jour entre startedAt et endedAt
+		while (!startDate.isAfter(endDate)) {
+			if (isWeekend(startDate)) {
+				return ResponseEntity
+						.badRequest()
+						.body(Map.of("startedAt", "La période sélectionnée contient un week-end."));
+			}
 
-		// Vérification que la date de début n'est pas un jour férié
-		if (isConflictWithPublicHoliday(model.getStartedAt())) {
-			return ResponseEntity
-					.badRequest()
-					.body(Map.of("startedAt", "La date ne peut pas être un jour férié."));
-		}
+			if (isConflictWithPublicHoliday(startDate)) {
+				return ResponseEntity
+						.badRequest()
+						.body(Map.of("startedAt", "La période sélectionnée contient un jour férié."));
+			}
 
-		// Vérification que la date de fin n'est pas un jour férié
-		if (isConflictWithPublicHoliday(model.getEndedAt())) {
-			return ResponseEntity
-					.badRequest()
-					.body(Map.of("endedAt", "La date ne peut pas être un jour férié."));
-		}
+			if (isConflictWithWTR(startDate)) {
+				return ResponseEntity
+						.badRequest()
+						.body(Map.of("startedAt", "La période sélectionnée contient une RTT employeur."));
+			}
 
-		// Vérification que la date de début n'est pas un jour WTR
-		if (isConflictWithWTR(model.getStartedAt())) {
-			return ResponseEntity
-					.badRequest()
-					.body(Map.of("startedAt", "Une autre RTT employeur existe déjà à cette date."));
-		}
-
-		// Vérification que la date de fin n'est pas un jour WTR
-		if (isConflictWithWTR(model.getEndedAt())) {
-			return ResponseEntity
-					.badRequest()
-					.body(Map.of("endedAt", "Une autre RTT employeur existe déjà à cette date."));
+			startDate = startDate.plusDays(1); // Passer au jour suivant
 		}
 
 		// Verify that reason is not null or empty when the absence type is UNPAID_LEAVE
@@ -172,46 +156,30 @@ public class AbsenceRequestController {
 				.body(Map.of("message", "Cette demande d'absence a été validée."));
 		}
 
-		// Vérification que la date de début n'est pas un week-end
-		if (isWeekend(model.getStartedAt())) {
-			return ResponseEntity
-					.badRequest()
-					.body(Map.of("startedAt", "La date ne peut pas être un week-end."));
-		}
+		LocalDate startDate = model.getStartedAt();
+		LocalDate endDate = model.getEndedAt();
 
-		// Vérification que la date de fin n'est pas un week-end
-		if (isWeekend(model.getEndedAt())) {
-			return ResponseEntity
-					.badRequest()
-					.body(Map.of("endedAt", "La date ne peut pas être un week-end."));
-		}
+		// Vérification de chaque jour entre startedAt et endedAt
+		while (!startDate.isAfter(endDate)) {
+			if (isWeekend(startDate)) {
+				return ResponseEntity
+						.badRequest()
+						.body(Map.of("startedAt", "La période sélectionnée contient un week-end."));
+			}
 
-		// Vérification que la date de début n'est pas un jour férié
-		if (isConflictWithPublicHoliday(model.getStartedAt())) {
-			return ResponseEntity
-					.badRequest()
-					.body(Map.of("startedAt", "La date ne peut pas être un jour férié."));
-		}
+			if (isConflictWithPublicHoliday(startDate)) {
+				return ResponseEntity
+						.badRequest()
+						.body(Map.of("startedAt", "La période sélectionnée contient un jour férié."));
+			}
 
-		// Vérification que la date de fin n'est pas un jour férié
-		if (isConflictWithPublicHoliday(model.getEndedAt())) {
-			return ResponseEntity
-					.badRequest()
-					.body(Map.of("endedAt", "La date ne peut pas être un jour férié."));
-		}
+			if (isConflictWithWTR(startDate)) {
+				return ResponseEntity
+						.badRequest()
+						.body(Map.of("startedAt", "La période sélectionnée contient une RTT employeur."));
+			}
 
-		// Vérification que la date de début n'est pas un jour WTR
-		if (isConflictWithWTR(model.getStartedAt())) {
-			return ResponseEntity
-					.badRequest()
-					.body(Map.of("startedAt", "Une autre RTT employeur existe déjà à cette date."));
-		}
-
-		// Vérification que la date de fin n'est pas un jour WTR
-		if (isConflictWithWTR(model.getEndedAt())) {
-			return ResponseEntity
-					.badRequest()
-					.body(Map.of("endedAt", "Une autre RTT employeur existe déjà à cette date."));
+			startDate = startDate.plusDays(1); // Passer au jour suivant
 		}
 
 		// Verify that the start date is lesser than the end date
