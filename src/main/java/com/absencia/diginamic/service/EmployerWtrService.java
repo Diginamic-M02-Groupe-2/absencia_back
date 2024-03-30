@@ -6,7 +6,6 @@ import com.absencia.diginamic.repository.EmployerWtrRepository;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,6 @@ public class EmployerWtrService {
 
 	private EmployerWtrRepository employerWtrRepository;
 
-	@Autowired
 	public EmployerWtrService(final EmployerWtrRepository employerWtrRepository) {
 		this.employerWtrRepository = employerWtrRepository;
 	}

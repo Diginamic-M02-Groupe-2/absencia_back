@@ -6,7 +6,6 @@ import com.absencia.diginamic.repository.PublicHolidayRepository;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 public class PublicHolidayService {
 	private PublicHolidayRepository publicHolidayRepository;
 
-	@Autowired
 	public PublicHolidayService(final PublicHolidayRepository publicHolidayRepository) {
 		this.publicHolidayRepository = publicHolidayRepository;
 	}

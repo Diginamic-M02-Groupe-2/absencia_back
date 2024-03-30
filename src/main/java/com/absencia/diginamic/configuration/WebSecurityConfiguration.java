@@ -3,7 +3,6 @@ package com.absencia.diginamic.configuration;
 import com.absencia.diginamic.service.JwtService;
 import com.absencia.diginamic.service.UserService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +27,6 @@ public class WebSecurityConfiguration {
 	private final JwtService jwtService;
 	private final UserService userService;
 
-	@Autowired
 	public WebSecurityConfiguration(final JwtAuthenticationEntryPoint unauthorizedHandler, final JwtConfiguration jwtConfiguration, final JwtService jwtService, final UserService userService) {
 		this.unauthorizedHandler = unauthorizedHandler;
 		this.jwtConfiguration = jwtConfiguration;

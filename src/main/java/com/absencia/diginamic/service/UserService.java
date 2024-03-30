@@ -3,7 +3,6 @@ package com.absencia.diginamic.service;
 import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.repository.UserRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 public class UserService implements UserDetailsService {
 	private UserRepository userRepository;
 
-	@Autowired
 	public UserService(final UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
