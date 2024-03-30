@@ -27,7 +27,12 @@ public class WebSecurityConfiguration {
 	private final JwtService jwtService;
 	private final UserService userService;
 
-	public WebSecurityConfiguration(final JwtAuthenticationEntryPoint unauthorizedHandler, final JwtConfiguration jwtConfiguration, final JwtService jwtService, final UserService userService) {
+	public WebSecurityConfiguration(
+		final JwtAuthenticationEntryPoint unauthorizedHandler,
+		final JwtConfiguration jwtConfiguration,
+		final JwtService jwtService,
+		final UserService userService
+	) {
 		this.unauthorizedHandler = unauthorizedHandler;
 		this.jwtConfiguration = jwtConfiguration;
 		this.jwtService = jwtService;

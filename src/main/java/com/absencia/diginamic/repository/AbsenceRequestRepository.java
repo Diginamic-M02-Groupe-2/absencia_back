@@ -15,6 +15,11 @@ public interface AbsenceRequestRepository extends JpaRepository<AbsenceRequest, 
 	AbsenceRequest findOneByIdAndDeletedAtIsNull(final long id);
 	List<AbsenceRequest> findByUserAndDeletedAtIsNull(final User user);
 	List<AbsenceRequest> findInitial();
-	boolean isOverlapping(final Long id, final User user, final LocalDate startedAt, final LocalDate endedAt);
 	long countRemaining(final User user, final AbsenceType type);
+	boolean isOverlapping(
+		final Long id,
+		final User user,
+		final LocalDate startedAt,
+		final LocalDate endedAt
+	);
 }
