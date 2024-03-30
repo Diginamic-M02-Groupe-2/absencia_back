@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled=true, securedEnabled=true)
@@ -30,28 +32,6 @@ public class WebSecurityConfiguration {
 		this.unauthorizedHandler = unauthorizedHandler;
 		this.jwtService = jwtService;
 		this.userService = userService;
-	}
-
-	@Bean
-	public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
-		return http
-			.csrf(csrf -> csrf.disable())
-			.cors(cors -> cors.configurationSource(corsConfigurer -> {
-				final CorsConfiguration corsConfiguration = new CorsConfiguration();
-
-				corsConfiguration.applyPermitDefaultValues();
-				corsConfiguration.addAllowedMethod("PATCH");
-				corsConfiguration.addAllowedMethod("DELETE");
-
-				return corsConfiguration;
-			}))
-			.exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
-			.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers("/api/login").permitAll()
-				.anyRequest().authenticated()
-			)
-			.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-			.build();
 	}
 
 	@Bean
@@ -70,7 +50,36 @@ public class WebSecurityConfiguration {
 	}
 
 	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		final CorsConfiguration corsConfiguration = new CorsConfiguration();
+
+		corsConfiguration.applyPermitDefaultValues();
+		corsConfiguration.addAllowedMethod("PATCH");
+		corsConfiguration.addAllowedMethod("DELETE");
+
+		final UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
+
+		corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+
+		return corsConfigurationSource;
+	}
+
+	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
+		return http
+			.csrf(csrf -> csrf.disable())
+			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+			.exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
+			.authorizeHttpRequests(authorize -> authorize
+				.requestMatchers("/api/login").permitAll()
+				.anyRequest().authenticated()
+			)
+			.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+			.build();
 	}
 }
