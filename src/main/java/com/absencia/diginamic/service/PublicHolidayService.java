@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PublicHolidayService {
-	private PublicHolidayRepository publicHolidayRepository;
+	private final PublicHolidayRepository publicHolidayRepository;
 
 	public PublicHolidayService(final PublicHolidayRepository publicHolidayRepository) {
 		this.publicHolidayRepository = publicHolidayRepository;

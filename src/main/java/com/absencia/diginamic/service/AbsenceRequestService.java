@@ -16,7 +16,7 @@ public class AbsenceRequestService {
 	public static final long MAX_PAID_LEAVES = 25;
 	public static final long MAX_EMPLOYEE_WTR = 6;
 
-	private AbsenceRequestRepository absenceRequestRepository;
+	private final AbsenceRequestRepository absenceRequestRepository;
 
 	public AbsenceRequestService(final AbsenceRequestRepository absenceRequestRepository) {
 		this.absenceRequestRepository = absenceRequestRepository;

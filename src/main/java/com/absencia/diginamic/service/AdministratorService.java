@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AdministratorService implements UserDetailsService {
-	private AdministratorRepository administratorRepository;
+	private final AdministratorRepository administratorRepository;
 
 	public AdministratorService(final AdministratorRepository administratorRepository) {
 		this.administratorRepository = administratorRepository;

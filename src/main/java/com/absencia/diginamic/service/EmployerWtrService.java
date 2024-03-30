@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class EmployerWtrService {
 	public static final long MAX_EMPLOYER_WTR = 5;
 
-	private EmployerWtrRepository employerWtrRepository;
+	private final EmployerWtrRepository employerWtrRepository;
 
 	public EmployerWtrService(final EmployerWtrRepository employerWtrRepository) {
 		this.employerWtrRepository = employerWtrRepository;
