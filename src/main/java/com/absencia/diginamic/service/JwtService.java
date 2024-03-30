@@ -1,5 +1,7 @@
 package com.absencia.diginamic.service;
 
+import com.absencia.diginamic.configuration.JwtConfiguration;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
@@ -7,8 +9,6 @@ import java.util.Date;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
-import com.absencia.diginamic.configuration.JwtConfiguration;
 
 @Service
 public class JwtService {

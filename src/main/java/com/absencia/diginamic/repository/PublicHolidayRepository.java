@@ -12,6 +12,5 @@ import org.springframework.stereotype.Repository;
 public interface PublicHolidayRepository extends JpaRepository<PublicHoliday, Long> {
 	PublicHoliday findOneById(final long id);
 	List<PublicHoliday> findByYear(final int year);
-
 	boolean existsByDate(LocalDate date);
 }

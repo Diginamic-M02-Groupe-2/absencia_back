@@ -1,7 +1,6 @@
 package com.absencia.diginamic.exception;
 
 import java.util.Map;
-
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpHeaders;

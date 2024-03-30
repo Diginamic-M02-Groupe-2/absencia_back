@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Import(WebSecurityConfiguration.class)
 @RequestMapping("/api")
 public class AuthenticationController {
-	private AuthenticationService authenticationService;
+	private final AuthenticationService authenticationService;
 
 	public AuthenticationController(final AuthenticationService authenticationService) {
 		this.authenticationService = authenticationService;
