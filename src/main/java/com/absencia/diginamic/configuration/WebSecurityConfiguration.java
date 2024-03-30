@@ -1,46 +1,39 @@
-package com.absencia.diginamic.config;
+package com.absencia.diginamic.configuration;
 
+import com.absencia.diginamic.service.JwtService;
 import com.absencia.diginamic.service.UserService;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
-@EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled=true, securedEnabled=true)
-public class WebSecurityConfig {
-	private JwtAuthenticationEntryPoint unauthorizedHandler;
-	private JwtTokenUtil jwtTokenUtil;
-	private UserService userService;
+@EnableWebSecurity
+public class WebSecurityConfiguration {
+	private final JwtAuthenticationEntryPoint unauthorizedHandler;
+	private final JwtConfiguration jwtConfiguration;
+	private final JwtService jwtService;
+	private final UserService userService;
 
 	@Autowired
-	public WebSecurityConfig(final JwtAuthenticationEntryPoint unauthorizedHandler, final JwtTokenUtil jwtTokenUtil, final UserService userService) {
+	public WebSecurityConfiguration(final JwtAuthenticationEntryPoint unauthorizedHandler, final JwtConfiguration jwtConfiguration, final JwtService jwtService, final UserService userService) {
 		this.unauthorizedHandler = unauthorizedHandler;
-		this.jwtTokenUtil = jwtTokenUtil;
+		this.jwtConfiguration = jwtConfiguration;
+		this.jwtService = jwtService;
 		this.userService = userService;
-	}
-
-	@Bean
-	public AuthenticationManager authenticationManager(final HttpSecurity http, final BCryptPasswordEncoder bCryptPasswordEncoder) throws Exception {
-		AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-
-		authenticationManagerBuilder
-			.userDetailsService(userService)
-			.passwordEncoder(bCryptPasswordEncoder);
-
-		return authenticationManagerBuilder.build();
 	}
 
 	@Bean
@@ -59,27 +52,29 @@ public class WebSecurityConfig {
 			.exceptionHandling(customizer -> customizer.authenticationEntryPoint(unauthorizedHandler))
 			.authorizeHttpRequests(authorize -> authorize
 				.requestMatchers("/api/login").permitAll()
-				.anyRequest().authenticated())
-			.logout((logout -> logout
-				.logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> {
-						httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-					})))
-			.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
+				.anyRequest().authenticated()
+			)
+			.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 			.build();
 	}
 
 	@Bean
-	public JwtAuthenticationFilter authenticationTokenFilterBean() throws Exception {
-		return new JwtAuthenticationFilter(jwtTokenUtil, userService);
+	public AuthenticationFilter authenticationFilter() {
+		return new AuthenticationFilter(jwtConfiguration, jwtService, userService);
 	}
 
 	@Bean
-	public BCryptPasswordEncoder encoder() {
+	public AuthenticationManager authenticationManager(final UserDetailsService userDetailsService, final PasswordEncoder passwordEncoder) {
+		final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+
+		authenticationProvider.setUserDetailsService(userDetailsService);
+		authenticationProvider.setPasswordEncoder(passwordEncoder);
+
+		return new ProviderManager(authenticationProvider);
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	public SessionCreationPolicy sessionCreationPolicy() {
-		return SessionCreationPolicy.STATELESS;
 	}
 }

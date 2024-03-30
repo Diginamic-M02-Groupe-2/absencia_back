@@ -4,14 +4,14 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public class LoginModel {
-	@NotBlank(message="Veuillez saisir votre email.")
-	@NotNull(message="Veuillez saisir votre email.")
+public class PostLoginModel {
+	@NotBlank(message="Ce champ est requis.")
+	@NotNull(message="Ce champ est requis.")
 	@Email(message="Veuillez saisir un email valide.")
 	private String email;
 
-	@NotBlank(message="Veuillez saisir votre mot de passe.")
-	@NotNull(message="Veuillez saisir votre mot de passe.")
+	@NotBlank(message="Ce champ est requis.")
+	@NotNull(message="Ce champ est requis.")
 	private String password;
 
 	public String getEmail() {
