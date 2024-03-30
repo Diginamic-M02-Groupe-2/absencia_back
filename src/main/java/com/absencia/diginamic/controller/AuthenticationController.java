@@ -9,10 +9,8 @@ import jakarta.validation.Valid;
 import java.util.Map;
 
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,21 +27,16 @@ public class AuthenticationController {
 	}
 
 	@PostMapping(value="/login", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> login(@ModelAttribute @Valid final PostLoginModel model) {
-		final ResponseCookie cookie;
-
+	public ResponseEntity<Map<String, String>> login(@ModelAttribute @Valid final PostLoginModel model) {
 		try {
-			cookie = authenticationService.authenticate(model);
+			final String bearer = authenticationService.authenticate(model);
+
+			return ResponseEntity.ok(Map.of("token", bearer));
 		} catch (final AuthenticationException exception) {
 			return ResponseEntity
 				.status(HttpStatus.FORBIDDEN)
-				.body(Map.of("email", exception.getMessage()));
+				.body(Map.of("email", "Identifiants invalides."));
 		}
-
-		return ResponseEntity
-			.ok()
-			.header(HttpHeaders.SET_COOKIE, cookie.toString())
-			.build();
 	}
 
 	@PostMapping(value="/logout")

@@ -11,9 +11,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class JwtConfiguration {
-	@Value("${jwt.cookie}")
-	private String cookieName;
-
 	@Value("${jwt.expiration}")
 	private long expiration;
 
@@ -21,10 +18,6 @@ public class JwtConfiguration {
 	private byte[] encodedSecretKey;
 
 	private SecretKey secretKey;
-
-	public String getCookieName() {
-		return cookieName;
-	}
 
 	public long getExpiration() {
 		return expiration;

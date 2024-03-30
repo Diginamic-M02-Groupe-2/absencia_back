@@ -14,7 +14,6 @@ public class PostEmployerWtrModel {
 	private LocalDate date;
 
 	@NotBlank(message="Ce champ est requis")
-	@NotNull(message="Ce champ est requis.")
 	@Length(max=255, message="Ce champ ne doit pas dépasser 255 caractères.")
 	private String label;
 
