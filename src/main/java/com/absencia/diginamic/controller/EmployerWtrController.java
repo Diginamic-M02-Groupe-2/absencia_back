@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -21,9 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/employer-wtr")
 public class EmployerWtrController {
-	private EmployerWtrService employerWtrService;
+	private final EmployerWtrService employerWtrService;
 
-	@Autowired
 	public EmployerWtrController(final EmployerWtrService employerWtrService) {
 		this.employerWtrService = employerWtrService;
 	}

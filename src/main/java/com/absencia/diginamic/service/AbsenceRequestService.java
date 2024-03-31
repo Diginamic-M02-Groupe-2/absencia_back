@@ -8,7 +8,6 @@ import com.absencia.diginamic.repository.AbsenceRequestRepository;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +16,8 @@ public class AbsenceRequestService {
 	public static final long MAX_PAID_LEAVES = 25;
 	public static final long MAX_EMPLOYEE_WTR = 6;
 
-	private AbsenceRequestRepository absenceRequestRepository;
+	private final AbsenceRequestRepository absenceRequestRepository;
 
-	@Autowired
 	public AbsenceRequestService(final AbsenceRequestRepository absenceRequestRepository) {
 		this.absenceRequestRepository = absenceRequestRepository;
 	}

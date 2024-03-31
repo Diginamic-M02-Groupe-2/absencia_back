@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +23,6 @@ public class NightTask {
 	private final AbsenceRequestService absenceRequestService;
 	private final EmployerWtrService employerWtrService;
 
-	@Autowired
 	public NightTask(final AbsenceRequestService absenceRequestService, final EmployerWtrService employerWtrService) {
 		this.absenceRequestService = absenceRequestService;
 		this.employerWtrService = employerWtrService;

@@ -3,7 +3,6 @@ package com.absencia.diginamic.service;
 import com.absencia.diginamic.entity.User.Employee;
 import com.absencia.diginamic.repository.EmployeeRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,9 +10,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmployeeService implements UserDetailsService {
-	private EmployeeRepository employeeRepository;
+	private final EmployeeRepository employeeRepository;
 
-	@Autowired
 	public EmployeeService(final EmployeeRepository employeeRepository) {
 		this.employeeRepository = employeeRepository;
 	}

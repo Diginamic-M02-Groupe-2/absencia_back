@@ -17,7 +17,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,17 +27,21 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/absence-requests")
 public class AbsenceRequestController {
-	private AbsenceRequestService absenceRequestService;
-	private ManagerService managerService;
-	private UserService userService;
-	private EmployerWtrService employerWtrService;
-	private PublicHolidayService publicHolidayService;
-	private WeekEndService weekEndService;
+	private final AbsenceRequestService absenceRequestService;
+	private final ManagerService managerService;
+	private final UserService userService;
+	private final EmployerWtrService employerWtrService;
+	private final PublicHolidayService publicHolidayService;
+	private final WeekEndService weekEndService;
 
-	@Autowired
-	public AbsenceRequestController(final AbsenceRequestService absenceRequestService, final ManagerService managerService, final UserService userService,
-									final EmployerWtrService employerWtrService, final PublicHolidayService publicHolidayService,
-									final WeekEndService weekEndService) {
+	public AbsenceRequestController(
+		final AbsenceRequestService absenceRequestService,
+		final ManagerService managerService,
+		final UserService userService,
+		final EmployerWtrService employerWtrService,
+		final PublicHolidayService publicHolidayService,
+		final WeekEndService weekEndService
+	) {
 		this.absenceRequestService = absenceRequestService;
 		this.managerService = managerService;
 		this.userService = userService;

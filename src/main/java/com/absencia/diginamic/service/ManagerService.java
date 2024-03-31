@@ -3,7 +3,6 @@ package com.absencia.diginamic.service;
 import com.absencia.diginamic.entity.User.Manager;
 import com.absencia.diginamic.repository.ManagerRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,9 +10,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ManagerService implements UserDetailsService {
-	private ManagerRepository managerRepository;
+	private final ManagerRepository managerRepository;
 
-	@Autowired
 	public ManagerService(final ManagerRepository managerRepository) {
 		this.managerRepository = managerRepository;
 	}
