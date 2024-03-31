@@ -1,5 +1,7 @@
 package com.absencia.diginamic.entity.User;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
@@ -11,6 +13,7 @@ import java.util.List;
 @Table(name="user_manager")
 public class Manager extends User {
 	@OneToMany(mappedBy="manager", fetch=FetchType.EAGER)
+	@JsonIgnore
 	private List<Employee> employees;
 
 	public List<Employee> getEmployees() {

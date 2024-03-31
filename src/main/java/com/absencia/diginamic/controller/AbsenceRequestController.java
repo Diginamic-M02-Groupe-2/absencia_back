@@ -66,7 +66,7 @@ public class AbsenceRequestController {
 
 	@GetMapping("/manager")
 	@Secured("MANAGER")
-	@JsonView(View.EmployeeAbsenceRequest.class)
+	@JsonView(View.AbsenceRequest.GetEmployeeAbsenceRequests.class)
 	public ResponseEntity<List<?>> getEmployeeAbsenceRequests(final Authentication authentication) {
 		final Manager manager = managerService.loadUserByUsername(authentication.getName());
 		final List<Employee> employees = manager.getEmployees();
