@@ -304,6 +304,43 @@ public class AbsenceRequestController {
 		return ResponseEntity.ok(Map.of("message", "La demande d'absence a été validée."));
 	}
 
+	@PatchMapping("/{id}/reject")
+	@Secured("MANAGER")
+	public ResponseEntity<Map<String, String>> rejectAbsenceRequest(final Authentication authentication, @PathVariable final long id) {
+		final AbsenceRequest absenceRequest = absenceRequestService.find(id);
+
+		// Verify that this absence request exists
+		if (absenceRequest == null) {
+			return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(Map.of("message", "Cette demande d'absence n'existe pas ou plus."));
+		}
+
+		final User user = absenceRequest.getUser();
+		final Manager manager = (Manager) userService.loadUserByUsername(authentication.getName());
+
+		// Verify that the absence request is owned by an employee of this manager
+		// and that they're in the same service
+		if (!manager.getEmployees().contains(user) || manager.getService() != user.getService()) {
+			return ResponseEntity
+				.status(HttpStatus.UNAUTHORIZED)
+				.body(Map.of("message", "Vous n'avez pas la permission de refuser cette demande d'absence."));
+		}
+
+		// Verify that the absence request is in pending state
+		if (absenceRequest.getStatus() != AbsenceRequestStatus.PENDING) {
+			return ResponseEntity
+				.status(HttpStatus.UNAUTHORIZED)
+				.body(Map.of("message", "Cette demande d'absence n'est pas en attente de validation."));
+		}
+
+		absenceRequest.setStatus(AbsenceRequestStatus.REJECTED);
+
+		absenceRequestService.save(absenceRequest);
+
+		return ResponseEntity.ok(Map.of("message", "La demande d'absence a été refusée."));
+	}
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Map<String, String>> deleteAbsenceRequest(final Authentication authentication, @PathVariable final long id) {
 		final AbsenceRequest absenceRequest = absenceRequestService.find(id);
