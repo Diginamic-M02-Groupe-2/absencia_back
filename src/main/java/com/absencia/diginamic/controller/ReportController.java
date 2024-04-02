@@ -27,7 +27,7 @@ public class ReportController {
 	}
 
 	@GetMapping("/employer-wtr-and-public-holidays")
-	public ResponseEntity<?> getEmployerWtrAndPublicHolidayReport(@RequestParam int year) {
+	public ResponseEntity<?> getEmployerWtrAndPublicHolidayReport(@RequestParam final int year) {
 		List<EmployerWtr> employerWtr = employerWtrService.findByYear(year);
 		List<PublicHoliday> publicHolidays = publicHolidayService.findByYear(year);
 
