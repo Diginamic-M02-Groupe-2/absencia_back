@@ -123,7 +123,7 @@ public class EmployerWtrController {
 		if (employerWtr == null) {
 			return ResponseEntity
 				.status(HttpStatus.NOT_FOUND)
-				.body(Map.of("message", "Le RTT employeur n'a pas été trouvée."));
+				.body(Map.of("message", "Ce RTT employeur n'existe pas ou plus."));
 		}
 
 		//Récupérer la date actuelle
@@ -132,7 +132,7 @@ public class EmployerWtrController {
 		if (employerWtr.getDate().isBefore(currentDate)) {
 			return ResponseEntity
 				.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("message", "La date du RTT employeur est passée."));
+				.body(Map.of("message", "La date du RTT employeur est passé."));
 		}
 
 		// Vérifier que tous les champs requis sont renseignés
@@ -140,13 +140,6 @@ public class EmployerWtrController {
 			return ResponseEntity
 				.status(HttpStatus.BAD_REQUEST)
 				.body(Map.of("message", "Tous les champs requis ne sont pas renseignés."));
-		}
-
-		// Vérifier que le RTT employeur a déjà été supprimée
-		if (employerWtr.getDeletedAt() != null) {
-			return ResponseEntity
-				.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("message", "Le RTT employeur a déjà été supprimée."));
 		}
 
 		// Vérifier les autorisations de l'utilisateur
@@ -160,6 +153,6 @@ public class EmployerWtrController {
 		// Supprimer la RTT employeur
 		employerWtrService.delete(employerWtr);
 
-		return ResponseEntity.ok(Map.of("message", "Le RTT employeur a été supprimée."));
+		return ResponseEntity.ok(Map.of("message", "Le RTT employeur a été supprimé."));
 	}
 }
