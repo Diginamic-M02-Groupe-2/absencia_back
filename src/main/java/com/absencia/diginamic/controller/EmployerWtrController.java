@@ -7,6 +7,8 @@ import com.absencia.diginamic.model.PatchEmployerWtrModel;
 import com.absencia.diginamic.model.PostEmployerWtrModel;
 import com.absencia.diginamic.service.EmployerWtrService;
 import com.absencia.diginamic.service.UserService;
+
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 
 import jakarta.validation.Valid;
@@ -117,6 +119,7 @@ public class EmployerWtrController {
 		return ResponseEntity.ok(Map.of("message", "La RTT employeur a été modifiée."));
 	}
 
+	@Secured("ADMINISTRATOR")
 	@DeleteMapping(value="/{id}")
 	public ResponseEntity<Map<String, String>> deleteEmployerWtr(final Authentication authentication, @PathVariable final long id) {
 		EmployerWtr employerWtr = employerWtrService.findOneByIdAndDeletedAtIsNull(id);
@@ -131,23 +134,8 @@ public class EmployerWtrController {
 		// Vérifier que la date de la RTT employeur est passée
 		if (employerWtr.getDate().isBefore(currentDate)) {
 			return ResponseEntity
-				.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("message", "La date du RTT employeur est passé."));
-		}
-
-		// Vérifier que tous les champs requis sont renseignés
-		if (employerWtr.getDate() == null || employerWtr.getLabel() == null) {
-			return ResponseEntity
-				.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("message", "Tous les champs requis ne sont pas renseignés."));
-		}
-
-		// Vérifier les autorisations de l'utilisateur
-		final User user = userService.loadUserByUsername(authentication.getName());
-		if (user == null || user.getRole() != Role.ADMINISTRATOR) {
-			return ResponseEntity
 				.status(HttpStatus.UNAUTHORIZED)
-				.body(Map.of("message", "Vous n'avez pas l'autorisation de supprimer un RTT employeur."));
+				.body(Map.of("message", "La date du RTT employeur est passé."));
 		}
 
 		// Supprimer la RTT employeur
