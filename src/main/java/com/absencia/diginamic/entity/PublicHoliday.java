@@ -21,6 +21,15 @@ import org.hibernate.annotations.NamedQuery;
 		WHERE YEAR(ph.date) = :year
 	"""
 )
+@NamedQuery(
+		name="PublicHoliday.findByMonthAndYear",
+		query="""
+		SELECT ph
+		FROM PublicHoliday ph
+		WHERE YEAR(ph.date) = :year
+		AND MONTH(ph.date) = :month
+	"""
+)
 public class PublicHoliday {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

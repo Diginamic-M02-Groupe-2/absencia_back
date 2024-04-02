@@ -66,4 +66,9 @@ public class AbsenceRequestService {
 
 		return isOverlapping;
 	}
+
+	public List<AbsenceRequest> findByMonthYearAndService(int month, int year, com.absencia.diginamic.entity.User.Service service) {
+		return absenceRequestRepository.findByMonthYearAndService(month, year, service);
+	}
+
 }

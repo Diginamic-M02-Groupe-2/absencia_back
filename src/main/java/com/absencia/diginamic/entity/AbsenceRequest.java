@@ -52,6 +52,18 @@ import java.time.LocalDate;
 		AND ar.endedAt > :startedAt
 	"""
 )
+@NamedQuery(
+		name = "AbsenceRequest.findByMonthYearAndService",
+		query = """
+        SELECT ar
+        FROM AbsenceRequest ar
+        JOIN ar.user u
+        WHERE FUNCTION('YEAR', ar.startedAt) = :year
+        AND FUNCTION('MONTH', ar.startedAt) = :month
+        AND u.service = :service
+        AND ar.deletedAt IS NULL
+    """
+)
 public class AbsenceRequest {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
