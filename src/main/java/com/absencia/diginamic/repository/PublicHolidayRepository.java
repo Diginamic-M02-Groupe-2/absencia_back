@@ -13,4 +13,5 @@ public interface PublicHolidayRepository extends JpaRepository<PublicHoliday, Lo
 	PublicHoliday findOneById(final long id);
 	List<PublicHoliday> findByYear(final int year);
 	boolean existsByDate(LocalDate date);
+	List<PublicHoliday> findByMonthAndYear(final int month, final int year);
 }

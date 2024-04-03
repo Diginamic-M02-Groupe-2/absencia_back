@@ -86,4 +86,4 @@ public class AbsenceRequestService {
 		return dataForDay;
 	}
 
-	}
+}

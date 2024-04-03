@@ -32,4 +32,9 @@ public class PublicHolidayService {
 	public boolean isDateConflicting(LocalDate date) {
 		return publicHolidayRepository.existsByDate(date);
 	}
+
+	public List<PublicHoliday> findByMonthAndYear(int month, int year) {
+		return publicHolidayRepository.findByMonthAndYear(month, year);
+	}
+
 }

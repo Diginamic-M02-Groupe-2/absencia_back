@@ -2,8 +2,8 @@ package com.absencia.diginamic.repository;
 
 import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.AbsenceType;
-import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.entity.User.Service;
+import com.absencia.diginamic.entity.User.User;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,6 +23,7 @@ public interface AbsenceRequestRepository extends JpaRepository<AbsenceRequest, 
 		final LocalDate startedAt,
 		final LocalDate endedAt
 	);
+
 	List<AbsenceRequest> findByMonthYearAndService(final int month, final int year, final Service service);
 	int getDataForDayForEmployee(final Long employeeId, final LocalDate date);
 }
