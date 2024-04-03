@@ -31,14 +31,14 @@ public class AbsenceRequestController {
 	private final UserService userService;
 	private final EmployerWtrService employerWtrService;
 	private final PublicHolidayService publicHolidayService;
-	private final WeekEndService weekEndService;
+	private final DateService weekEndService;
 
 	public AbsenceRequestController(
 		final AbsenceRequestService absenceRequestService,
 		final UserService userService,
 		final EmployerWtrService employerWtrService,
 		final PublicHolidayService publicHolidayService,
-		final WeekEndService weekEndService
+		final DateService weekEndService
 	) {
 		this.absenceRequestService = absenceRequestService;
 		this.userService = userService;

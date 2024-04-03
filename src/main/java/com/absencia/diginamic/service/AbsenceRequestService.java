@@ -66,4 +66,24 @@ public class AbsenceRequestService {
 
 		return isOverlapping;
 	}
-}
+
+	public List<AbsenceRequest> findByMonthYearAndService(int month, int year, com.absencia.diginamic.entity.User.Service service) {
+		return absenceRequestRepository.findByMonthYearAndService(month, year, service);
+	}
+
+	public com.absencia.diginamic.entity.User.Service getServiceById(int serviceId) {
+		for (com.absencia.diginamic.entity.User.Service service : com.absencia.diginamic.entity.User.Service.values()) {
+			if (service.value == serviceId) {
+				return service;
+			}
+		}
+		return null;
+	}
+
+	public int getDataForDay(Long employeeId, int year, int month, int day) {
+		LocalDate date = LocalDate.of(year, month, day);
+		int dataForDay = absenceRequestRepository.getDataForDayForEmployee(employeeId, date);
+		return dataForDay;
+	}
+
+	}
