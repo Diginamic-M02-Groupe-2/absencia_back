@@ -9,10 +9,8 @@ import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.EmployerWtr;
 import com.absencia.diginamic.entity.PublicHoliday;
 import com.absencia.diginamic.entity.User.Service;
-import com.absencia.diginamic.service.AbsenceRequestService;
-import com.absencia.diginamic.service.DateService;
-import com.absencia.diginamic.service.EmployerWtrService;
-import com.absencia.diginamic.service.PublicHolidayService;
+import com.absencia.diginamic.entity.User.User;
+import com.absencia.diginamic.service.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,15 +23,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReportController {
 	private final PublicHolidayService publicHolidayService;
 	private final EmployerWtrService employerWtrService;
-	private final DateService dateService;
 	private final AbsenceRequestService absenceRequestService;
+	private final DateService dateService;
+	private final UserService userService;
 
 	public ReportController(final PublicHolidayService publicHolidayService, final EmployerWtrService employerWtrService,
-							final DateService dateService, final AbsenceRequestService absenceRequestService) {
+							final AbsenceRequestService absenceRequestService, final DateService dateService,
+							final UserService userService) {
 		this.publicHolidayService = publicHolidayService;
 		this.employerWtrService = employerWtrService;
-		this.dateService = dateService;
 		this.absenceRequestService = absenceRequestService;
+		this.dateService = dateService;
+		this.userService = userService;
 	}
 
 	@GetMapping("/employer-wtr-and-public-holidays")
@@ -82,6 +83,10 @@ public class ReportController {
 		// Itérer sur chaque employé pour construire les données de l'histogramme
 		for (EmployerWtr employee : employees) {
 			Map<String, Object> employeeData = new HashMap<>();
+			User user = userService.find(employee.getId());
+			employeeData.put("id", user.getId());
+			employeeData.put("firstName", user.getFirstName());
+			employeeData.put("lastName", user.getLastName());
 
 			List<Integer> dataSet = new ArrayList<>();
 
