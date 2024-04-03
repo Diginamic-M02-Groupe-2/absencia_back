@@ -121,52 +121,6 @@ public class ReportController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/table")
-	@Secured("MANAGER")
-	public ResponseEntity<?> getTableReport(@RequestParam final int month, @RequestParam final int year, @RequestParam final int service) {
-
-		Service currentService = absenceRequestService.getServiceById(service);
-
-		if (currentService == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Ce service n'existe pas."));
-		}
-
-		final List<EmployerWtr> employees = employerWtrService.findByYear(year);
-
-		final List<AbsenceRequest> absenceRequests = absenceRequestService.findByMonthYearAndService(month, year, currentService);
-
-		final List<Map<String, Object>> tableData = new ArrayList<>();
-
-		// Itérer sur chaque employé pour construire les données de l'histogramme
-		for (EmployerWtr employee : employees) {
-			Map<String, Object> employeeData = new HashMap<>();
-			User user = userService.find(employee.getId());
-			employeeData.put("id", user.getId());
-			employeeData.put("firstName", user.getFirstName());
-			employeeData.put("lastName", user.getLastName());
-
-			List<Integer> dataSet = new ArrayList<>();
-
-			// Itérer sur chaque jour du mois pour l'employé actuel
-			for (int day = 1; day <= dateService.getDaysInMonth(month, year); day++) {
-				final int finalDay = day;
-				long absenceCount = absenceRequests.stream()
-						.filter(request ->
-								request.getUser().getId() == employee.getId() &&
-										request.getStartedAt().getDayOfMonth() <= finalDay &&
-										request.getEndedAt().getDayOfMonth() >= finalDay)
-						.count();
-
-				dataSet.add((int) absenceCount);
-			}
-
-			employeeData.put("dataset", dataSet);
-			tableData.add(employeeData);
-		}
-
-		return ResponseEntity.ok(tableData);
-	}
-
 	@GetMapping("/histogram")
 	@Secured("MANAGER")
 	public ResponseEntity<?> getHistogramReport(@RequestParam final int month, @RequestParam final int year, @RequestParam final int service) {
