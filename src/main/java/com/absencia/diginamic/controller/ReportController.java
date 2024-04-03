@@ -121,14 +121,6 @@ public class ReportController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/table")
-	@Secured("MANAGER")
-	public ResponseEntity<?> getTableReport() {
-		// TODO
-
-		return ResponseEntity.ok(Map.of("message", "TODO"));
-	}
-
 	@GetMapping("/histogram")
 	@Secured("MANAGER")
 	public ResponseEntity<?> getHistogramReport(@RequestParam final int month, @RequestParam final int year, @RequestParam final int service) {
