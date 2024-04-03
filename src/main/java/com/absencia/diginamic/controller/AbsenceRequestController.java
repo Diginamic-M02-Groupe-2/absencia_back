@@ -31,20 +31,20 @@ public class AbsenceRequestController {
 	private final UserService userService;
 	private final EmployerWtrService employerWtrService;
 	private final PublicHolidayService publicHolidayService;
-	private final WeekEndService weekEndService;
+	private final DateService dateService;
 
 	public AbsenceRequestController(
 		final AbsenceRequestService absenceRequestService,
 		final UserService userService,
 		final EmployerWtrService employerWtrService,
 		final PublicHolidayService publicHolidayService,
-		final WeekEndService weekEndService
+		final DateService dateService
 	) {
 		this.absenceRequestService = absenceRequestService;
 		this.userService = userService;
 		this.employerWtrService = employerWtrService;
 		this.publicHolidayService = publicHolidayService;
-		this.weekEndService = weekEndService;
+		this.dateService = dateService;
 	}
 
 	@GetMapping
@@ -96,13 +96,13 @@ public class AbsenceRequestController {
 				.body(Map.of("startedAt", "Veuillez sélectionner une période valide."));
 		}
 
-		if (weekEndService.isWeekEndDay(model.getStartedAt())) {
+		if (dateService.isWeekEndDay(model.getStartedAt())) {
 			return ResponseEntity
 				.badRequest()
 				.body(Map.of("startedAt", "La date ne peut pas être un week-end."));
 		}
 
-		if (weekEndService.isWeekEndDay(model.getEndedAt())) {
+		if (dateService.isWeekEndDay(model.getEndedAt())) {
 			return ResponseEntity
 				.badRequest()
 				.body(Map.of("endedAt", "La date ne peut pas être un week-end."));
@@ -195,13 +195,13 @@ public class AbsenceRequestController {
 				.body(Map.of("message", "Cette demande d'absence a été validée."));
 		}
 
-		if(weekEndService.isWeekEndDay(model.getStartedAt())){
+		if(dateService.isWeekEndDay(model.getStartedAt())){
 			return ResponseEntity
 				.badRequest()
 				.body(Map.of("startedAt", "Cette date ne peut pas être un week-end."));
 		}
 
-		if(weekEndService.isWeekEndDay(model.getEndedAt())){
+		if(dateService.isWeekEndDay(model.getEndedAt())){
 			return ResponseEntity
 				.badRequest()
 				.body(Map.of("endedAt", "Cette date ne peut pas être un week-end."));

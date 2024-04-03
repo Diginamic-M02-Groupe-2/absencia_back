@@ -10,10 +10,7 @@ import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.EmployerWtr;
 import com.absencia.diginamic.entity.PublicHoliday;
 import com.absencia.diginamic.entity.User.Service;
-import com.absencia.diginamic.service.AbsenceRequestService;
-import com.absencia.diginamic.service.EmployerWtrService;
-import com.absencia.diginamic.service.PublicHolidayService;
-import com.absencia.diginamic.service.UserService;
+import com.absencia.diginamic.service.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,13 +26,16 @@ public class ReportController {
 	private final AbsenceRequestService absenceRequestService;
 
 	private final UserService userService;
+	private final DateService dateService;
 
 	public ReportController(final PublicHolidayService publicHolidayService, final EmployerWtrService employerWtrService,
-							final AbsenceRequestService absenceRequestService, final UserService userService) {
+							final AbsenceRequestService absenceRequestService, final UserService userService,
+							final DateService dateService) {
 		this.publicHolidayService = publicHolidayService;
 		this.employerWtrService = employerWtrService;
 		this.absenceRequestService = absenceRequestService;
 		this.userService = userService;
+		this.dateService = dateService;
 	}
 
 	@GetMapping("/employer-wtr-and-public-holidays")
@@ -49,7 +49,7 @@ public class ReportController {
 	public ResponseEntity<?> getPlanningReport(@RequestParam final int month, @RequestParam final int year, @RequestParam final int service) {
 
 		// Récupérer l'objet Service correspondant à partir de l'ID du service
-		Service currentService = getServiceById(service);
+		Service currentService = absenceRequestService.getServiceById(service);
 
 		// Vérifiez si le service existe avant de continuer
 		if (currentService == null) {
@@ -74,7 +74,7 @@ public class ReportController {
 			List<Integer> dataSet = new ArrayList<>();
 
 			// Construire le jeu de données de l'employé pour chaque jour du mois
-			for (int day = 1; day <= getDaysInMonth(month, year); day++) {
+			for (int day = 1; day <= dateService.getDaysInMonth(month, year); day++) {
 				// Vérifier si le jour est un jour férié
 				int finalDay = day;
 				boolean isHoliday = publicHolidays.stream().anyMatch(holiday -> holiday.getDate().getDayOfMonth() == finalDay);
@@ -106,23 +106,7 @@ public class ReportController {
 		response.put("employees", planning);
 		response.put("publicHolidays", publicHolidays);
 
-		// Retourner la réponse avec le statut 200 OK
 		return ResponseEntity.ok(response);
-	}
-
-	// Fonction utilitaire pour obtenir le nombre de jours dans un mois donné
-	private int getDaysInMonth(int month, int year) {
-		YearMonth yearMonthObject = YearMonth.of(year, month);
-		return yearMonthObject.lengthOfMonth();
-	}
-
-	public Service getServiceById(int serviceId) {
-		for (Service service : Service.values()) {
-			if (service.value == serviceId) {
-				return service;
-			}
-		}
-		return null;
 	}
 
 	@GetMapping("/table")

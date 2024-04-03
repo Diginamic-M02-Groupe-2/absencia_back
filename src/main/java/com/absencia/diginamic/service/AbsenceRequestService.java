@@ -71,4 +71,13 @@ public class AbsenceRequestService {
 		return absenceRequestRepository.findByMonthYearAndService(month, year, service);
 	}
 
+	public com.absencia.diginamic.entity.User.Service getServiceById(int serviceId) {
+		for (com.absencia.diginamic.entity.User.Service service : com.absencia.diginamic.entity.User.Service.values()) {
+			if (service.value == serviceId) {
+				return service;
+			}
+		}
+		return null;
+	}
+
 }
