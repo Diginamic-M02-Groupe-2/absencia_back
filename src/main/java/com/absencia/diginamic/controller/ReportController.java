@@ -9,6 +9,7 @@ import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.EmployerWtr;
 import com.absencia.diginamic.entity.PublicHoliday;
 import com.absencia.diginamic.entity.User.Service;
+import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.service.EmployerWtrService;
 import com.absencia.diginamic.service.PublicHolidayService;
 import com.absencia.diginamic.service.*;
@@ -28,13 +29,16 @@ public class ReportController {
 	private final EmployerWtrService employerWtrService;
 	private final AbsenceRequestService absenceRequestService;
 	private final DateService dateService;
+	private final UserService userService;
 
 	public ReportController(final PublicHolidayService publicHolidayService, final EmployerWtrService employerWtrService,
-							final AbsenceRequestService absenceRequestService, final DateService dateService) {
+							final AbsenceRequestService absenceRequestService, final DateService dateService,
+							final UserService userService) {
 		this.publicHolidayService = publicHolidayService;
 		this.employerWtrService = employerWtrService;
 		this.absenceRequestService = absenceRequestService;
 		this.dateService = dateService;
+		this.userService = userService;
 	}
 
 	@GetMapping("/employer-wtr-and-public-holidays")
@@ -74,6 +78,10 @@ public class ReportController {
 		// Itérer sur chaque employé pour construire son jeu de données pour le planning
 		for (EmployerWtr employee : employees) {
 			Map<String, Object> employeeData = new HashMap<>();
+			User user = userService.find(employee.getId());
+			employeeData.put("id", user.getId());
+			employeeData.put("firstName", user.getFirstName());
+			employeeData.put("lastName", user.getLastName());
 
 			List<Integer> dataSet = new ArrayList<>();
 
