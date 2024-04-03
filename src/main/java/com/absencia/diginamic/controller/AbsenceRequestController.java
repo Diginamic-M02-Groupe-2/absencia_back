@@ -78,7 +78,8 @@ public class AbsenceRequestController {
 					"absenceRequests", absenceRequestService
 						.findByUser(employee)
 						.stream()
-						.filter(absenceRequest -> absenceRequest.getStatus() == AbsenceRequestStatus.PENDING)
+						.filter(absenceRequest -> absenceRequest.getStatus() == AbsenceRequestStatus.PENDING ||
+							absenceRequest.getStatus() == AbsenceRequestStatus.REJECTED)
 						.toArray()
 				))
 				.toArray()
