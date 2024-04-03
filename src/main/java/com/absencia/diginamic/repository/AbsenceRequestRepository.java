@@ -25,4 +25,5 @@ public interface AbsenceRequestRepository extends JpaRepository<AbsenceRequest, 
 	);
 
 	List<AbsenceRequest> findByMonthYearAndService(final int month, final int year, final Service service);
+	int getDataForDayForEmployee(final Long employeeId, final LocalDate date);
 }

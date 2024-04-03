@@ -80,4 +80,10 @@ public class AbsenceRequestService {
 		return null;
 	}
 
+	public int getDataForDay(Long employeeId, int year, int month, int day) {
+		LocalDate date = LocalDate.of(year, month, day);
+		int dataForDay = absenceRequestRepository.getDataForDayForEmployee(employeeId, date);
+		return dataForDay;
+	}
+
 }

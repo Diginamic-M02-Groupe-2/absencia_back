@@ -64,6 +64,15 @@ import java.time.LocalDate;
         AND ar.deletedAt IS NULL
     """
 )
+@NamedQuery(
+	name="AbsenceRequest.getDataForDayForEmployee",
+	query="""
+		SELECT COUNT(ar) FROM AbsenceRequest ar
+		WHERE ar.user.id = :employeeId
+		AND :date BETWEEN ar.startedAt AND ar.endedAt
+		AND ar.deletedAt IS NULL
+	"""
+)
 public class AbsenceRequest {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
