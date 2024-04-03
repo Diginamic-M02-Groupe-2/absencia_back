@@ -1,6 +1,5 @@
 package com.absencia.diginamic.controller;
 
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +9,10 @@ import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.EmployerWtr;
 import com.absencia.diginamic.entity.PublicHoliday;
 import com.absencia.diginamic.entity.User.Service;
+import com.absencia.diginamic.service.EmployerWtrService;
+import com.absencia.diginamic.service.PublicHolidayService;
 import com.absencia.diginamic.service.*;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,28 +23,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/reports")
 public class ReportController {
+
 	private final PublicHolidayService publicHolidayService;
 	private final EmployerWtrService employerWtrService;
 	private final AbsenceRequestService absenceRequestService;
-
-	private final UserService userService;
 	private final DateService dateService;
 
 	public ReportController(final PublicHolidayService publicHolidayService, final EmployerWtrService employerWtrService,
-							final AbsenceRequestService absenceRequestService, final UserService userService,
-							final DateService dateService) {
+							final AbsenceRequestService absenceRequestService, final DateService dateService) {
 		this.publicHolidayService = publicHolidayService;
 		this.employerWtrService = employerWtrService;
 		this.absenceRequestService = absenceRequestService;
-		this.userService = userService;
 		this.dateService = dateService;
 	}
 
 	@GetMapping("/employer-wtr-and-public-holidays")
-	public ResponseEntity<?> getEmployerWtrAndPublicHolidayReport() {
-		// TODO
+	public ResponseEntity<Map<String, ?>> getEmployerWtrAndPublicHolidayReport(@RequestParam final int year) {
+		List<EmployerWtr> employerWtr = employerWtrService.findByYear(year);
+		List<PublicHoliday> publicHolidays = publicHolidayService.findByYear(year);
 
-		return ResponseEntity.ok(Map.of("message", "TODO"));
+		Map<String, Object> response = new HashMap<>();
+		response.put("employerWtr", employerWtr);
+		response.put("publicHolidays", publicHolidays);
+
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/planning")
