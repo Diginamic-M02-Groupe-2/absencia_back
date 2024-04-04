@@ -37,4 +37,8 @@ public class PublicHolidayService {
 		return publicHolidayRepository.findByMonthAndYear(month, year);
 	}
 
+	public void clearTable(){
+		publicHolidayRepository.clearTable();
+	}
+
 }

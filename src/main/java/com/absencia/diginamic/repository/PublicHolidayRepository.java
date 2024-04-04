@@ -5,7 +5,9 @@ import com.absencia.diginamic.entity.PublicHoliday;
 import java.time.LocalDate;
 import java.util.List;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -29,4 +31,9 @@ public interface PublicHolidayRepository extends JpaRepository<PublicHoliday, Lo
 		AND MONTH(ph.date) = :month
 	""")
 	List<PublicHoliday> findByMonthAndYear(final int month, final int year);
+
+	@Modifying
+	@Transactional
+	@Query(value = "TRUNCATE TABLE public_holiday", nativeQuery = true)
+	void clearTable();
 }
