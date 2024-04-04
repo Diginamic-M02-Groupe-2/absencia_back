@@ -32,7 +32,7 @@ public class NightTask {
 	public void run() {
 		final List<AbsenceRequest> initialAbsenceRequests = absenceRequestService.findInitial();
 
-		logger.info("Found {} absence requests.", initialAbsenceRequests.size());
+		logger.info("Found {} initial absence requests.", initialAbsenceRequests.size());
 
 		for (final AbsenceRequest absenceRequest : initialAbsenceRequests) {
 			logger.info("Processing absence request #{}...", absenceRequest.getId());
@@ -40,7 +40,7 @@ public class NightTask {
 			if (hasEnoughDays(absenceRequest)) {
 				absenceRequest.setStatus(AbsenceRequestStatus.PENDING);
 
-				logger.info("  Marked as pending.", absenceRequest.getId());
+				logger.info("  Marked as pending.");
 			} else {
 				absenceRequest.setStatus(AbsenceRequestStatus.REJECTED);
 
@@ -52,9 +52,11 @@ public class NightTask {
 
 		logger.info("Finished processing absence requests.");
 
-		final List<EmployerWtr> employerWtrList = employerWtrService.findInitial();
+		final List<EmployerWtr> initialEmployerWtrList = employerWtrService.findInitial();
 
-		for (final EmployerWtr employerWtr : employerWtrList) {
+		logger.info("Found {} initial employer WTR.", initialEmployerWtrList.size());
+
+		for (final EmployerWtr employerWtr : initialEmployerWtrList) {
 			logger.info("Processing employer WTR #{}...", employerWtr.getId());
 
 			employerWtr.setStatus(EmployerWtrStatus.APPROVED);
@@ -63,6 +65,8 @@ public class NightTask {
 
 			employerWtrService.save(employerWtr);
 		}
+
+		logger.info("Finished processing employer WTR.");
 	}
 
 	private boolean hasEnoughDays(final AbsenceRequest absenceRequest) {
