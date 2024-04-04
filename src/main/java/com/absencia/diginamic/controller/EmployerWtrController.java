@@ -1,8 +1,6 @@
 package com.absencia.diginamic.controller;
 
 import com.absencia.diginamic.entity.EmployerWtr;
-import com.absencia.diginamic.entity.User.Role;
-import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.model.PatchEmployerWtrModel;
 import com.absencia.diginamic.model.PostEmployerWtrModel;
 import com.absencia.diginamic.service.EmployerWtrService;
@@ -21,18 +19,15 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/employer-wtr")
 public class EmployerWtrController {
 	private final EmployerWtrService employerWtrService;
-	private final UserService userService;
 
 	public EmployerWtrController(final EmployerWtrService employerWtrService,  final UserService userService) {
 		this.employerWtrService = employerWtrService;
-		this.userService = userService;
 	}
 
 	// TODO: Include non-approved employer WTR?
