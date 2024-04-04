@@ -17,11 +17,21 @@ import java.time.LocalDate;
 @NamedQuery(
 	name="EmployerWtr.findByYear",
 	query="""
-        SELECT ew
-        FROM EmployerWtr ew
-        WHERE YEAR(ew.date) = :year
-        AND ew.deletedAt IS NULL
-    """
+		SELECT ew
+		FROM EmployerWtr ew
+		WHERE ew.deletedAt IS NULL
+		AND YEAR(ew.date) = :year
+	"""
+)
+@NamedQuery(
+	name="EmployerWtr.findInitial",
+	query="""
+		SELECT ew
+		FROM EmployerWtr ew
+		WHERE ew.deletedAt IS NULL
+		AND ew.status = EmployerWtrStatus.INITIAL
+		ORDER BY ew.date ASC
+	"""
 )
 @NamedQuery(
 	name="EmployerWtr.countApproved",

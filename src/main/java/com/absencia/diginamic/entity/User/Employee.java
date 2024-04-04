@@ -12,12 +12,6 @@ public class Employee extends User {
 	@JoinColumn(nullable=false)
 	private Manager manager;
 
-	public Employee() {
-		super();
-
-		setRole(Role.EMPLOYEE);
-	}
-
 	public Manager getManager() {
 		return manager;
 	}

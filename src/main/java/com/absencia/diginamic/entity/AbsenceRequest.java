@@ -1,9 +1,10 @@
 package com.absencia.diginamic.entity;
 
 import com.absencia.diginamic.entity.User.User;
+import com.absencia.diginamic.view.View;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,6 +20,16 @@ import java.time.LocalDate;
 
 @Entity
 @NamedQuery(
+	name="AbsenceRequest.findInitial",
+	query="""
+		SELECT ar
+		FROM AbsenceRequest ar
+		WHERE ar.deletedAt IS NULL
+		AND ar.status = AbsenceRequestStatus.INITIAL
+		ORDER BY ar.startedAt ASC
+	"""
+)
+@NamedQuery(
 	name="AbsenceRequest.countRemaining",
 	query="""
 		SELECT COUNT(1)
@@ -30,7 +41,7 @@ import java.time.LocalDate;
 	"""
 )
 @NamedQuery(
-	name="AbsenceRequest.countOverlapping",
+	name="AbsenceRequest.isOverlapping",
 	query="""
 		SELECT CASE WHEN COUNT(ar) > 0 THEN true ELSE false END
 		FROM AbsenceRequest ar
@@ -41,27 +52,54 @@ import java.time.LocalDate;
 		AND ar.endedAt > :startedAt
 	"""
 )
+@NamedQuery(
+		name = "AbsenceRequest.findByMonthYearAndService",
+		query = """
+        SELECT ar
+        FROM AbsenceRequest ar
+        JOIN ar.user u
+        WHERE FUNCTION('YEAR', ar.startedAt) = :year
+        AND FUNCTION('MONTH', ar.startedAt) = :month
+        AND u.service = :service
+        AND ar.deletedAt IS NULL
+    """
+)
+@NamedQuery(
+	name="AbsenceRequest.getDataForDayForEmployee",
+	query="""
+		SELECT COUNT(ar) FROM AbsenceRequest ar
+		WHERE ar.user.id = :employeeId
+		AND :date BETWEEN ar.startedAt AND ar.endedAt
+		AND ar.deletedAt IS NULL
+	"""
+)
 public class AbsenceRequest {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@JsonView(View.AbsenceRequest.GetEmployeeAbsenceRequests.class)
 	private Long id;
 
-	@ManyToOne(cascade=CascadeType.PERSIST)
+	@ManyToOne
 	@JoinColumn(nullable=false)
 	@JsonIgnore
 	private User user;
 
 	@Enumerated(EnumType.ORDINAL)
+	@JsonView(View.AbsenceRequest.GetEmployeeAbsenceRequests.class)
 	private AbsenceType type;
 
 	@Enumerated(EnumType.ORDINAL)
+	@JsonView(View.AbsenceRequest.GetEmployeeAbsenceRequests.class)
 	private AbsenceRequestStatus status;
 
+	@JsonView(View.AbsenceRequest.GetEmployeeAbsenceRequests.class)
 	private LocalDate startedAt;
 
+	@JsonView(View.AbsenceRequest.GetEmployeeAbsenceRequests.class)
 	private LocalDate endedAt;
 
 	@Column(length=255, nullable=true)
+	@JsonView(View.AbsenceRequest.GetEmployeeAbsenceRequests.class)
 	private String reason;
 
 	@Column(nullable=true)

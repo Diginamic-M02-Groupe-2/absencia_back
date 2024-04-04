@@ -1,4 +1,4 @@
-package com.absencia.diginamic.config;
+package com.absencia.diginamic.configuration;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

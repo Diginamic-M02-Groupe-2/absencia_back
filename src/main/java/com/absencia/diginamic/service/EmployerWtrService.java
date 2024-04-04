@@ -1,14 +1,11 @@
 package com.absencia.diginamic.service;
 
-import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.EmployerWtr;
-import com.absencia.diginamic.model.PostEmployerWtrModel;
 import com.absencia.diginamic.repository.EmployerWtrRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +13,13 @@ import org.springframework.stereotype.Service;
 public class EmployerWtrService {
 	public static final long MAX_EMPLOYER_WTR = 5;
 
-	private EmployerWtrRepository employerWtrRepository;
+	private final EmployerWtrRepository employerWtrRepository;
 
-	@Autowired
 	public EmployerWtrService(final EmployerWtrRepository employerWtrRepository) {
 		this.employerWtrRepository = employerWtrRepository;
 	}
 
-	public EmployerWtr findOneByIdAndDeletedAtIsNull(final Long id) {
+	public EmployerWtr findOneByIdAndDeletedAtIsNull(final long id) {
 		return employerWtrRepository.findOneByIdAndDeletedAtIsNull(id);
 	}
 
@@ -41,17 +37,21 @@ public class EmployerWtrService {
 		return employerWtrRepository.findByYear(year);
 	}
 
+	public List<EmployerWtr> findInitial() {
+		return employerWtrRepository.findInitial();
+	}
+
 	public long countRemainingEmployerWtr() {
 		final long count = employerWtrRepository.countApproved();
 
 		return MAX_EMPLOYER_WTR - count;
 	}
 
-	public boolean isDateConflicting(LocalDate date) {
+	public boolean isDateConflicting(final LocalDate date) {
 		return employerWtrRepository.existsByDate(date);
 	}
 
-	public boolean isDateConflictingWithOther(final Long id, LocalDate date) {
+	public boolean isDateConflictingWithOther(final Long id, final LocalDate date) {
 		return employerWtrRepository.isDateConflictingWithOther(id, date);
 	}
 }

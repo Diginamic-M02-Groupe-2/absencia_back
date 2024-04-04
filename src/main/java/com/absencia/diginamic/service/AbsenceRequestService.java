@@ -8,7 +8,6 @@ import com.absencia.diginamic.repository.AbsenceRequestRepository;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +16,8 @@ public class AbsenceRequestService {
 	public static final long MAX_PAID_LEAVES = 25;
 	public static final long MAX_EMPLOYEE_WTR = 6;
 
-	private AbsenceRequestRepository absenceRequestRepository;
+	private final AbsenceRequestRepository absenceRequestRepository;
 
-	@Autowired
 	public AbsenceRequestService(final AbsenceRequestRepository absenceRequestRepository) {
 		this.absenceRequestRepository = absenceRequestRepository;
 	}
@@ -34,12 +32,16 @@ public class AbsenceRequestService {
 		save(absenceRequest);
 	}
 
-	public AbsenceRequest find(final Long id) {
+	public AbsenceRequest find(final long id) {
 		return absenceRequestRepository.findOneByIdAndDeletedAtIsNull(id);
 	}
 
 	public List<AbsenceRequest> findByUser(final User user) {
 		return absenceRequestRepository.findByUserAndDeletedAtIsNull(user);
+	}
+
+	public List<AbsenceRequest> findInitial() {
+		return absenceRequestRepository.findInitial();
 	}
 
 	public long countRemainingPaidLeaves(final User user) {
@@ -55,13 +57,33 @@ public class AbsenceRequestService {
 	}
 
 	public boolean isOverlapping(final AbsenceRequest absenceRequest) {
-		final long count = absenceRequestRepository.countOverlapping(
+		final boolean isOverlapping = absenceRequestRepository.isOverlapping(
 			absenceRequest.getId(), // Ignore this absence request
 			absenceRequest.getUser(), // Filter by the same user
 			absenceRequest.getStartedAt(),
 			absenceRequest.getEndedAt()
 		);
 
-		return count != 0;
+		return isOverlapping;
 	}
+
+	public List<AbsenceRequest> findByMonthYearAndService(int month, int year, com.absencia.diginamic.entity.User.Service service) {
+		return absenceRequestRepository.findByMonthYearAndService(month, year, service);
+	}
+
+	public com.absencia.diginamic.entity.User.Service getServiceById(int serviceId) {
+		for (com.absencia.diginamic.entity.User.Service service : com.absencia.diginamic.entity.User.Service.values()) {
+			if (service.value == serviceId) {
+				return service;
+			}
+		}
+		return null;
+	}
+
+	public int getDataForDay(Long employeeId, int year, int month, int day) {
+		LocalDate date = LocalDate.of(year, month, day);
+		int dataForDay = absenceRequestRepository.getDataForDayForEmployee(employeeId, date);
+		return dataForDay;
+	}
+
 }

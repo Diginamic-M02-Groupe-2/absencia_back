@@ -18,23 +18,21 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/employer-wtr")
 public class EmployerWtrController {
-	private EmployerWtrService employerWtrService;
-	private UserService userService;
+	private final EmployerWtrService employerWtrService;
+	private final UserService userService;
 
-	@Autowired
 	public EmployerWtrController(final EmployerWtrService employerWtrService,  final UserService userService) {
 		this.employerWtrService = employerWtrService;
 		this.userService = userService;
-
 	}
 
 	// TODO: Include non-approved employer WTR?
@@ -46,13 +44,8 @@ public class EmployerWtrController {
 	}
 
 	@PostMapping(consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	@Secured("ADMINISTRATOR")
 	public ResponseEntity<Map<String, String>> postEmployerWtr(@ModelAttribute @Valid final PostEmployerWtrModel model) {
-		// TODO : Gérer les roles admin
-		/* Vérification de l'utilisateur administrateur
-		if (!userService.isAdmin()) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "L'utilisateur n'est pas autorisé à effectuer cette action."));
-		}*/
-
 		// Vérification que la date n'est pas dans le passé
 		LocalDate currentDate = LocalDate.now();
 		if (model.getDate().isBefore(currentDate)) {
@@ -81,14 +74,8 @@ public class EmployerWtrController {
 	}
 
 	@PatchMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	@Secured("ADMINISTRATOR")
 	public ResponseEntity<Map<String, String>> patchEmployerWtr(@PathVariable final long id, @ModelAttribute @Valid final PatchEmployerWtrModel model) {
-
-		// TODO : Gérer les roles admin
-		/* Vérification de l'utilisateur administrateur
-		if (!userService.isAdmin()) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "L'utilisateur n'est pas autorisé à effectuer cette action."));
-		}*/
-
 		// Vérification de la date dans le passé
 		LocalDate currentDate = LocalDate.now();
 		if (model.getDate().isBefore(currentDate)) {
