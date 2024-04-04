@@ -1,9 +1,15 @@
 package com.absencia.diginamic.controller;
 
 import com.absencia.diginamic.entity.EmployerWtr;
+import com.absencia.diginamic.entity.User.Role;
+import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.model.PatchEmployerWtrModel;
 import com.absencia.diginamic.model.PostEmployerWtrModel;
 import com.absencia.diginamic.service.EmployerWtrService;
+import com.absencia.diginamic.service.UserService;
+
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
 
 import jakarta.validation.Valid;
 
@@ -12,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -21,9 +28,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/employer-wtr")
 public class EmployerWtrController {
 	private final EmployerWtrService employerWtrService;
+	private final UserService userService;
 
-	public EmployerWtrController(final EmployerWtrService employerWtrService) {
+	public EmployerWtrController(final EmployerWtrService employerWtrService,  final UserService userService) {
 		this.employerWtrService = employerWtrService;
+		this.userService = userService;
 	}
 
 	// TODO: Include non-approved employer WTR?
@@ -97,11 +106,28 @@ public class EmployerWtrController {
 		return ResponseEntity.ok(Map.of("message", "La RTT employeur a été modifiée."));
 	}
 
-	@DeleteMapping(value="/{id}")
 	@Secured("ADMINISTRATOR")
-	public ResponseEntity<Map<String, String>> deleteEmployerWtr(@PathVariable final long id) {
-		// TODO
+	@DeleteMapping(value="/{id}")
+	public ResponseEntity<Map<String, String>> deleteEmployerWtr(final Authentication authentication, @PathVariable final long id) {
+		EmployerWtr employerWtr = employerWtrService.findOneByIdAndDeletedAtIsNull(id);
+		if (employerWtr == null) {
+			return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(Map.of("message", "Ce RTT employeur n'existe pas ou plus."));
+		}
 
-		return ResponseEntity.ok(Map.of("message", "TODO"));
+		//Récupérer la date actuelle
+		LocalDate currentDate = LocalDate.now();
+		// Vérifier que la date de la RTT employeur est passée
+		if (employerWtr.getDate().isBefore(currentDate)) {
+			return ResponseEntity
+				.status(HttpStatus.UNAUTHORIZED)
+				.body(Map.of("message", "La date du RTT employeur est passé."));
+		}
+
+		// Supprimer la RTT employeur
+		employerWtrService.delete(employerWtr);
+
+		return ResponseEntity.ok(Map.of("message", "Le RTT employeur a été supprimé."));
 	}
 }
