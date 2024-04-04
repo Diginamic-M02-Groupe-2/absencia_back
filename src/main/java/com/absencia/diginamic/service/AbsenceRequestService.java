@@ -45,15 +45,15 @@ public class AbsenceRequestService {
 	}
 
 	public long countRemainingPaidLeaves(final User user) {
-		final long count = absenceRequestRepository.countRemaining(user, AbsenceType.PAID_LEAVE);
+		final long sum = absenceRequestRepository.sumApprovedDays(user.getId(), AbsenceType.PAID_LEAVE);
 
-		return MAX_PAID_LEAVES - count;
+		return MAX_PAID_LEAVES - sum;
 	}
 
 	public long countRemainingEmployeeWtr(final User user) {
-		final long count = absenceRequestRepository.countRemaining(user, AbsenceType.EMPLOYEE_WTR);
+		final long sum = absenceRequestRepository.sumApprovedDays(user.getId(), AbsenceType.EMPLOYEE_WTR);
 
-		return MAX_EMPLOYEE_WTR - count;
+		return MAX_EMPLOYEE_WTR - sum;
 	}
 
 	public boolean isOverlapping(final AbsenceRequest absenceRequest) {
