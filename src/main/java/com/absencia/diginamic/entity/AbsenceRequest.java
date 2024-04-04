@@ -14,65 +14,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQuery;
 
 import java.time.LocalDate;
 
 @Entity
-@NamedQuery(
-	name="AbsenceRequest.findInitial",
-	query="""
-		SELECT ar
-		FROM AbsenceRequest ar
-		WHERE ar.deletedAt IS NULL
-		AND ar.status = AbsenceRequestStatus.INITIAL
-		ORDER BY ar.startedAt ASC
-	"""
-)
-@NamedQuery(
-	name="AbsenceRequest.countRemaining",
-	query="""
-		SELECT COUNT(1)
-		FROM AbsenceRequest ar
-		WHERE ar.deletedAt IS NULL
-		AND ar.user = :user
-		AND ar.type = :type
-		AND ar.status = AbsenceRequestStatus.APPROVED
-	"""
-)
-@NamedQuery(
-	name="AbsenceRequest.isOverlapping",
-	query="""
-		SELECT CASE WHEN COUNT(ar) > 0 THEN true ELSE false END
-		FROM AbsenceRequest ar
-		WHERE ar.deletedAt IS NULL
-		AND (:id IS NULL OR ar.id != :id)
-		AND ar.user = :user
-		AND ar.startedAt < :endedAt
-		AND ar.endedAt > :startedAt
-	"""
-)
-@NamedQuery(
-		name = "AbsenceRequest.findByMonthYearAndService",
-		query = """
-        SELECT ar
-        FROM AbsenceRequest ar
-        JOIN ar.user u
-        WHERE FUNCTION('YEAR', ar.startedAt) = :year
-        AND FUNCTION('MONTH', ar.startedAt) = :month
-        AND u.service = :service
-        AND ar.deletedAt IS NULL
-    """
-)
-@NamedQuery(
-	name="AbsenceRequest.getDataForDayForEmployee",
-	query="""
-		SELECT COUNT(ar) FROM AbsenceRequest ar
-		WHERE ar.user.id = :employeeId
-		AND :date BETWEEN ar.startedAt AND ar.endedAt
-		AND ar.deletedAt IS NULL
-	"""
-)
 public class AbsenceRequest {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

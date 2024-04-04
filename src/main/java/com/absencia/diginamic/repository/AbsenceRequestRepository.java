@@ -9,14 +9,43 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AbsenceRequestRepository extends JpaRepository<AbsenceRequest, Long> {
 	AbsenceRequest findOneByIdAndDeletedAtIsNull(final long id);
+
 	List<AbsenceRequest> findByUserAndDeletedAtIsNull(final User user);
+
+	@Query("""
+		SELECT ar
+		FROM AbsenceRequest ar
+		WHERE ar.deletedAt IS NULL
+		AND ar.status = AbsenceRequestStatus.INITIAL
+		ORDER BY ar.startedAt ASC
+	""")
 	List<AbsenceRequest> findInitial();
-	long countRemaining(final User user, final AbsenceType type);
+
+	@Query("""
+		SELECT COALESCE(SUM(DATEDIFF(ar.endedAt, ar.startedAt) + 1), 0)
+		FROM AbsenceRequest ar
+		WHERE ar.deletedAt IS NULL
+		AND ar.user.id = :userId
+		AND ar.type = :type
+		AND ar.status = AbsenceRequestStatus.APPROVED
+	""")
+	long sumApprovedDays(final long userId, final AbsenceType type);
+
+	@Query("""
+		SELECT CASE WHEN COUNT(ar) > 0 THEN true ELSE false END
+		FROM AbsenceRequest ar
+		WHERE ar.deletedAt IS NULL
+		AND (:id IS NULL OR ar.id != :id)
+		AND ar.user = :user	
+		AND ar.startedAt < :endedAt
+		AND ar.endedAt > :startedAt
+	""")
 	boolean isOverlapping(
 		final Long id,
 		final User user,
@@ -24,6 +53,22 @@ public interface AbsenceRequestRepository extends JpaRepository<AbsenceRequest, 
 		final LocalDate endedAt
 	);
 
+	@Query("""
+		SELECT ar
+		FROM AbsenceRequest ar
+		JOIN ar.user u
+		WHERE FUNCTION('YEAR', ar.startedAt) = :year
+		AND FUNCTION('MONTH', ar.startedAt) = :month
+		AND u.service = :service
+		AND ar.deletedAt IS NULL
+	""")
 	List<AbsenceRequest> findByMonthYearAndService(final int month, final int year, final Service service);
+
+	@Query("""
+		SELECT COUNT(ar) FROM AbsenceRequest ar
+		WHERE ar.user.id = :employeeId
+		AND :date BETWEEN ar.startedAt AND ar.endedAt
+		AND ar.deletedAt IS NULL
+	""")
 	int getDataForDayForEmployee(final Long employeeId, final LocalDate date);
 }
