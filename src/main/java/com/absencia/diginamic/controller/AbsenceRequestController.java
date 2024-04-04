@@ -28,23 +28,23 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/absence-requests")
 public class AbsenceRequestController {
 	private final AbsenceRequestService absenceRequestService;
-	private final UserService userService;
+	private final DateService dateService;
 	private final EmployerWtrService employerWtrService;
 	private final PublicHolidayService publicHolidayService;
-	private final DateService dateService;
+	private final UserService userService;
 
 	public AbsenceRequestController(
 		final AbsenceRequestService absenceRequestService,
-		final UserService userService,
+		final DateService dateService,
 		final EmployerWtrService employerWtrService,
 		final PublicHolidayService publicHolidayService,
-		final DateService dateService
+		final UserService userService
 	) {
 		this.absenceRequestService = absenceRequestService;
-		this.userService = userService;
+		this.dateService = dateService;
 		this.employerWtrService = employerWtrService;
 		this.publicHolidayService = publicHolidayService;
-		this.dateService = dateService;
+		this.userService = userService;
 	}
 
 	@GetMapping
