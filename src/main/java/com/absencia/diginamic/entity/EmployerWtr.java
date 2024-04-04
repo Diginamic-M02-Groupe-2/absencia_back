@@ -9,43 +9,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.NamedQuery;
 
 import java.time.LocalDate;
 
 @Entity
-@NamedQuery(
-	name="EmployerWtr.findByYear",
-	query="""
-		SELECT ew
-		FROM EmployerWtr ew
-		WHERE ew.deletedAt IS NULL
-		AND YEAR(ew.date) = :year
-	"""
-)
-@NamedQuery(
-	name="EmployerWtr.findInitial",
-	query="""
-		SELECT ew
-		FROM EmployerWtr ew
-		WHERE ew.deletedAt IS NULL
-		AND ew.status = EmployerWtrStatus.INITIAL
-		ORDER BY ew.date ASC
-	"""
-)
-@NamedQuery(
-	name="EmployerWtr.countApproved",
-	query="""
-		SELECT COUNT(1)
-		FROM EmployerWtr ew
-		WHERE ew.deletedAt IS NULL
-		AND ew.status = EmployerWtrStatus.APPROVED
-	"""
-)
-@NamedQuery(
-		name = "EmployerWtr.isDateConflictingWithOther",
-		query = "SELECT COUNT(ew) > 0 FROM EmployerWtr ew WHERE ew.id <> :id AND ew.date = :date AND ew.deletedAt IS NULL"
-)
 public class EmployerWtr {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
