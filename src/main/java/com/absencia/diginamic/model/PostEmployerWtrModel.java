@@ -13,7 +13,7 @@ public class PostEmployerWtrModel {
 	@DateTimeFormat(iso=DateTimeFormat.ISO.DATE)
 	private LocalDate date;
 
-	@NotBlank(message="Ce champ est requis")
+	@NotBlank(message="Ce champ est requis.")
 	@Length(max=255, message="Ce champ ne doit pas dépasser 255 caractères.")
 	private String label;
 
