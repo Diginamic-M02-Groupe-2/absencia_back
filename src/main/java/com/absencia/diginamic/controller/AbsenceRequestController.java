@@ -137,7 +137,7 @@ public class AbsenceRequestController {
 		if (model.getType() == AbsenceType.UNPAID_LEAVE && (model.getReason() == null || model.getReason().trim().isEmpty())) {
 			return ResponseEntity
 				.badRequest()
-				.body(Map.of("reason", "Veuillez spécifier un motif pour votre demande de congés sans solde."));
+				.body(Map.of("reason", "Veuillez saisir un motif pour votre demande de congés sans solde."));
 		}
 
 		final User user = userService.loadUserByUsername(authentication.getName());
@@ -243,7 +243,7 @@ public class AbsenceRequestController {
 		if (model.getType() == AbsenceType.UNPAID_LEAVE && (model.getReason() == null || model.getReason().trim().isEmpty())) {
 			return ResponseEntity
 				.badRequest()
-				.body(Map.of("reason", "Veuillez spécifier un motif pour votre demande de congés sans solde."));
+				.body(Map.of("reason", "Veuillez saisir un motif pour votre demande de congés sans solde."));
 		}
 
 		absenceRequest
