@@ -14,6 +14,7 @@ import com.absencia.diginamic.service.*;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -116,6 +117,32 @@ public class ReportController {
 
 		return ResponseEntity.ok(response);
 	}
+
+	@GetMapping("/table")
+	@Secured("MANAGER")
+	public ResponseEntity<?> getTableReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId, final Authentication authentication) {
+		final User manager = userService.loadUserByUsername(authentication.getName());
+		final Service service = Service.values()[serviceId];
+
+		if (service == null) {
+			return ResponseEntity
+					.badRequest()
+					.body(Map.of("message", "Ce service n'existe pas."));
+		}
+
+		List<User> managerEmployees = userService.findEmployeesManagedByManager(manager.getId());
+
+		List<AbsenceRequest> absenceRequests = absenceRequestService.findApprovedByMonthYearAndServiceAndEmployees(month, year, service, managerEmployees);
+
+		List<EmployerWtr> approvedEmployerWtr = employerWtrService.findApprovedByYearAndEmployees(year, managerEmployees);
+
+		Map<String, Object> responseData = new HashMap<>();
+		responseData.put("absenceRequests", absenceRequests);
+		responseData.put("employerWtr", approvedEmployerWtr);
+
+		return ResponseEntity.ok(responseData);
+	}
+
 
 	@GetMapping("/histogram")
 	@Secured("MANAGER")

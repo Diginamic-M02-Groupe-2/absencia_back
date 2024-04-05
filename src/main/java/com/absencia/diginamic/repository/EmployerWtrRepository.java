@@ -49,4 +49,15 @@ public interface EmployerWtrRepository extends JpaRepository<EmployerWtr, Long> 
 		AND ew.deletedAt IS NULL
 	""")
 	boolean isDateConflictingWithOther(final Long id, final LocalDate date);
+
+	@Query("""
+    SELECT ew
+    FROM EmployerWtr ew
+    WHERE ew.deletedAt IS NULL
+    AND ew.status = EmployerWtrStatus.APPROVED
+    AND YEAR(ew.date) = :year
+    AND ew.user.id IN :employeeIds
+	""")
+	List<EmployerWtr> findApprovedByYearAndEmployees(int year, List<Long> employeeIds);
+
 }

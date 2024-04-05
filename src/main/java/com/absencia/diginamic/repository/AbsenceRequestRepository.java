@@ -71,4 +71,12 @@ public interface AbsenceRequestRepository extends JpaRepository<AbsenceRequest, 
 		AND ar.deletedAt IS NULL
 	""")
 	int getDataForDayForEmployee(final Long employeeId, final LocalDate date);
+
+	@Query("""
+   		SELECT ar FROM AbsenceRequest ar 
+ 		WHERE ar.service = :service AND ar.year = :year
+ 		AND ar.month = :month AND ar.status = 'APPROVED'
+ 		AND ar.user.id IN :employeeIds"
+ 	""")
+	List<AbsenceRequest> findApprovedByMonthYearAndServiceAndEmployees(int month, int year, Service service, List<Long> employeeIds);
 }
