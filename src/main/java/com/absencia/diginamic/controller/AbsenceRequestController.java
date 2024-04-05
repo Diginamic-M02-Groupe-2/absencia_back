@@ -100,40 +100,40 @@ public class AbsenceRequestController {
 		if (dateService.isWeekEndDay(model.getStartedAt())) {
 			return ResponseEntity
 				.badRequest()
-				.body(Map.of("startedAt", "La date ne peut pas être un week-end."));
+				.body(Map.of("startedAt", "Cette date ne doit pas être un week-end."));
 		}
 
 		if (dateService.isWeekEndDay(model.getEndedAt())) {
 			return ResponseEntity
 				.badRequest()
-				.body(Map.of("endedAt", "La date ne peut pas être un week-end."));
+				.body(Map.of("endedAt", "Cette date ne doit pas être un week-end."));
 		}
 
 		if (publicHolidayService.isDateConflicting(model.getStartedAt())) {
 			return ResponseEntity
 				.badRequest()
-				.body(Map.of("startedAt", "La date sélectionnée est un jour férié."));
+				.body(Map.of("startedAt", "Cette date ne doit pas être un jour férié."));
 		}
 
 		if (publicHolidayService.isDateConflicting(model.getEndedAt())) {
 			return ResponseEntity
 				.badRequest()
-				.body(Map.of("endedAt", "La date sélectionnée est un jour férié."));
+				.body(Map.of("endedAt", "Cette date ne doit pas être un jour férié."));
 		}
 
 		if (employerWtrService.isDateConflicting(model.getStartedAt())) {
 			return ResponseEntity
 				.badRequest()
-				.body(Map.of("startedAt", "La date sélectionnée est une RTT employeur."));
+				.body(Map.of("startedAt", "Cette date ne doit pas être une RTT employeur."));
 		}
 
 		if (employerWtrService.isDateConflicting(model.getEndedAt())) {
 			return ResponseEntity
 				.badRequest()
-				.body(Map.of("endedAt", "La date sélectionnée es une RTT employeur."));
+				.body(Map.of("endedAt", "Cette date ne doit pas être une RTT employeur."));
 		}
 
-		// Verify that reason is not null or empty when the absence type is UNPAID_LEAVE
+		// Verify that the reason is not null or empty when the absence type is UNPAID_LEAVE
 		if (model.getType() == AbsenceType.UNPAID_LEAVE && (model.getReason() == null || model.getReason().trim().isEmpty())) {
 			return ResponseEntity
 				.badRequest()
@@ -159,7 +159,7 @@ public class AbsenceRequestController {
 
 		absenceRequestService.save(absenceRequest);
 
-		return ResponseEntity.ok(Map.of("message", "Votre demande d'absence a été créée."));
+		return ResponseEntity.ok(Map.of("message", "La demande d'absence a été créée."));
 	}
 
 	@PatchMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -186,50 +186,14 @@ public class AbsenceRequestController {
 		if (absenceRequest.getStatus() == AbsenceRequestStatus.PENDING) {
 			return ResponseEntity
 				.status(HttpStatus.UNAUTHORIZED)
-				.body(Map.of("message", "Cette demande d'absence est en cours de validation."));
+				.body(Map.of("message", "Cette demande d'absence ne peut pas être modifiée car elle est en cours de validation."));
 		}
 
 		// Verify that the absence request is not approved
 		if (absenceRequest.getStatus() == AbsenceRequestStatus.APPROVED) {
 			return ResponseEntity
 				.status(HttpStatus.UNAUTHORIZED)
-				.body(Map.of("message", "Cette demande d'absence a été validée."));
-		}
-
-		if(dateService.isWeekEndDay(model.getStartedAt())){
-			return ResponseEntity
-				.badRequest()
-				.body(Map.of("startedAt", "Cette date ne peut pas être un week-end."));
-		}
-
-		if(dateService.isWeekEndDay(model.getEndedAt())){
-			return ResponseEntity
-				.badRequest()
-				.body(Map.of("endedAt", "Cette date ne peut pas être un week-end."));
-		}
-
-		if (publicHolidayService.isDateConflicting(model.getStartedAt())) {
-			return ResponseEntity
-				.badRequest()
-				.body(Map.of("startedAt", "La date sélectionnée est un jour férié."));
-		}
-
-		if (publicHolidayService.isDateConflicting(model.getEndedAt())) {
-			return ResponseEntity
-				.badRequest()
-				.body(Map.of("endedAt", "La date sélectionnée est un jour férié."));
-		}
-
-		if (employerWtrService.isDateConflicting(model.getStartedAt())) {
-			return ResponseEntity
-				.badRequest()
-				.body(Map.of("startedAt", "La date sélectionnée est une RTT employeur."));
-		}
-
-		if (employerWtrService.isDateConflicting(model.getEndedAt())) {
-			return ResponseEntity
-				.badRequest()
-				.body(Map.of("endedAt", "La date sélectionnée est une RTT employeur."));
+				.body(Map.of("message", "Cette demande d'absence ne peut pas être modifiée car elle a été validée."));
 		}
 
 		// Verify that the start date is lesser than the end date
@@ -237,6 +201,42 @@ public class AbsenceRequestController {
 			return ResponseEntity
 				.badRequest()
 				.body(Map.of("startedAt", "Veuillez sélectionner une période valide."));
+		}
+
+		if (dateService.isWeekEndDay(model.getStartedAt())) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("startedAt", "Cette date ne doit pas être un week-end."));
+		}
+
+		if (dateService.isWeekEndDay(model.getEndedAt())) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("endedAt", "Cette date ne doit pas être un week-end."));
+		}
+
+		if (publicHolidayService.isDateConflicting(model.getStartedAt())) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("startedAt", "Cette date ne doit pas être un jour férié."));
+		}
+
+		if (publicHolidayService.isDateConflicting(model.getEndedAt())) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("endedAt", "Cette date ne doit pas être un jour férié."));
+		}
+
+		if (employerWtrService.isDateConflicting(model.getStartedAt())) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("startedAt", "Cette date ne doit pas être une RTT employeur."));
+		}
+
+		if (employerWtrService.isDateConflicting(model.getEndedAt())) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("endedAt", "Cette date ne doit pas être une RTT employeur."));
 		}
 
 		// Verify that reason is not null or empty when the absence type is UNPAID_LEAVE
