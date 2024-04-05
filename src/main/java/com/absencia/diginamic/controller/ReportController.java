@@ -10,8 +10,6 @@ import com.absencia.diginamic.entity.EmployerWtr;
 import com.absencia.diginamic.entity.PublicHoliday;
 import com.absencia.diginamic.entity.User.Service;
 import com.absencia.diginamic.entity.User.User;
-import com.absencia.diginamic.service.EmployerWtrService;
-import com.absencia.diginamic.service.PublicHolidayService;
 import com.absencia.diginamic.service.*;
 
 import org.springframework.http.ResponseEntity;
@@ -24,16 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/reports")
 public class ReportController {
-
 	private final PublicHolidayService publicHolidayService;
 	private final EmployerWtrService employerWtrService;
 	private final AbsenceRequestService absenceRequestService;
 	private final DateService dateService;
 	private final UserService userService;
 
-	public ReportController(final PublicHolidayService publicHolidayService, final EmployerWtrService employerWtrService,
-							final AbsenceRequestService absenceRequestService, final DateService dateService,
-							final UserService userService) {
+	public ReportController(final PublicHolidayService publicHolidayService, final EmployerWtrService employerWtrService, final AbsenceRequestService absenceRequestService, final DateService dateService, final UserService userService) {
 		this.publicHolidayService = publicHolidayService;
 		this.employerWtrService = employerWtrService;
 		this.absenceRequestService = absenceRequestService;
@@ -43,10 +38,10 @@ public class ReportController {
 
 	@GetMapping("/employer-wtr-and-public-holidays")
 	public ResponseEntity<Map<String, ?>> getEmployerWtrAndPublicHolidayReport(@RequestParam final int year) {
-		List<EmployerWtr> employerWtr = employerWtrService.findByYear(year);
-		List<PublicHoliday> publicHolidays = publicHolidayService.findByYear(year);
+		final List<EmployerWtr> employerWtr = employerWtrService.findApprovedByYear(year);
+		final List<PublicHoliday> publicHolidays = publicHolidayService.findByYear(year);
+		final Map<String, Object> response = new HashMap<>();
 
-		Map<String, Object> response = new HashMap<>();
 		response.put("employerWtr", employerWtr);
 		response.put("publicHolidays", publicHolidays);
 
@@ -58,13 +53,15 @@ public class ReportController {
 		// Récupérer l'objet Service correspondant à partir de l'ID du service
 		final Service service = Service.values()[serviceId];
 
-		// Vérifiez si le service existe avant de continuer
+		// Verify that the service exists
 		if (service == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Ce service n'existe pas."));
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("message", "Ce service n'existe pas."));
 		}
 
 		// Récupérer les demandes d'absence de tous les employés pour le mois, l'année et le service sélectionnés
-		final List<EmployerWtr> employees = employerWtrService.findByYear(year);
+		final List<EmployerWtr> employees = employerWtrService.findApprovedByYear(year);
 
 		// Créer une liste pour stocker les données du planning
 		final List<Map<String, Object>> planning = new ArrayList<>();
@@ -125,11 +122,14 @@ public class ReportController {
 	public ResponseEntity<?> getHistogramReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId) {
 		final Service service = Service.values()[serviceId];
 
+		// Verify that the service exists
 		if (service == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Ce service n'existe pas."));
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("message", "Ce service n'existe pas."));
 		}
 
-		final List<EmployerWtr> employees = employerWtrService.findByYear(year);
+		final List<EmployerWtr> employees = employerWtrService.findApprovedByYear(year);
 
 		final List<AbsenceRequest> absenceRequests = absenceRequestService.findByMonthYearAndService(month, year, service);
 
@@ -164,6 +164,4 @@ public class ReportController {
 
 		return ResponseEntity.ok(histogramData);
 	}
-
-
 }

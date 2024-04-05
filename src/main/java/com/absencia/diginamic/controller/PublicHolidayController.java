@@ -3,6 +3,8 @@ package com.absencia.diginamic.controller;
 import com.absencia.diginamic.entity.PublicHoliday;
 import com.absencia.diginamic.model.PatchPublicHolidayModel;
 import com.absencia.diginamic.service.PublicHolidayService;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import jakarta.validation.Valid;
 
@@ -19,8 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/api/public-holidays")
@@ -43,16 +43,20 @@ public class PublicHolidayController {
 	public ResponseEntity<Map<String, String>> patchPublicHoliday(@PathVariable final long id, @ModelAttribute @Valid final PatchPublicHolidayModel model) {
 		final PublicHoliday publicHoliday = publicHolidayService.findOneById(id);
 
+		// Verify that the public holiday exists
 		if (publicHoliday == null) {
-			return ResponseEntity.badRequest().body(Map.of("worked", "Ce jour férié n'existe pas."));
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("message", "Ce jour férié n'existe pas."));
 		}
 
-		// Vérification de la date dans le passé
+		// Verify that the public holiday date is not passed
 		if (publicHoliday.getDate().isBefore(LocalDate.now())) {
-			return ResponseEntity.badRequest().body(Map.of("worked", "Ce jour férié est déjà passé."));
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("message", "Ce jour férié est déjà passé."));
 		}
 
-		// Mise à jour du statut du jour férié
 		publicHoliday.setWorked(model.isWorked());
 
 		publicHolidayService.save(publicHoliday);
@@ -64,7 +68,6 @@ public class PublicHolidayController {
 	@Secured("ADMINISTRATOR")
 	public ResponseEntity<Map<String, String>> reloadPublicHoliday() {
 		try {
-
 			HttpClient client = HttpClient.newHttpClient();
 			HttpRequest request = HttpRequest.newBuilder()
 					.uri(URI.create("https://calendrier.api.gouv.fr/jours-feries/metropole.json"))

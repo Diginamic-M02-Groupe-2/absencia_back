@@ -4,10 +4,7 @@ import com.absencia.diginamic.entity.EmployerWtr;
 import com.absencia.diginamic.model.PatchEmployerWtrModel;
 import com.absencia.diginamic.model.PostEmployerWtrModel;
 import com.absencia.diginamic.service.EmployerWtrService;
-import com.absencia.diginamic.service.UserService;
-
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.Authentication;
+import com.absencia.diginamic.service.PublicHolidayService;
 
 import jakarta.validation.Valid;
 
@@ -19,21 +16,24 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/employer-wtr")
 public class EmployerWtrController {
 	private final EmployerWtrService employerWtrService;
+	private final PublicHolidayService publicHolidayService;
 
-	public EmployerWtrController(final EmployerWtrService employerWtrService,  final UserService userService) {
+	public EmployerWtrController(final EmployerWtrService employerWtrService, final PublicHolidayService publicHolidayService) {
 		this.employerWtrService = employerWtrService;
+		this.publicHolidayService = publicHolidayService;
 	}
 
-	// TODO: Include non-approved employer WTR?
 	@GetMapping("/{year}")
 	public ResponseEntity<List<EmployerWtr>> getEmployerWtr(@PathVariable final int year) {
-		final List<EmployerWtr> employerWtr = employerWtrService.findByYear(year);
+		final List<EmployerWtr> employerWtr = employerWtrService.findApprovedByYear(year);
 
 		return ResponseEntity.ok(employerWtr);
 	}
@@ -41,28 +41,42 @@ public class EmployerWtrController {
 	@PostMapping(consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
 	@Secured("ADMINISTRATOR")
 	public ResponseEntity<Map<String, String>> postEmployerWtr(@ModelAttribute @Valid final PostEmployerWtrModel model) {
-		// Vérification que la date n'est pas dans le passé
-		LocalDate currentDate = LocalDate.now();
-		if (model.getDate().isBefore(currentDate)) {
-			return ResponseEntity.badRequest().body(Map.of("date", "La date ne peut pas être dans le passé."));
+		// Verify that the date is not passed
+		if (model.getDate().isBefore(LocalDate.now())) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("date", "Cette date ne doit pas être dans le passé."));
 		}
 
-		// Vérification que la date n'est pas un week-end
-		DayOfWeek dayOfWeek = model.getDate().getDayOfWeek();
+		final DayOfWeek dayOfWeek = model.getDate().getDayOfWeek();
+
+		// Verify that the date is not within a week-end
 		if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-			return ResponseEntity.badRequest().body(Map.of("date", "La date ne peut pas être un week-end."));
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("date", "Cette date ne doit pas être un week-end."));
 		}
 
-		// Vérification qu'aucun autre jour férié ou RTT employeur n'existe à cette date
+		// Verify that the date is not conflicting with another employer WTR
 		if (employerWtrService.isDateConflicting(model.getDate())) {
-			return ResponseEntity.badRequest().body(Map.of("date", "Une autre RTT employeur existe déjà à cette date."));
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("date", "Cette date est déjà prise par une autre RTT employeur."));
 		}
 
-		// Sauvegarde de l'objet EmployerWtr
+		// Verify that the date is not conflicting with a public holiday
+		if (publicHolidayService.isDateConflicting(model.getDate())) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("date", "Cette date ne doit pas être un jour férié."));
+		}
+
 		final EmployerWtr employerWtr = new EmployerWtr();
+
 		employerWtr
-				.setDate(model.getDate())
-				.setLabel(model.getLabel());
+			.setDate(model.getDate())
+			.setLabel(model.getLabel());
+
 		employerWtrService.save(employerWtr);
 
 		return ResponseEntity.ok(Map.of("message", "La RTT employeur a été créée."));
@@ -71,31 +85,56 @@ public class EmployerWtrController {
 	@PatchMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
 	@Secured("ADMINISTRATOR")
 	public ResponseEntity<Map<String, String>> patchEmployerWtr(@PathVariable final long id, @ModelAttribute @Valid final PatchEmployerWtrModel model) {
-		// Vérification de la date dans le passé
-		LocalDate currentDate = LocalDate.now();
-		if (model.getDate().isBefore(currentDate)) {
-			return ResponseEntity.badRequest().body(Map.of("date", "La date ne peut pas être dans le passé."));
+		// Verify that the date is not passed
+		if (model.getDate().isBefore(LocalDate.now())) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("date", "Cette date ne doit pas être dans le passé."));
 		}
 
-		// Vérification de la date un week-end
-		DayOfWeek dayOfWeek = model.getDate().getDayOfWeek();
+		final DayOfWeek dayOfWeek = model.getDate().getDayOfWeek();
+
+		// Verify that the date is not within a week-end
 		if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-			return ResponseEntity.badRequest().body(Map.of("date", "La date ne peut pas être un week-end."));
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("date", "Cette date ne doit pas être un week-end."));
 		}
 
-		// Vérification qu'aucun RTT employeur n'existe à cette date
+		// Verify that the date is not conflicting with another employer WTR
 		if (employerWtrService.isDateConflictingWithOther(id, model.getDate())) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Une autre RTT employeur existe déjà à cette date."));
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("date", "Cette date est déjà prise par une autre RTT employeur."));
+		}
+
+		// Verify that the date is not conflicting with a public holiday
+		if (publicHolidayService.isDateConflicting(model.getDate())) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("date", "Cette date ne doit pas être un jour férié."));
 		}
 
 		final EmployerWtr employerWtr = employerWtrService.findOneByIdAndDeletedAtIsNull(id);
 
-		// Mise à jour des champs
-		employerWtr
-				.setDate(model.getDate())
-				.setLabel(model.getLabel());
+		// Verify that the employer WTR exists
+		if (employerWtr == null) {
+			return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(Map.of("message", "Cette RTT employeur n'existe pas ou plus."));
+		}
 
-		// Enregistrement des modifications
+		// Verify that the employer WTR date is not passed
+		if (employerWtr.getDate().isBefore(LocalDate.now())) {
+			return ResponseEntity
+				.status(HttpStatus.UNAUTHORIZED)
+				.body(Map.of("message", "Cette RTT employeur est déjà passée."));
+		}
+
+		employerWtr
+			.setDate(model.getDate())
+			.setLabel(model.getLabel());
+
 		employerWtrService.save(employerWtr);
 
 		return ResponseEntity.ok(Map.of("message", "La RTT employeur a été modifiée."));
@@ -104,25 +143,24 @@ public class EmployerWtrController {
 	@Secured("ADMINISTRATOR")
 	@DeleteMapping(value="/{id}")
 	public ResponseEntity<Map<String, String>> deleteEmployerWtr(final Authentication authentication, @PathVariable final long id) {
-		EmployerWtr employerWtr = employerWtrService.findOneByIdAndDeletedAtIsNull(id);
+		final EmployerWtr employerWtr = employerWtrService.findOneByIdAndDeletedAtIsNull(id);
+
+		// Verify that the employer WTR exists
 		if (employerWtr == null) {
 			return ResponseEntity
 				.status(HttpStatus.NOT_FOUND)
-				.body(Map.of("message", "Ce RTT employeur n'existe pas ou plus."));
+				.body(Map.of("message", "Cette RTT employeur n'existe pas ou plus."));
 		}
 
-		//Récupérer la date actuelle
-		LocalDate currentDate = LocalDate.now();
-		// Vérifier que la date de la RTT employeur est passée
-		if (employerWtr.getDate().isBefore(currentDate)) {
+		// Verify that the employer WTR date is not passed
+		if (employerWtr.getDate().isBefore(LocalDate.now())) {
 			return ResponseEntity
 				.status(HttpStatus.UNAUTHORIZED)
-				.body(Map.of("message", "La date du RTT employeur est passé."));
+				.body(Map.of("message", "Cette RTT employeur est déjà passée."));
 		}
 
-		// Supprimer la RTT employeur
 		employerWtrService.delete(employerWtr);
 
-		return ResponseEntity.ok(Map.of("message", "Le RTT employeur a été supprimé."));
+		return ResponseEntity.ok(Map.of("message", "La RTT employeur a été supprimée."));
 	}
 }
