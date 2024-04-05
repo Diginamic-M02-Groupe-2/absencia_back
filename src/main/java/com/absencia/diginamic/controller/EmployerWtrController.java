@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -29,13 +28,6 @@ public class EmployerWtrController {
 	public EmployerWtrController(final EmployerWtrService employerWtrService, final PublicHolidayService publicHolidayService) {
 		this.employerWtrService = employerWtrService;
 		this.publicHolidayService = publicHolidayService;
-	}
-
-	@GetMapping("/{year}")
-	public ResponseEntity<List<EmployerWtr>> getEmployerWtr(@PathVariable final int year) {
-		final List<EmployerWtr> employerWtr = employerWtrService.findApprovedByYear(year);
-
-		return ResponseEntity.ok(employerWtr);
 	}
 
 	@PostMapping(consumes=MediaType.MULTIPART_FORM_DATA_VALUE)

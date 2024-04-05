@@ -27,11 +27,11 @@ public class EmployerWtrAndPublicHolidayController {
 
 	@GetMapping("/{year}")
 	public ResponseEntity<Map<String, ?>> getEmployerWtrAndPublicHolidays(@PathVariable final int year) {
-		final List<EmployerWtr> approvedEmployerWtr = employerWtrService.findApprovedByYear(year);
+		final List<EmployerWtr> employerWtr = employerWtrService.findByYear(year);
 		final List<PublicHoliday> publicHolidays = publicHolidayService.findByYear(year);
 
 		return ResponseEntity.ok(Map.of(
-			"employerWtr", approvedEmployerWtr,
+			"employerWtr", employerWtr,
 			"publicHolidays", publicHolidays
 		));
 	}

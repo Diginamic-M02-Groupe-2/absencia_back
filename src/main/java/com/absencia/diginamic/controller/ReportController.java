@@ -36,7 +36,7 @@ public class ReportController {
 		this.publicHolidayService = publicHolidayService;
 		this.userService = userService;
 	}
-	
+
 	@GetMapping("/planning")
 	@Secured("MANAGER")
 	public ResponseEntity<?> getPlanningReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId, final Authentication authentication) {
@@ -53,7 +53,7 @@ public class ReportController {
 
 		List<AbsenceRequest> absenceRequests = absenceRequestService.findApprovedByMonthYearAndServiceAndEmployees(month, year, service, managerEmployees);
 
-		List<EmployerWtr> approvedEmployerWtr = employerWtrService.findApprovedByYear(year);
+		List<EmployerWtr> approvedEmployerWtr = employerWtrService.findByYear(year);
 
 		final long remainingPaidLeaves = absenceRequestService.countRemainingPaidLeaves(manager);
 		final long remainingEmployeeWtr = absenceRequestService.countRemainingEmployeeWtr(manager);
@@ -83,7 +83,7 @@ public class ReportController {
 				.body(Map.of("message", "Ce service n'existe pas."));
 		}
 
-		final List<EmployerWtr> employees = employerWtrService.findApprovedByYear(year);
+		final List<EmployerWtr> employees = employerWtrService.findByYear(year);
 
 		final List<AbsenceRequest> absenceRequests = absenceRequestService.findByMonthYearAndService(month, year, service);
 

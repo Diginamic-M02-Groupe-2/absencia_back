@@ -45,8 +45,8 @@ public class EmployerWtrService {
 	/**
 	 * @param year The year to filter the employer WTR by
 	 */
-	public List<EmployerWtr> findApprovedByYear(final int year) {
-		return employerWtrRepository.findApprovedByYear(year);
+	public List<EmployerWtr> findByYear(final int year) {
+		return employerWtrRepository.findByYear(year);
 	}
 
 	public List<EmployerWtr> findInitial() {
