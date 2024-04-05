@@ -73,13 +73,4 @@ public class EmployerWtrService {
 	public boolean isDateConflictingWithOther(final Long id, final LocalDate date) {
 		return employerWtrRepository.isDateConflictingWithOther(id, date);
 	}
-
-	/**
-	 * @param year The year to build the date object
-	 * @param employeeIds The List of ids of the employees to get the data from
-	 * @return
-	 */
-	public List<EmployerWtr> findApprovedByYearAndEmployees(int year, List<Long> employeeIds) {
-		return employerWtrRepository.findApprovedByYearAndEmployees(year, employeeIds);
-	}
 }

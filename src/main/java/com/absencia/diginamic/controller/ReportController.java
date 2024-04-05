@@ -134,11 +134,16 @@ public class ReportController {
 
 		List<AbsenceRequest> absenceRequests = absenceRequestService.findApprovedByMonthYearAndServiceAndEmployees(month, year, service, managerEmployees);
 
-		List<EmployerWtr> approvedEmployerWtr = employerWtrService.findApprovedByYearAndEmployees(year, managerEmployees);
+		List<EmployerWtr> approvedEmployerWtr = employerWtrService.findApprovedByYear(year);
+
+		final long remainingPaidLeaves = absenceRequestService.countRemainingPaidLeaves(manager);
+		final long remainingEmployeeWtr = absenceRequestService.countRemainingEmployeeWtr(manager);
 
 		Map<String, Object> responseData = new HashMap<>();
 		responseData.put("absenceRequests", absenceRequests);
 		responseData.put("employerWtr", approvedEmployerWtr);
+		responseData.put("remainingPaidLeaves", remainingPaidLeaves);
+		responseData.put("remainingEmployeeWtr", remainingEmployeeWtr);
 
 		return ResponseEntity.ok(responseData);
 	}
