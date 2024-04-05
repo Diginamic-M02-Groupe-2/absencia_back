@@ -14,7 +14,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.MediaType;
@@ -29,13 +28,6 @@ public class PublicHolidayController {
 
 	public PublicHolidayController(final PublicHolidayService publicHolidayService) {
 		this.publicHolidayService = publicHolidayService;
-	}
-
-	@GetMapping("/{year}")
-	public ResponseEntity<List<PublicHoliday>> getPublicHolidays(@PathVariable final int year) {
-		final List<PublicHoliday> publicHolidays = publicHolidayService.findByYear(year);
-
-		return ResponseEntity.ok(publicHolidays);
 	}
 
 	@PatchMapping(value="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)

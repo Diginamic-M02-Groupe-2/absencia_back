@@ -19,10 +19,9 @@ public interface EmployerWtrRepository extends JpaRepository<EmployerWtr, Long> 
 		SELECT ew
 		FROM EmployerWtr ew
 		WHERE ew.deletedAt IS NULL
-		AND ew.status = EmployerWtrStatus.APPROVED
 		AND YEAR(ew.date) = :year
 	""")
-	List<EmployerWtr> findApprovedByYear(final int year);
+	List<EmployerWtr> findByYear(final int year);
 
 	@Query("""
 		SELECT ew

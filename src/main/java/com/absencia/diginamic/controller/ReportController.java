@@ -23,32 +23,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/reports")
 public class ReportController {
-	private final PublicHolidayService publicHolidayService;
-	private final EmployerWtrService employerWtrService;
 	private final AbsenceRequestService absenceRequestService;
 	private final DateService dateService;
+	private final EmployerWtrService employerWtrService;
+	private final PublicHolidayService publicHolidayService;
 	private final UserService userService;
 
-	public ReportController(final PublicHolidayService publicHolidayService, final EmployerWtrService employerWtrService, final AbsenceRequestService absenceRequestService, final DateService dateService, final UserService userService) {
-		this.publicHolidayService = publicHolidayService;
-		this.employerWtrService = employerWtrService;
+	public ReportController(final AbsenceRequestService absenceRequestService, final DateService dateService, final EmployerWtrService employerWtrService, final PublicHolidayService publicHolidayService, final UserService userService) {
 		this.absenceRequestService = absenceRequestService;
 		this.dateService = dateService;
+		this.employerWtrService = employerWtrService;
+		this.publicHolidayService = publicHolidayService;
 		this.userService = userService;
 	}
 
-	@GetMapping("/employer-wtr-and-public-holidays")
-	public ResponseEntity<Map<String, ?>> getEmployerWtrAndPublicHolidayReport(@RequestParam final int year) {
-		final List<EmployerWtr> employerWtr = employerWtrService.findApprovedByYear(year);
-		final List<PublicHoliday> publicHolidays = publicHolidayService.findByYear(year);
-		final Map<String, Object> response = new HashMap<>();
-
-		response.put("employerWtr", employerWtr);
-		response.put("publicHolidays", publicHolidays);
-
-		return ResponseEntity.ok(response);
-	}
-	
 	@GetMapping("/planning")
 	@Secured("MANAGER")
 	public ResponseEntity<?> getPlanningReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId, final Authentication authentication) {
@@ -65,7 +53,7 @@ public class ReportController {
 
 		List<AbsenceRequest> absenceRequests = absenceRequestService.findApprovedByMonthYearAndServiceAndEmployees(month, year, service, managerEmployees);
 
-		List<EmployerWtr> approvedEmployerWtr = employerWtrService.findApprovedByYear(year);
+		List<EmployerWtr> approvedEmployerWtr = employerWtrService.findByYear(year);
 
 		final long remainingPaidLeaves = absenceRequestService.countRemainingPaidLeaves(manager);
 		final long remainingEmployeeWtr = absenceRequestService.countRemainingEmployeeWtr(manager);
@@ -95,7 +83,7 @@ public class ReportController {
 				.body(Map.of("message", "Ce service n'existe pas."));
 		}
 
-		final List<EmployerWtr> employees = employerWtrService.findApprovedByYear(year);
+		final List<EmployerWtr> employees = employerWtrService.findByYear(year);
 
 		final List<AbsenceRequest> absenceRequests = absenceRequestService.findByMonthYearAndService(month, year, service);
 
