@@ -130,7 +130,7 @@ public class ReportController {
 					.body(Map.of("message", "Ce service n'existe pas."));
 		}
 
-		List<User> managerEmployees = userService.findEmployeesManagedByManager(manager.getId());
+		List<Long> managerEmployees = userService.findEmployeesManagedByManager(manager.getId());
 
 		List<AbsenceRequest> absenceRequests = absenceRequestService.findApprovedByMonthYearAndServiceAndEmployees(month, year, service, managerEmployees);
 

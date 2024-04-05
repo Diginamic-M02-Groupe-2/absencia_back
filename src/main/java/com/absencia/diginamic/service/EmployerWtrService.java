@@ -1,12 +1,10 @@
 package com.absencia.diginamic.service;
 
 import com.absencia.diginamic.entity.EmployerWtr;
-import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.repository.EmployerWtrRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -78,13 +76,10 @@ public class EmployerWtrService {
 
 	/**
 	 * @param year The year to build the date object
-	 * @param employees The List of the employees to get the data from
+	 * @param employeeIds The List of ids of the employees to get the data from
 	 * @return
 	 */
-	public List<EmployerWtr> findApprovedByYearAndEmployees(int year, List<User> employees) {
-		List<Long> employeeIds = employees.stream()
-				.map(User::getId)
-				.collect(Collectors.toList());
+	public List<EmployerWtr> findApprovedByYearAndEmployees(int year, List<Long> employeeIds) {
 		return employerWtrRepository.findApprovedByYearAndEmployees(year, employeeIds);
 	}
 }

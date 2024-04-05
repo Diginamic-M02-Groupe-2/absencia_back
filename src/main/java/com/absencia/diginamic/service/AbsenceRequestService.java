@@ -7,7 +7,6 @@ import com.absencia.diginamic.repository.AbsenceRequestRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -114,13 +113,10 @@ public class AbsenceRequestService {
 	 * @param month The month to build the date object
 	 * @param year The year to build the date object
 	 * @param service The service to filter the absence requests from
-	 * @param employees The List of the employees to get the data from
+	 * @param employeeIds The List of ids of the employees to get the data from
 	 * @return
 	 */
-	public List<AbsenceRequest> findApprovedByMonthYearAndServiceAndEmployees(int month, int year, com.absencia.diginamic.entity.User.Service service, List<User> employees) {
-		List<Long> employeeIds = employees.stream()
-				.map(User::getId)
-				.collect(Collectors.toList());
+	public List<AbsenceRequest> findApprovedByMonthYearAndServiceAndEmployees(int month, int year, com.absencia.diginamic.entity.User.Service service, List<Long> employeeIds) {
 		return absenceRequestRepository.findApprovedByMonthYearAndServiceAndEmployees(month, year, service, employeeIds);
 	}
 }

@@ -51,7 +51,7 @@ public class UserService implements UserDetailsService {
 	/**
 	 * @param managerId The ID of manager
 	 */
-	public List<User> findEmployeesManagedByManager(long managerId) {
+	public List<Long> findEmployeesManagedByManager(long managerId) {
 		return userRepository.findByManagerId(managerId);
 	}
 }
