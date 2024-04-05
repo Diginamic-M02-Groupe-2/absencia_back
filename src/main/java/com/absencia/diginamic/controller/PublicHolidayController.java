@@ -6,6 +6,11 @@ import com.absencia.diginamic.service.PublicHolidayService;
 
 import jakarta.validation.Valid;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/api/public-holidays")
@@ -37,12 +44,12 @@ public class PublicHolidayController {
 		final PublicHoliday publicHoliday = publicHolidayService.findOneById(id);
 
 		if (publicHoliday == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Ce jour férié n'existe pas."));
+			return ResponseEntity.badRequest().body(Map.of("worked", "Ce jour férié n'existe pas."));
 		}
 
 		// Vérification de la date dans le passé
 		if (publicHoliday.getDate().isBefore(LocalDate.now())) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Ce jour férié est déjà passé."));
+			return ResponseEntity.badRequest().body(Map.of("worked", "Ce jour férié est déjà passé."));
 		}
 
 		// Mise à jour du statut du jour férié
@@ -51,5 +58,41 @@ public class PublicHolidayController {
 		publicHolidayService.save(publicHoliday);
 
 		return ResponseEntity.ok(Map.of("message", "Le jour férié a été modifié."));
+	}
+
+	@PostMapping("/reloadData")
+	@Secured("ADMINISTRATOR")
+	public ResponseEntity<Map<String, String>> reloadPublicHoliday() {
+		try {
+
+			HttpClient client = HttpClient.newHttpClient();
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(URI.create("https://calendrier.api.gouv.fr/jours-feries/metropole.json"))
+					.build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+			if (response.statusCode() == 200) {
+
+				JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
+
+				publicHolidayService.clearTable();
+
+				for (String date : jsonObject.keySet()) {
+					String label = jsonObject.get(date).getAsString();
+					PublicHoliday publicHoliday = new PublicHoliday();
+					publicHoliday.setWorked(false);
+					publicHoliday.setDate(LocalDate.parse(date));
+					publicHoliday.setLabel(label);
+					publicHolidayService.save(publicHoliday);
+				}
+
+				return ResponseEntity.ok(Map.of("message", "Les jours fériés ont été mis à jour avec succès."));
+			} else {
+				return ResponseEntity.badRequest().body(Map.of("message", "Échec de la récupération des jours fériés depuis l'API."));
+			}
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().body(Map.of("message", "Une erreur s'est produite lors de la récupération des jours fériés depuis l'API."));
+		}
 	}
 }

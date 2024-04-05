@@ -21,7 +21,6 @@ public class PublicHoliday {
 	@Column(length=255)
 	private String label;
 
-	@JsonIgnore
 	private boolean worked;
 
 	public PublicHoliday() {
