@@ -48,79 +48,10 @@ public class ReportController {
 
 		return ResponseEntity.ok(response);
 	}
-
+	
 	@GetMapping("/planning")
-	public ResponseEntity<?> getPlanningReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId) {
-		// Récupérer l'objet Service correspondant à partir de l'ID du service
-		final Service service = Service.values()[serviceId];
-
-		// Verify that the service exists
-		if (service == null) {
-			return ResponseEntity
-				.badRequest()
-				.body(Map.of("message", "Ce service n'existe pas."));
-		}
-
-		// Récupérer les demandes d'absence de tous les employés pour le mois, l'année et le service sélectionnés
-		final List<EmployerWtr> employees = employerWtrService.findApprovedByYear(year);
-
-		// Créer une liste pour stocker les données du planning
-		final List<Map<String, Object>> planning = new ArrayList<>();
-
-		final List<AbsenceRequest> absenceRequests = absenceRequestService.findByMonthYearAndService(month, year, service);
-
-		// Récupérer les jours fériés du mois
-		final List<PublicHoliday> publicHolidays = publicHolidayService.findByMonthAndYear(month, year);
-
-		// Itérer sur chaque employé pour construire son jeu de données pour le planning
-		for (EmployerWtr employee : employees) {
-			Map<String, Object> employeeData = new HashMap<>();
-			User user = userService.find(employee.getId());
-			employeeData.put("id", user.getId());
-			employeeData.put("firstName", user.getFirstName());
-			employeeData.put("lastName", user.getLastName());
-
-			List<Integer> dataSet = new ArrayList<>();
-
-			// Construire le jeu de données de l'employé pour chaque jour du mois
-			for (int day = 1; day <= dateService.getDaysInMonth(month, year); day++) {
-				// Vérifier si le jour est un jour férié
-				int finalDay = day;
-				boolean isHoliday = publicHolidays.stream().anyMatch(holiday -> holiday.getDate().getDayOfMonth() == finalDay);
-				if (isHoliday) {
-					// Si c'est un jour férié, marquer comme tel dans le jeu de données
-					dataSet.add(0);
-				} else {
-					// Sinon, vérifier s'il y a une demande d'absence pour cet employé ce jour-là
-					boolean hasAbsence = absenceRequests.stream().anyMatch(request ->
-							request.getUser().getId() == employee.getId() &&
-									request.getStartedAt().getDayOfMonth() <= finalDay &&
-									request.getEndedAt().getDayOfMonth() >= finalDay);
-					if (hasAbsence) {
-						// Si une demande d'absence est présente, marquer comme tel dans le jeu de données
-						dataSet.add(0);
-					} else {
-						// Sinon, marquer comme jour de travail normal
-						dataSet.add(1);
-					}
-				}
-			}
-
-			employeeData.put("dataset", dataSet);
-			planning.add(employeeData);
-		}
-
-		// Créer la réponse JSON
-		Map<String, Object> response = new HashMap<>();
-		response.put("employees", planning);
-		response.put("publicHolidays", publicHolidays);
-
-		return ResponseEntity.ok(response);
-	}
-
-	@GetMapping("/table")
 	@Secured("MANAGER")
-	public ResponseEntity<?> getTableReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId, final Authentication authentication) {
+	public ResponseEntity<?> getPlanningReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId, final Authentication authentication) {
 		final User manager = userService.loadUserByUsername(authentication.getName());
 		final Service service = Service.values()[serviceId];
 
@@ -139,11 +70,14 @@ public class ReportController {
 		final long remainingPaidLeaves = absenceRequestService.countRemainingPaidLeaves(manager);
 		final long remainingEmployeeWtr = absenceRequestService.countRemainingEmployeeWtr(manager);
 
+		final List<PublicHoliday> publicHolidays = publicHolidayService.findByMonthAndYear(month, year);
+
 		Map<String, Object> responseData = new HashMap<>();
 		responseData.put("absenceRequests", absenceRequests);
 		responseData.put("employerWtr", approvedEmployerWtr);
 		responseData.put("remainingPaidLeaves", remainingPaidLeaves);
 		responseData.put("remainingEmployeeWtr", remainingEmployeeWtr);
+		responseData.put("publicHolidays", publicHolidays);
 
 		return ResponseEntity.ok(responseData);
 	}
