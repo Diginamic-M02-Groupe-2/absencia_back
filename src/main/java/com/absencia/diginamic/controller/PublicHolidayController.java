@@ -60,7 +60,7 @@ public class PublicHolidayController {
 		return ResponseEntity.ok(Map.of("message", "Le jour férié a été modifié."));
 	}
 
-	@PostMapping("/reloadData")
+	@PostMapping("/reload")
 	@Secured("ADMINISTRATOR")
 	public ResponseEntity<Map<String, String>> reloadPublicHoliday() {
 		try {
