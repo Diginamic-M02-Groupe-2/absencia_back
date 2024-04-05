@@ -74,8 +74,8 @@ public interface AbsenceRequestRepository extends JpaRepository<AbsenceRequest, 
 
 	@Query("""
     SELECT ar FROM AbsenceRequest ar 
-    WHERE ar.user.service = :service AND FUNCTION('YEAR', ar.startedAt) = :year
-    AND FUNCTION('MONTH', ar.startedAt) = :month AND ar.status = AbsenceRequestStatus.APPROVED
+    WHERE ar.user.service = :service AND YEAR(ar.startedAt) = :year
+    AND MONTH(ar.startedAt) = :month AND ar.status = AbsenceRequestStatus.APPROVED
     AND ar.user.id IN :employeeIds
 	""")
 	List<AbsenceRequest> findApprovedByMonthYearAndServiceAndEmployees(int month, int year, Service service, List<Long> employeeIds);
