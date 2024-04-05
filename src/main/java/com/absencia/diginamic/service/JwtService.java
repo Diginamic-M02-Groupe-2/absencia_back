@@ -18,6 +18,9 @@ public class JwtService {
 		this.jwtConfiguration = jwtConfiguration;
 	}
 
+	/**
+	 * @param userDetails The user details to get the username from
+	 */
 	public String buildJwt(final UserDetails userDetails) {
 		final Date issuedAt = new Date();
 		final Date expiration = new Date(issuedAt.getTime() + jwtConfiguration.getExpiration() * 1000);
@@ -31,6 +34,9 @@ public class JwtService {
 			.compact();
 	}
 
+	/**
+	 * @param jwt The JWT to parse
+	 */
 	public Claims parseClaims(final String jwt) {
 		return Jwts
 			.parser()

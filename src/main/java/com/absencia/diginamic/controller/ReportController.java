@@ -54,13 +54,12 @@ public class ReportController {
 	}
 
 	@GetMapping("/planning")
-	public ResponseEntity<?> getPlanningReport(@RequestParam final int month, @RequestParam final int year, @RequestParam final int service) {
-
+	public ResponseEntity<?> getPlanningReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId) {
 		// Récupérer l'objet Service correspondant à partir de l'ID du service
-		Service currentService = absenceRequestService.getServiceById(service);
+		final Service service = Service.values()[serviceId];
 
 		// Vérifiez si le service existe avant de continuer
-		if (currentService == null) {
+		if (service == null) {
 			return ResponseEntity.badRequest().body(Map.of("message", "Ce service n'existe pas."));
 		}
 
@@ -70,7 +69,7 @@ public class ReportController {
 		// Créer une liste pour stocker les données du planning
 		final List<Map<String, Object>> planning = new ArrayList<>();
 
-		final List<AbsenceRequest> absenceRequests = absenceRequestService.findByMonthYearAndService(month, year, currentService);
+		final List<AbsenceRequest> absenceRequests = absenceRequestService.findByMonthYearAndService(month, year, service);
 
 		// Récupérer les jours fériés du mois
 		final List<PublicHoliday> publicHolidays = publicHolidayService.findByMonthAndYear(month, year);
@@ -123,17 +122,16 @@ public class ReportController {
 
 	@GetMapping("/histogram")
 	@Secured("MANAGER")
-	public ResponseEntity<?> getHistogramReport(@RequestParam final int month, @RequestParam final int year, @RequestParam final int service) {
+	public ResponseEntity<?> getHistogramReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId) {
+		final Service service = Service.values()[serviceId];
 
-		Service currentService = absenceRequestService.getServiceById(service);
-
-		if (currentService == null) {
+		if (service == null) {
 			return ResponseEntity.badRequest().body(Map.of("message", "Ce service n'existe pas."));
 		}
 
 		final List<EmployerWtr> employees = employerWtrService.findByYear(year);
 
-		final List<AbsenceRequest> absenceRequests = absenceRequestService.findByMonthYearAndService(month, year, currentService);
+		final List<AbsenceRequest> absenceRequests = absenceRequestService.findByMonthYearAndService(month, year, service);
 
 		final List<Map<String, Object>> histogramData = new ArrayList<>();
 

@@ -20,6 +20,9 @@ public class AuthenticationService {
 		this.userService = userService;
 	}
 
+	/**
+	 * @param model The user identifiers (email and password)
+	 */
 	public String authenticate(final PostLoginModel model) throws AuthenticationException {
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(model.getEmail(), model.getPassword()));
 

@@ -22,20 +22,32 @@ public class AbsenceRequestService {
 		this.absenceRequestRepository = absenceRequestRepository;
 	}
 
+	/**
+	 * @param absenceRequest The absence request to save
+	 */
 	public void save(@NonNull final AbsenceRequest absenceRequest) {
 		absenceRequestRepository.save(absenceRequest);
 	}
 
+	/**
+	 * @param absenceRequest The absence request to delete
+	 */
 	public void delete(final AbsenceRequest absenceRequest) {
 		absenceRequest.setDeletedAt(LocalDate.now());
 
 		save(absenceRequest);
 	}
 
+	/**
+	 * @param user The ID of the absence request to get
+	 */
 	public AbsenceRequest find(final long id) {
 		return absenceRequestRepository.findOneByIdAndDeletedAtIsNull(id);
 	}
 
+	/**
+	 * @param user The user to get the absence requests from
+	 */
 	public List<AbsenceRequest> findByUser(final User user) {
 		return absenceRequestRepository.findByUserAndDeletedAtIsNull(user);
 	}
@@ -44,18 +56,27 @@ public class AbsenceRequestService {
 		return absenceRequestRepository.findInitial();
 	}
 
+	/**
+	 * @param user The user to count the remaining paid leave days from
+	 */
 	public long countRemainingPaidLeaves(final User user) {
 		final long sum = absenceRequestRepository.sumApprovedDays(user.getId(), AbsenceType.PAID_LEAVE);
 
 		return MAX_PAID_LEAVES - sum;
 	}
 
+	/**
+	 * @param user The user to count the remaining employee WTR days from
+	 */
 	public long countRemainingEmployeeWtr(final User user) {
 		final long sum = absenceRequestRepository.sumApprovedDays(user.getId(), AbsenceType.EMPLOYEE_WTR);
 
 		return MAX_EMPLOYEE_WTR - sum;
 	}
 
+	/**
+	 * @param absenceRequest The absence request to check for overlaps with others
+	 */
 	public boolean isOverlapping(final AbsenceRequest absenceRequest) {
 		final boolean isOverlapping = absenceRequestRepository.isOverlapping(
 			absenceRequest.getId(), // Ignore this absence request
@@ -67,23 +88,24 @@ public class AbsenceRequestService {
 		return isOverlapping;
 	}
 
-	public List<AbsenceRequest> findByMonthYearAndService(int month, int year, com.absencia.diginamic.entity.User.Service service) {
+	/**
+	 * @param month The month to filter the absence requests from
+	 * @param year The year to filter the absence requests from
+	 * @param service The service to filter the absence requests from
+	 */
+	public List<AbsenceRequest> findByMonthYearAndService(final int month, final int year, final com.absencia.diginamic.entity.User.Service service) {
 		return absenceRequestRepository.findByMonthYearAndService(month, year, service);
 	}
 
-	public com.absencia.diginamic.entity.User.Service getServiceById(int serviceId) {
-		for (com.absencia.diginamic.entity.User.Service service : com.absencia.diginamic.entity.User.Service.values()) {
-			if (service.value == serviceId) {
-				return service;
-			}
-		}
-		return null;
-	}
+	/**
+	 * @param employeeId The ID of the employee to get the data from
+	 * @param year The year to build the date object
+	 * @param month The month to build the date object
+	 * @param day The day to build the date object
+	 */
+	public int getDataForDay(final Long employeeId, final int year, final int month, final int day) {
+		final LocalDate date = LocalDate.of(year, month, day);
 
-	public int getDataForDay(Long employeeId, int year, int month, int day) {
-		LocalDate date = LocalDate.of(year, month, day);
-		int dataForDay = absenceRequestRepository.getDataForDayForEmployee(employeeId, date);
-		return dataForDay;
+		return absenceRequestRepository.getDataForDayForEmployee(employeeId, date);
 	}
-
 }

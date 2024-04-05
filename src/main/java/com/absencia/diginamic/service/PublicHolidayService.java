@@ -17,28 +17,43 @@ public class PublicHolidayService {
 		this.publicHolidayRepository = publicHolidayRepository;
 	}
 
-	public PublicHoliday findOneById(final long id) {
-		return publicHolidayRepository.findOneById(id);
-	}
-
+	/**
+	 * @param publicHoliday The public holiday to delete
+	 */
 	public void save(@NonNull final PublicHoliday publicHoliday) {
 		publicHolidayRepository.save(publicHoliday);
 	}
 
+	/**
+	 * @param id The ID of the public holiday to get
+	 */
+	public PublicHoliday findOneById(final long id) {
+		return publicHolidayRepository.findOneById(id);
+	}
+
+	/**
+	 * @param year The year to filter the public holidays by
+	 */
 	public List<PublicHoliday> findByYear(final int year) {
 		return publicHolidayRepository.findByYear(year);
 	}
 
-	public boolean isDateConflicting(LocalDate date) {
+	/**
+	 * @param date The date to check for conflicting public holidays
+	 */
+	public boolean isDateConflicting(final LocalDate date) {
 		return publicHolidayRepository.existsByDate(date);
 	}
 
-	public List<PublicHoliday> findByMonthAndYear(int month, int year) {
+	/**
+	 * @param month The month to filter the public holidays by
+	 * @param year The year to filter the public holidays by
+	 */
+	public List<PublicHoliday> findByMonthAndYear(final int month, final int year) {
 		return publicHolidayRepository.findByMonthAndYear(month, year);
 	}
 
-	public void clearTable(){
+	public void clearTable() {
 		publicHolidayRepository.clearTable();
 	}
-
 }

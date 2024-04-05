@@ -19,20 +19,32 @@ public class EmployerWtrService {
 		this.employerWtrRepository = employerWtrRepository;
 	}
 
+	/**
+	 * @param id The ID of the employer WTR to get
+	 */
 	public EmployerWtr findOneByIdAndDeletedAtIsNull(final long id) {
 		return employerWtrRepository.findOneByIdAndDeletedAtIsNull(id);
 	}
 
+	/**
+	 * @param employerWtr The employer WTR to save
+	 */
 	public void save(@NonNull final EmployerWtr employerWtr) {
 		employerWtrRepository.save(employerWtr);
 	}
 
+	/**
+	 * @param employerWtr The employer WTR to delete
+	 */
 	public void delete(final EmployerWtr employerWtr) {
 		employerWtr.setDeletedAt(LocalDate.now());
 
 		save(employerWtr);
 	}
 
+	/**
+	 * @param year The year to filter the employer WTR by
+	 */
 	public List<EmployerWtr> findByYear(final int year) {
 		return employerWtrRepository.findByYear(year);
 	}
@@ -47,10 +59,17 @@ public class EmployerWtrService {
 		return MAX_EMPLOYER_WTR - count;
 	}
 
+	/**
+	 * @param date The date to check for conflicting employer WTR
+	 */
 	public boolean isDateConflicting(final LocalDate date) {
 		return employerWtrRepository.existsByDate(date);
 	}
 
+	/**
+	 * @param id The ID of the employer WTR to check date conflict with
+	 * @param date The date to check for conflicting employer WTR
+	 */
 	public boolean isDateConflictingWithOther(final Long id, final LocalDate date) {
 		return employerWtrRepository.isDateConflictingWithOther(id, date);
 	}
