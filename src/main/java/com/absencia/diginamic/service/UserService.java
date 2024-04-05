@@ -3,6 +3,8 @@ package com.absencia.diginamic.service;
 import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.repository.UserRepository;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Primary;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,5 +46,12 @@ public class UserService implements UserDetailsService {
 	 */
 	public User find(final long id) {
 		return userRepository.findOneById(id);
+	}
+
+	/**
+	 * @param managerId The ID of manager
+	 */
+	public List<Long> findEmployeesManagedByManager(final long managerId) {
+		return userRepository.findByManagerId(managerId);
 	}
 }
