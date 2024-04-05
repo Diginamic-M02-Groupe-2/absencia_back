@@ -2,10 +2,11 @@ package com.absencia.diginamic.repository;
 
 import com.absencia.diginamic.entity.PublicHoliday;
 
+import jakarta.transaction.Transactional;
+
 import java.time.LocalDate;
 import java.util.List;
 
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Repository;
 public interface PublicHolidayRepository extends JpaRepository<PublicHoliday, Long> {
 	PublicHoliday findOneById(final long id);
 
-	boolean existsByDate(LocalDate date);
+	boolean existsByDate(final LocalDate date);
 
 	@Query("""
 		SELECT ph
@@ -34,6 +35,6 @@ public interface PublicHolidayRepository extends JpaRepository<PublicHoliday, Lo
 
 	@Modifying
 	@Transactional
-	@Query(value = "TRUNCATE TABLE public_holiday", nativeQuery = true)
+	@Query(value="TRUNCATE TABLE public_holiday", nativeQuery=true)
 	void clearTable();
 }

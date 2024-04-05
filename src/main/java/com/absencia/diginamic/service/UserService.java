@@ -18,6 +18,9 @@ public class UserService implements UserDetailsService {
 		this.userRepository = userRepository;
 	}
 
+	/**
+	 * @param username The username to load the user by
+	 */
 	@Override
 	public User loadUserByUsername(final String username) throws UsernameNotFoundException {
 		final User user = userRepository.findOneByEmail(username);
@@ -29,10 +32,16 @@ public class UserService implements UserDetailsService {
 		return user;
 	}
 
+	/**
+	 * @param user The user to save
+	 */
 	public void save(@NonNull final User user) {
 		userRepository.save(user);
 	}
 
+	/**
+	 * @param id The ID of the user to get
+	 */
 	public User find(final long id) {
 		return userRepository.findOneById(id);
 	}

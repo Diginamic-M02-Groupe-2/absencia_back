@@ -1,12 +1,10 @@
-package com.absencia.diginamic.task;
+package com.absencia.diginamic.service;
 
 import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.AbsenceRequestStatus;
 import com.absencia.diginamic.entity.AbsenceType;
 import com.absencia.diginamic.entity.EmployerWtr;
 import com.absencia.diginamic.entity.EmployerWtrStatus;
-import com.absencia.diginamic.service.AbsenceRequestService;
-import com.absencia.diginamic.service.EmployerWtrService;
 
 import java.time.Period;
 import java.util.List;
@@ -14,16 +12,16 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-public class NightTask {
-	private static final Logger logger = LoggerFactory.getLogger(NightTask.class);
+@Service
+public class NightTaskService {
+	private static final Logger logger = LoggerFactory.getLogger(NightTaskService.class);
 
 	private final AbsenceRequestService absenceRequestService;
 	private final EmployerWtrService employerWtrService;
 
-	public NightTask(final AbsenceRequestService absenceRequestService, final EmployerWtrService employerWtrService) {
+	public NightTaskService(final AbsenceRequestService absenceRequestService, final EmployerWtrService employerWtrService) {
 		this.absenceRequestService = absenceRequestService;
 		this.employerWtrService = employerWtrService;
 	}

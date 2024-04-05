@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 public interface EmployerWtrRepository extends JpaRepository<EmployerWtr, Long> {
 	EmployerWtr findOneByIdAndDeletedAtIsNull(final Long id);
 
-	boolean existsByDate(LocalDate date);
+	boolean existsByDate(final LocalDate date);
 
 	@Query("""
 		SELECT ew
@@ -47,5 +47,5 @@ public interface EmployerWtrRepository extends JpaRepository<EmployerWtr, Long> 
 		AND ew.date = :date
 		AND ew.deletedAt IS NULL
 	""")
-	boolean isDateConflictingWithOther(final Long id, LocalDate date);
+	boolean isDateConflictingWithOther(final Long id, final LocalDate date);
 }

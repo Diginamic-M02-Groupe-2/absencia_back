@@ -1,15 +1,15 @@
 package com.absencia.diginamic;
 
-import com.absencia.diginamic.task.NightTask;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
+import com.absencia.diginamic.service.NightTaskService;
+
 @SpringBootTest
 class ApplicationTests {
 	@SpyBean
-	private NightTask nightTask;
+	private NightTaskService nightTask;
 
 	@Test
 	void testNightTask() {
