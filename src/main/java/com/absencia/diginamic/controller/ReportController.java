@@ -38,8 +38,26 @@ public class ReportController {
 	}
 
 	@GetMapping("/planning")
+	public ResponseEntity<?> getPlanningReport(final Authentication authentication, @RequestParam final int month, @RequestParam final int year) {
+		final User user = userService.loadUserByUsername(authentication.getName());
+		final List<AbsenceRequest> absenceRequests = absenceRequestService.findApprovedByMonthYearAndServiceAndEmployees(month, year, user.getService(), List.of(user.getId()));
+		final List<EmployerWtr> employerWtr = employerWtrService.findByYear(year);
+		final List<PublicHoliday> publicHolidays = publicHolidayService.findByMonthAndYear(month, year);
+		final long remainingPaidLeaves = absenceRequestService.countRemainingPaidLeaves(user);
+		final long remainingEmployeeWtr = absenceRequestService.countRemainingEmployeeWtr(user);
+
+		return ResponseEntity.ok(Map.of(
+			"absenceRequests", absenceRequests,
+			"employerWtr", employerWtr,
+			"publicHolidays", publicHolidays,
+			"remainingPaidLeaves", remainingPaidLeaves,
+			"remainingEmployeeWtr", remainingEmployeeWtr
+		));
+	}
+
+	@GetMapping("/table")
 	@Secured("MANAGER")
-	public ResponseEntity<?> getPlanningReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId, final Authentication authentication) {
+	public ResponseEntity<?> getTableReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId, final Authentication authentication) {
 		final User manager = userService.loadUserByUsername(authentication.getName());
 		final Service service = Service.values()[serviceId];
 
@@ -69,7 +87,6 @@ public class ReportController {
 
 		return ResponseEntity.ok(responseData);
 	}
-
 
 	@GetMapping("/histogram")
 	@Secured("MANAGER")
