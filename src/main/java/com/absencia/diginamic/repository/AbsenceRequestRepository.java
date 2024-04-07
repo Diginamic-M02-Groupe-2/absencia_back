@@ -57,27 +57,29 @@ public interface AbsenceRequestRepository extends JpaRepository<AbsenceRequest, 
 		SELECT ar
 		FROM AbsenceRequest ar
 		JOIN ar.user u
-		WHERE FUNCTION('YEAR', ar.startedAt) = :year
+		WHERE ar.deletedAt IS NULL
+		AND FUNCTION('YEAR', ar.startedAt) = :year
 		AND FUNCTION('MONTH', ar.startedAt) = :month
 		AND u.service = :service
-		AND ar.deletedAt IS NULL
 	""")
 	List<AbsenceRequest> findByMonthYearAndService(final int month, final int year, final Service service);
 
 	@Query("""
 		SELECT COUNT(ar) FROM AbsenceRequest ar
-		WHERE ar.user.id = :employeeId
+		WHERE ar.deletedAt IS NULL
+		AND ar.user.id = :employeeId
 		AND :date BETWEEN ar.startedAt AND ar.endedAt
-		AND ar.deletedAt IS NULL
 	""")
 	int getDataForDayForEmployee(final Long employeeId, final LocalDate date);
 
 	@Query("""
-    SELECT ar FROM AbsenceRequest ar 
-    WHERE ar.user.service = :service AND YEAR(ar.startedAt) = :year
-    AND MONTH(ar.startedAt) = :month AND ar.status = AbsenceRequestStatus.APPROVED
-    AND ar.user.id IN :employeeIds
+		SELECT ar FROM AbsenceRequest ar 
+		WHERE ar.deletedAt IS NULL
+		AND ar.user.service = :service
+		AND YEAR(ar.startedAt) = :year
+		AND MONTH(ar.startedAt) = :month
+		AND ar.status = AbsenceRequestStatus.APPROVED
+		AND ar.user.id IN :employeeIds
 	""")
 	List<AbsenceRequest> findApprovedByMonthYearAndServiceAndEmployees(int month, int year, Service service, List<Long> employeeIds);
-
 }

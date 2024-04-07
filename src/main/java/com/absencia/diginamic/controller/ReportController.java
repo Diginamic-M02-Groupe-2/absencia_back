@@ -37,7 +37,7 @@ public class ReportController {
 	}
 
 	@GetMapping("/planning")
-	public ResponseEntity<?> getPlanningReport(final Authentication authentication, @RequestParam final int month, @RequestParam final int year) {
+	public ResponseEntity<Map<String, Object>> getPlanningReport(final Authentication authentication, @RequestParam final int month, @RequestParam final int year) {
 		final User user = userService.loadUserByUsername(authentication.getName());
 		final List<AbsenceRequest> absenceRequests = absenceRequestService.findApprovedByMonthYearAndServiceAndEmployees(month, year, user.getService(), List.of(user.getId()));
 		final List<EmployerWtr> employerWtr = employerWtrService.findByYear(year);
@@ -56,7 +56,46 @@ public class ReportController {
 
 	@GetMapping("/table")
 	@Secured("MANAGER")
-	public ResponseEntity<?> getTableReport(final Authentication authentication, @RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId) {
+	public ResponseEntity<Map<String, Object>> getTableReport(final Authentication authentication, @RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId) {
+		final Service service = Service.values()[serviceId];
+
+		// Verify that the service exists
+		if (service == null) {
+			return ResponseEntity
+				.badRequest()
+				.body(Map.of("message", "Ce service n'existe pas."));
+		}
+
+		final Manager manager = (Manager) userService.loadUserByUsername(authentication.getName());
+		final List<Employee> employees = manager.getEmployees();
+		final List<EmployerWtr> employerWtr = employerWtrService.findByYear(year);
+		final List<PublicHoliday> publicHolidays = publicHolidayService.findByMonthAndYear(month, year);
+		final List<Map<String, Object>> table = employees
+			.stream()
+			.filter(employee -> employee.getService() == service)
+			.map(employee -> Map.of(
+				"id", employee.getId(),
+				"firstName", employee.getFirstName(),
+				"lastName", employee.getLastName(),
+				"absenceRequests", absenceRequestService.findApprovedByMonthYearAndServiceAndEmployees(
+					month,
+					year,
+					service,
+					List.of(employee.getId())
+				)
+			))
+			.toList();
+
+		return ResponseEntity.ok(Map.of(
+			"table", table,
+			"employerWtr", employerWtr,
+			"publicHolidays", publicHolidays
+		));
+	}
+
+	@GetMapping("/histogram")
+	@Secured("MANAGER")
+	public ResponseEntity<?> getHistogramReport(final Authentication authentication, @RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId) {
 		final Service service = Service.values()[serviceId];
 
 		// Verify that the service exists
@@ -74,39 +113,15 @@ public class ReportController {
 			service,
 			employees
 				.stream()
+				.filter(employee -> employee.getService() == service)
 				.map(Employee::getId)
 				.toList()
 		);
-		final List<EmployerWtr> employerWtr = employerWtrService.findByYear(year);
-		final List<PublicHoliday> publicHolidays = publicHolidayService.findByMonthAndYear(month, year);
-
-		return ResponseEntity.ok(Map.of(
-			"absenceRequests", absenceRequests,
-			"employerWtr", employerWtr,
-			"publicHolidays", publicHolidays
-		));
-	}
-
-	@GetMapping("/histogram")
-	@Secured("MANAGER")
-	public ResponseEntity<?> getHistogramReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId) {
-		final Service service = Service.values()[serviceId];
-
-		// Verify that the service exists
-		if (service == null) {
-			return ResponseEntity
-				.badRequest()
-				.body(Map.of("message", "Ce service n'existe pas."));
-		}
-
-		final List<EmployerWtr> employees = employerWtrService.findByYear(year);
-
-		final List<AbsenceRequest> absenceRequests = absenceRequestService.findByMonthYearAndService(month, year, service);
-
+		final List<EmployerWtr> employerWtrList = employerWtrService.findByYear(year);
 		final List<Map<String, Object>> histogramData = new ArrayList<>();
 
 		// Itérer sur chaque employé pour construire les données de l'histogramme
-		for (EmployerWtr employee : employees) {
+		for (EmployerWtr employee : employerWtrList) {
 			Map<String, Object> employeeData = new HashMap<>();
 			User user = userService.find(employee.getId());
 			employeeData.put("id", user.getId());
