@@ -8,6 +8,8 @@ import java.util.List;
 import com.absencia.diginamic.entity.AbsenceRequest;
 import com.absencia.diginamic.entity.EmployerWtr;
 import com.absencia.diginamic.entity.PublicHoliday;
+import com.absencia.diginamic.entity.User.Employee;
+import com.absencia.diginamic.entity.User.Manager;
 import com.absencia.diginamic.entity.User.Service;
 import com.absencia.diginamic.entity.User.User;
 import com.absencia.diginamic.service.*;
@@ -15,10 +17,7 @@ import com.absencia.diginamic.service.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -57,35 +56,35 @@ public class ReportController {
 
 	@GetMapping("/table")
 	@Secured("MANAGER")
-	public ResponseEntity<?> getTableReport(@RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId, final Authentication authentication) {
-		final User manager = userService.loadUserByUsername(authentication.getName());
+	public ResponseEntity<?> getTableReport(final Authentication authentication, @RequestParam final int month, @RequestParam final int year, @RequestParam("service") final int serviceId) {
 		final Service service = Service.values()[serviceId];
 
+		// Verify that the service exists
 		if (service == null) {
 			return ResponseEntity
-					.badRequest()
-					.body(Map.of("message", "Ce service n'existe pas."));
+				.badRequest()
+				.body(Map.of("message", "Ce service n'existe pas."));
 		}
 
-		List<Long> managerEmployees = userService.findEmployeesManagedByManager(manager.getId());
-
-		List<AbsenceRequest> absenceRequests = absenceRequestService.findApprovedByMonthYearAndServiceAndEmployees(month, year, service, managerEmployees);
-
-		List<EmployerWtr> approvedEmployerWtr = employerWtrService.findByYear(year);
-
-		final long remainingPaidLeaves = absenceRequestService.countRemainingPaidLeaves(manager);
-		final long remainingEmployeeWtr = absenceRequestService.countRemainingEmployeeWtr(manager);
-
+		final Manager manager = (Manager) userService.loadUserByUsername(authentication.getName());
+		final List<Employee> employees = manager.getEmployees();
+		final List<AbsenceRequest> absenceRequests = absenceRequestService.findApprovedByMonthYearAndServiceAndEmployees(
+			month,
+			year,
+			service,
+			employees
+				.stream()
+				.map(Employee::getId)
+				.toList()
+		);
+		final List<EmployerWtr> employerWtr = employerWtrService.findByYear(year);
 		final List<PublicHoliday> publicHolidays = publicHolidayService.findByMonthAndYear(month, year);
 
-		Map<String, Object> responseData = new HashMap<>();
-		responseData.put("absenceRequests", absenceRequests);
-		responseData.put("employerWtr", approvedEmployerWtr);
-		responseData.put("remainingPaidLeaves", remainingPaidLeaves);
-		responseData.put("remainingEmployeeWtr", remainingEmployeeWtr);
-		responseData.put("publicHolidays", publicHolidays);
-
-		return ResponseEntity.ok(responseData);
+		return ResponseEntity.ok(Map.of(
+			"absenceRequests", absenceRequests,
+			"employerWtr", employerWtr,
+			"publicHolidays", publicHolidays
+		));
 	}
 
 	@GetMapping("/histogram")
