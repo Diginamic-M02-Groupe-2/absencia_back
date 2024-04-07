@@ -124,13 +124,13 @@ public class AbsenceRequestController {
 		if (employerWtrService.isDateConflicting(model.getStartedAt())) {
 			return ResponseEntity
 				.badRequest()
-				.body(Map.of("startedAt", "Cette date ne doit pas être une RTT employeur."));
+				.body(Map.of("startedAt", "Cette date est prise par une RTT employeur."));
 		}
 
 		if (employerWtrService.isDateConflicting(model.getEndedAt())) {
 			return ResponseEntity
 				.badRequest()
-				.body(Map.of("endedAt", "Cette date ne doit pas être une RTT employeur."));
+				.body(Map.of("endedAt", "Cette date est prise par une RTT employeur."));
 		}
 
 		// Verify that the reason is not null or empty when the absence type is UNPAID_LEAVE
@@ -230,13 +230,13 @@ public class AbsenceRequestController {
 		if (employerWtrService.isDateConflicting(model.getStartedAt())) {
 			return ResponseEntity
 				.badRequest()
-				.body(Map.of("startedAt", "Cette date ne doit pas être une RTT employeur."));
+				.body(Map.of("startedAt", "Cette date est prise par une RTT employeur."));
 		}
 
 		if (employerWtrService.isDateConflicting(model.getEndedAt())) {
 			return ResponseEntity
 				.badRequest()
-				.body(Map.of("endedAt", "Cette date ne doit pas être une RTT employeur."));
+				.body(Map.of("endedAt", "Cette date est prise par une RTT employeur."));
 		}
 
 		// Verify that reason is not null or empty when the absence type is UNPAID_LEAVE
