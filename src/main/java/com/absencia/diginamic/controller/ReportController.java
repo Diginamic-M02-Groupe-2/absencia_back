@@ -117,33 +117,35 @@ public class ReportController {
 				.map(Employee::getId)
 				.toList()
 		);
-		final List<EmployerWtr> employerWtrList = employerWtrService.findByYear(year);
 		final List<Map<String, Object>> histogramData = new ArrayList<>();
 
 		// Itérer sur chaque employé pour construire les données de l'histogramme
-		for (EmployerWtr employee : employerWtrList) {
-			Map<String, Object> employeeData = new HashMap<>();
-			User user = userService.find(employee.getId());
-			employeeData.put("id", user.getId());
-			employeeData.put("firstName", user.getFirstName());
-			employeeData.put("lastName", user.getLastName());
+		for (final Employee employee : employees) {
+			final Map<String, Object> employeeData = new HashMap<>();
+			final List<Integer> dataset = new ArrayList<>();
 
-			List<Integer> dataSet = new ArrayList<>();
+			employeeData.putAll(Map.of(
+				"id", employee.getId(),
+				"firstName", employee.getFirstName(),
+				"lastName", employee.getLastName()
+			));
 
 			// Itérer sur chaque jour du mois pour l'employé actuel
 			for (int day = 1; day <= dateService.getDaysInMonth(month, year); day++) {
 				final int finalDay = day;
-				long absenceCount = absenceRequests.stream()
-						.filter(request ->
-								request.getUser().getId() == employee.getId() &&
-										request.getStartedAt().getDayOfMonth() <= finalDay &&
-										request.getEndedAt().getDayOfMonth() >= finalDay)
-						.count();
+				final int absenceCount = (int) absenceRequests
+					.stream()
+					.filter(absenceRequest ->
+						absenceRequest.getUser().getId() == employee.getId() &&
+						absenceRequest.getStartedAt().getDayOfMonth() <= finalDay &&
+						absenceRequest.getEndedAt().getDayOfMonth() >= finalDay
+					)
+					.count();
 
-				dataSet.add((int) absenceCount);
+				dataset.add(absenceCount);
 			}
 
-			employeeData.put("dataset", dataSet);
+			employeeData.put("dataset", dataset);
 			histogramData.add(employeeData);
 		}
 
